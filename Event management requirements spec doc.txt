@@ -1,0 +1,293 @@
+Table of Contents
+1. Problem Statement
+2. Proposed Solution
+3. Applications to be Built
+4. User Roles
+5. Admin Role: Modules and Detailed Flow
+6. Customer Role: Modules and Detailed Flow
+7. Vendor Role: Modules and Detailed Flow
+8. Category and Subcategory Management
+9. Customer Request and Vendor Assignment Flow
+10. Status Flow
+11. Notifications
+12. Sample End-to-End Example
+13. Future Scope
+14. Conclusion
+
+1. Problem Statement
+The client wants to build a complete event management platform. The platform will help customers select event services and submit event requirements. It will also help vendors receive service requests. Admin will control the complete process.
+Today, event planning usually needs many phone calls, manual follow-ups, and separate discussions with different vendors. A customer may need photography, decoration, lighting, DJ, and food services for the same event. It is difficult for the customer to find the right vendors, compare services, and understand the estimated budget in one place.
+Vendors also need a proper system where they can register, share their service details, and receive suitable requests. Admin needs full control to manage categories, service items, customer requests, vendor selection, and final assignment.
+The main problem is to create one simple digital platform where customers, vendors, and admin can work together in a controlled and organized way.
+
+
+2. Proposed Solution
+The proposed solution is an event management ecosystem with one website, two Android applications, and one admin panel.
+Customers will use the customer app or website to view event service categories, select services, see an estimated budget, and submit the request. Vendors will use the vendor app or website to register, manage their profile, and respond to requests sent by admin. Admin will use the admin panel to manage all categories, subcategories, service items, pricing, images, vendors, customers, and requests.
+The customer-facing service list will be managed only by admin. This means customers will not create categories or service items. Customers can only select the options that admin has already uploaded.
+For vendor assignment, the request will not go automatically to all vendors. Admin will review the customer request, choose suitable vendors from the correct category, and send the request to those vendors. The vendor who accepts first will be notified to admin. Admin can then speak with that vendor and approve or move to the next vendor.
+
+
+
+3. Applications to be Built
+| Application          | Users                   | Purpose                                                                                                              |
+| -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Customer Android App | Customers               | Customers can register, browse services, select event requirements, see estimated budget, and submit requests.	|
+| Vendor Android App   | Vendors                 | Vendors can register, manage profile, receive requests from admin, and accept or reject requests.                    |
+| Website              | Customers & Vendors     | Website will support the same main actions as mobile apps. Customers and vendors can use it from browser.            |
+| Admin Panel          | Admin / Operations Team | Admin can manage all platform data, categories, vendors, customers, requests, vendor assignment, and booking status. |
+
+
+4. User Roles
+| Role         | Description                                                                                                                                                                |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Admin**    | Admin controls the platform. Admin creates service data, manages vendors, reviews customer requests, and assigns suitable vendors.					    |
+| **Customer** | Customer is the person who wants to plan an event and book services.										                            |
+| **Vendor**   | Vendor is the service provider such as photographer, decorator, lighting provider, DJ provider, or food/catering provider.					            |
+
+5. Admin Role: Modules and Detailed Flow
+Admin is the main control role in this platform. Admin will manage what customers can see, which vendors can receive requests, and how the customer request moves forward.
+
+| Module                  | What Admin Can Do                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard               | View total customers, vendors, requests, pending requests, accepted requests, and completed bookings.                                 |
+| Category Management     | Create and manage main service categories like Photography, Food, Lighting, Decoration, DJ, and Stage Setup.                          |
+| Subcategory Management  | Create subcategories under main categories. Example: Food has Veg and Non-Veg. Photography has Pre-Wedding and Wedding.               |
+| Service Item Management | Add service items under subcategories with name, image, description, price, and availability.                                         |
+| Media Management        | Upload images and videos for service items, decoration styles, lighting options, food items, and packages.                            |
+| Pricing Management      | Add price per item, package price, per plate price, or estimated price range.                                                         |
+| Vendor Management       | View vendor registrations, approve vendors, reject vendors, and map vendors to service categories.                                    |
+| Customer Management     | View customer details and customer request history.                                                                                   |
+| Request Management      | Review customer event requests and understand selected categories, location, date, and budget.                                        |
+| Vendor Assignment       | Select suitable vendors category-wise and send request to them.                                                                       |
+| Status Management       | Update request status such as Submitted, Under Review, Sent to Vendor, Vendor Accepted, Approved, Confirmed, Completed, or Cancelled. |
+| Notification Management | Send alerts to customers and vendors when status changes or action is needed.                                                         |
+
+
+5.2 Admin Flow: Manage Categories and Service Items
+1. Admin logs in to the admin panel.
+2. Admin opens Category Management.
+3. Admin creates a main category, for example Photography.
+4. Admin creates subcategories under Photography, for example Pre-Wedding Photography and Wedding Photography.
+5. Admin adds service items under the subcategory, for example Pre-Wedding Package 1 and Wedding Package 1.
+6. Admin uploads images, videos, description, and price for each item.
+7. Admin saves the data.
+8. The same data will now be visible to customers in the customer app and website.
+9. Customer can only select from this admin-created data.
+
+
+5.3 Admin Flow: Manage Vendors
+1. Vendor registers from the vendor app or website.
+2. Admin receives the new vendor registration in the admin panel.
+3. Admin checks vendor details such as name, phone number, business name, service category, location, and documents if needed.
+4. Admin checks which services the vendor can provide. One vendor can provide one or many services.
+5. Admin approves the vendor if details are correct.
+6. If details are not correct, admin can reject the vendor or ask for correction.
+7. After approval, the vendor becomes available for request assignment.
+8. Admin can later activate, deactivate, or update vendor category mapping.
+
+
+5.4 Admin Flow: Process Customer Request
+1. Customer submits an event request from customer app or website.
+2. Admin receives the request in the admin panel.
+3. Admin opens the request and checks event date, event location, number of guests, selected services, selected items, and estimated budget.
+4. Admin separates the requirement by category. Example: Photography request goes to photography vendors. Food request goes to food vendors. Decoration request goes to decoration vendors.
+5. Admin opens the vendor list for the required category.
+6. Admin selects suitable vendors based on service category, location, availability, and expected budget.
+7. Admin sends the request to selected vendors with event details and budget.
+8. Vendors receive the request in their app or website.
+9. When any vendor accepts, admin gets a notification.
+10. Admin talks to the vendor and checks if the vendor is suitable.
+11. If the vendor is suitable, admin approves that vendor for the customer request.
+12. If the vendor is not suitable or not available, admin can move to the next accepted vendor or send the request to more vendors.
+13. After final approval, admin connects the selected vendor with the customer.
+14. Admin updates the request status.
+
+
+6. Customer Role: Modules and Detailed Flow
+Customer uses the platform to plan an event and select services. The customer can only view the services and service items uploaded by admin.
+
+
+6.1 Customer Modules
+| Module                 | What Customer Can Do                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| Registration and Login | Create account and login using mobile number, email, or other approved login method.                     |
+| Profile                | Manage name, phone number, email, and address details.                                                   |
+| Browse Categories      | View admin-created categories like Photography, Food, Lighting, Decoration, DJ, and others.              |
+| View Subcategories     | View subcategories such as Veg, Non-Veg, Pre-Wedding, Wedding, Flower Decoration, Stage Decoration, etc. |
+| View Service Items     | View service item images, videos, descriptions, and pricing.                                             |
+| Create Event Request   | Enter event date, location, event type, guest count, and required services.                              |
+| Estimated Budget       | View estimated budget based on selected services and quantities.                                         |
+| Submit Request         | Submit the final requirement to admin.                                                                   |
+| Track Request          | Track request status after submission.                                                                   |
+| Vendor Details         | View vendor details after admin approves and connects the vendor.                                        |
+
+
+6.2 Customer Flow: Browse and Select Services
+1. Customer opens customer app or website.
+2. Customer logs in or creates a new account.
+3. Customer starts a new event request.
+4. Customer enters basic event details such as event type, date, location, time, and number of guests.
+5. Customer views main categories created by admin.
+6. Customer selects a main category, for example Food.
+7. Customer views subcategories under Food, for example Veg and Non-Veg.
+8. Customer selects required food items and number of plates.
+9. Customer can also select other categories such as Photography, Decoration, Lighting, and DJ.
+10. For each category, customer views available items with images and details.
+11. Customer adds required items to the request.
+12. System shows estimated budget based on selected items and quantity.
+13. Customer reviews all selected requirements.
+14. Customer submits the request to admin.
+
+6.3 Customer Flow: Track Request
+1. After request submission, customer sees request status as Submitted.
+2. When admin starts checking the request, status changes to Under Admin Review.
+3. When admin sends the request to vendors, customer may see that vendor selection is in progress.
+4. After admin finalizes a vendor, customer can see the approved vendor details.
+5. Customer can confirm the service if confirmation is required.
+6. After confirmation, the booking status changes to Confirmed.
+7. After the event is completed, status changes to Completed.
+
+7. Vendor Role: Modules and Detailed Flow
+Vendor is the service provider. Vendors can register in the platform and provide services like photography, food, lighting, decoration, DJ, or other event-related services. One vendor can provide multiple services.
+
+| Module                     | What Vendor Can Do                                                                  |
+| -------------------------- | ----------------------------------------------------------------------------------- |
+| Registration and Login     | Register and login from vendor app or website.                                      |
+| Vendor Profile             | Add business name, contact details, address, service area, and description.         |
+| Service Category Selection | Select one or more service categories provided by the vendor.                       |
+| Portfolio / Media          | Upload sample images and videos of previous work if allowed by admin.               |
+| Request Inbox              | Receive requests sent by admin.                                                     |
+| Request Details            | View event date, location, service requirement, estimated budget, and instructions. |
+| Accept / Reject Request    | Accept if available and interested, or reject if not suitable.                      |
+| Booking Status             | View approved and pending bookings.                                                 |
+| Notifications              | Receive notifications for new requests, admin approval, and status changes.         |
+
+
+7.2 Vendor Registration Flow
+1. Vendor opens vendor app or website.
+2. Vendor registers with name, mobile number, email, business name, and location.
+3. Vendor selects service categories. Example: Photography, Decoration, Lighting, DJ, and Food.
+4. Vendor can select one service or multiple services.
+5. Vendor adds service details and uploads sample images or videos if required.
+6. Vendor submits the profile for admin approval.
+7. Admin reviews the vendor profile.
+8. If admin approves, vendor becomes active in the platform.
+9. If admin rejects, vendor may need to update details and submit again.
+
+7.3 Vendor Request Flow
+1. Admin sends a customer request to selected vendors from a specific category.
+2. Vendor receives a notification in the vendor app or website.
+3. Vendor opens the request details.
+4. Vendor checks event date, event location, service requirement, estimated budget, and special notes.
+5. Vendor decides whether they can provide the service.
+6. If vendor is interested and available, vendor accepts the request.
+7. If vendor is not available or not interested, vendor rejects the request.
+8. When a vendor accepts, admin gets a notification.
+9. Admin talks to the accepted vendor and decides whether to approve.
+10. If admin approves, vendor is assigned to the customer request.
+11. If admin does not approve, the request can go to the next vendor.
+
+
+8. Category and Subcategory Management
+The platform must support multiple categories, subcategories, and service items. Admin will create and manage all of them.
+
+| Main Category | Possible Subcategories                                   | Example Items                                                        |
+| ------------- | -------------------------------------------------------- | -------------------------------------------------------------------- |
+| Photography   | Pre-Wedding, Wedding, Birthday, Candid, Traditional      | Pre-Wedding Package 1, Wedding Package 1, Candid Package             |
+| Food          | Veg, Non-Veg                                             | Veg Meals, Paneer Biryani, Chicken Biryani, Mutton Biryani, Starters |
+| Lighting      | Indoor Lighting, Outdoor Lighting, Stage Lighting        | Lighting 1 with image, Lighting 2 with image, Lighting 3 with image  |
+| Decoration    | Flower Decoration, Stage Decoration, Entrance Decoration | Flower Decoration 1, Flower Decoration 2, Stage Decoration 1         |
+| DJ            | Basic DJ, Premium DJ, Sound System                       | DJ Package 1, DJ Package 2, Sound Setup                              |
+| Stage Setup   | Small Stage, Wedding Stage, Custom Stage                 | Stage Setup 1, Stage Setup 2                                         |
+
+
+
+Example category structure:
+Food -> Veg -> Veg Meals, Paneer Biryani, Sweets
+Food -> Non-Veg -> Chicken Biryani, Mutton Biryani, Fish Fry
+Photography -> Pre-Wedding -> Package 1, Package 2
+Photography -> Wedding -> Traditional Photography, Candid Photography
+Lighting -> Lighting Options -> Lighting 1, Lighting 2, Lighting 3
+Decoration -> Flower Decoration -> Flower Decoration 1, Flower Decoration 2
+
+
+9. Customer Request and Vendor Assignment Flow
+This is the most important business flow of the platform.
+1. Admin creates all categories, subcategories, items, prices, images, and videos.
+2. Customer opens app or website and selects event services from the admin-created list.
+3. Customer enters event details and submits the request.
+4. System shows estimated budget before final submission.
+5. Admin receives the request.
+6. Admin checks each selected service category.
+7. Admin selects suitable vendors from the same category only.
+8. For photography, admin selects only photography vendors. For food, admin selects only food vendors.
+9. Admin sends the request to selected vendors with customer location, event date, service requirement, and budget.
+10. Vendors accept or reject the request.
+11. The first accepted response is shown to admin.
+12. Admin talks to the vendor and confirms suitability.
+13. If the vendor is suitable, admin approves the vendor.
+14. If the vendor is not suitable, admin moves to the next vendor or sends request to more vendors.
+15. After final vendor approval, admin connects vendor with customer.
+16. The booking moves forward based on confirmation.
+
+10. Status Flow
+| Status                        | Meaning                                         |
+| ----------------------------- | ----------------------------------------------- |
+| Request Submitted             | Customer has submitted the event request.       |
+| Under Admin Review            | Admin is checking the request details.          |
+| Vendor Selection In Progress  | Admin is selecting suitable vendors.            |
+| Sent to Vendors               | Admin has sent the request to selected vendors. |
+| Vendor Accepted               | One or more vendors accepted the request.       |
+| Vendor Approved by Admin      | Admin has approved a suitable vendor.           |
+| Customer Confirmation Pending | Customer confirmation is pending, if required.  |
+| Confirmed                     | Booking is confirmed.                           |
+| Completed                     | Event service is completed.                     |
+| Cancelled                     | Request or booking is cancelled.                |
+
+
+
+11. Notifications
+Customer should get notification when request is submitted.
+Admin should get notification when a new customer request is created.
+Vendor should get notification when admin sends a new request.
+Admin should get notification when vendor accepts or rejects the request.
+Customer should get notification when admin approves and connects a vendor.
+All users should get notification when important status changes happen.
+
+12. Sample End-to-End Example
+Example: A customer wants to plan a wedding event.
+1. Admin has already added Photography, Food, Lighting, Decoration, and DJ categories.
+2. Admin has added subcategories such as Wedding Photography, Veg Food, Non-Veg Food, Flower Decoration, and Stage Lighting.
+3. Customer opens the customer app.
+4. Customer enters wedding date, location, time, and guest count.
+5. Customer selects Wedding Photography.
+6. Customer selects Flower Decoration 1.
+7. Customer selects Lighting 2.
+8. Customer selects DJ Package 1.
+9. Customer selects 500 food plates with Veg and Non-Veg items.
+10. System shows estimated budget.
+11. Customer submits the request.
+12. Admin reviews the request.
+13. Admin sends photography requirement to three photography vendors.
+14. Admin sends food requirement to suitable food vendors.
+15. Admin sends decoration requirement to decoration vendors.
+16. One photography vendor accepts first.
+17. Admin talks to the vendor and approves if suitable.
+18. If not suitable, admin checks next vendor.
+19. Admin finalizes vendors and connects them with customer.
+20. Booking is confirmed and tracked until completion.
+
+13. Future Scope
+Online payment collection.
+Customer reviews and ratings.
+Vendor calendar availability.
+Automatic vendor matching based on location and budget.
+Chat between customer, admin, and vendor.
+Invoice generation.
+Coupon and offer management.
+Multi-city support.
+
+14. Conclusion
+This platform will make event service booking easier for customers, vendors, and admin. Customers can select services from a clear list. Vendors can receive proper service requests. Admin can control the complete process and make sure the right vendor is connected to the right customer request.
+The system will reduce manual confusion, improve request tracking, and create a structured event management process for all users.
