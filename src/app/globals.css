@@ -36,13 +36,13 @@
   }
 
   .dark {
-    --background: #030303;
-    --foreground: #f4f4f5;
-    --border: #1a1a1e;
-    --surface: #0a0a0c;
-    --surface-raised: #121215;
-    --muted: #121215;
-    --muted-foreground: #a1a1aa;
+    --background: #060211; /* Deep midnight-violet */
+    --foreground: #f2edf9; /* Soft lavender-tinted white */
+    --border: #1a0f30;     /* Deep indigo-violet borders */
+    --surface: #0e0720;    /* Dark purple-slate surface */
+    --surface-raised: #150c2d; /* Raised purple-slate surface */
+    --muted: #150c2d;
+    --muted-foreground: #9a90b0; /* Lavender-muted text */
   }
 }
 
@@ -52,6 +52,12 @@ body {
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
+}
+
+.dark body {
+  background-image: radial-gradient(circle at 10% 15%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 85%, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
+  background-attachment: fixed;
 }
 
 /* ─── Animations ─── */
@@ -85,10 +91,29 @@ body {
   to   { width: var(--progress-width, 0%); }
 }
 
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 8px 3px rgba(139, 92, 246, 0.6); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
 .animate-fade-in-up  { animation: fadeInUp  0.3s ease-out both; }
 .animate-fade-in     { animation: fadeIn    0.2s ease-out both; }
 .animate-slide-down  { animation: slideDown 0.2s ease-out both; }
 .animate-scale-in    { animation: scaleIn   0.2s ease-out both; }
+.animate-pulse-glow  { animation: pulseGlow 2.5s infinite ease-in-out; }
+.animate-float       { animation: float 6s infinite ease-in-out; }
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
 
 /* Staggered entry helpers */
 .stagger-1 { animation-delay: 0.06s; }
@@ -109,9 +134,9 @@ body {
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
 ::-webkit-scrollbar-thumb  { background: #d4d4d8; border-radius: 99px; }
-.dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+.dark ::-webkit-scrollbar-thumb { background: #3c2a61; }
 ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #553c8b; }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

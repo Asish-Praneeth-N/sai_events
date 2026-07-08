@@ -26,7 +26,7 @@ export default async function CustomerLayout({
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-purple-500 selection:text-white transition-all duration-300">
       {/* Sub Header */}
-      <div className="bg-surface/60 border-b border-border/50 backdrop-blur-lg sticky top-16 z-40 transition-all duration-300">
+      <div className="bg-surface/75 border-b border-border/80 backdrop-blur-xl sticky top-16 z-40 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <span className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-pulse" />
@@ -37,9 +37,9 @@ export default async function CustomerLayout({
           <div className="flex gap-4 sm:gap-6">
             <a
               href="/customer/dashboard"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors duration-200"
+              className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
-              My Dashboard
+              Overview
             </a>
             <a
               href="/customer/request"
