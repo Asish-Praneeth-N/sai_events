@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { 
   createOperationalManager, 
   updateOperationalManager, 
@@ -48,6 +49,11 @@ export default function OMRegistryClient({ initialManagers, databasePending = fa
   const [selectedOM, setSelectedOM] = useState<OMProfile | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // OM Form state
   const [fullName, setFullName] = useState("");
@@ -318,283 +324,289 @@ export default function OMRegistryClient({ initialManagers, databasePending = fa
       {/* ── DRAWERS/MODALS ── */}
 
       {/* A. Onboarding / Addition Modal */}
-      {isAdding && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0d0b08] border border-border rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-scale-in">
-            <div className="flex justify-between items-center p-5 border-b border-border">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Onboard Operational Manager</h3>
-              <button onClick={() => { setIsAdding(false); resetForm(); }} className="text-muted-foreground hover:text-foreground cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
+      {isAdding && mounted && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] overflow-y-auto">
+          <div className="flex min-h-full items-start justify-center p-4 py-8 animate-fade-in">
+            <div className="bg-[#0d0b08] border border-border rounded-2xl w-full max-w-xl shadow-2xl flex flex-col animate-scale-in">
+              <div className="flex justify-between items-center p-5 border-b border-border">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Onboard Operational Manager</h3>
+                <button onClick={() => { setIsAdding(false); resetForm(); }} className="text-muted-foreground hover:text-foreground cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <form onSubmit={handleCreate} className="p-5 space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="OM-2026-X"
+                      value={employeeId}
+                      onChange={(e) => setEmployeeId(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-mono transition-all duration-200"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Phone Number *</label>
+                    <input
+                      type="text"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-mono transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label>
+                    <input
+                      type="text"
+                      value={designation}
+                      onChange={(e) => setDesignation(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Joining Date</label>
+                    <input
+                      type="date"
+                      value={joiningDate}
+                      onChange={(e) => setJoiningDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Temporary Password *</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Min 8 chars, 1 uppercase, 1 symbol"
+                    value={tempPassword}
+                    onChange={(e) => setTempPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-mono transition-all duration-200"
+                  />
+                </div>
+
+                {/* Assignment Regions & Cities checkboxes */}
+                <div className="space-y-2 pt-2 border-t border-border/40">
+                  <h5 className="text-[10px] font-bold uppercase text-muted-foreground">Assign Regional Coverage</h5>
+                  
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <span className="text-[9px] font-bold text-muted-foreground">Regions</span>
+                      <div className="flex flex-wrap gap-2">
+                        {["North", "South", "East", "West", "Central"].map((reg) => (
+                          <button
+                            key={reg}
+                            type="button"
+                            onClick={() => toggleRegion(reg)}
+                            className={`px-3 py-1 border rounded-lg text-xxs font-semibold cursor-pointer transition ${
+                              regions.includes(reg) 
+                                ? "bg-accent-gold border-accent-gold text-black" 
+                                : "bg-surface border-border text-muted-foreground"
+                            }`}
+                          >
+                            {reg}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[9px] font-bold text-muted-foreground">Cities</span>
+                      <div className="flex flex-wrap gap-2">
+                        {["Hyderabad", "Bangalore", "Chennai", "Mumbai", "Delhi"].map((city) => (
+                          <button
+                            key={city}
+                            type="button"
+                            onClick={() => toggleCity(city)}
+                            className={`px-3 py-1 border rounded-lg text-xxs font-semibold cursor-pointer transition ${
+                              cities.includes(city) 
+                                ? "bg-accent-gold border-accent-gold text-black" 
+                                : "bg-surface border-border text-muted-foreground"
+                            }`}
+                          >
+                            {city}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Address</label>
+                  <textarea
+                    placeholder="Employee home address..."
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full h-14 px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200 resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="w-full py-2.5 bg-accent-gold text-black rounded-xl text-xs font-bold hover:scale-[1.01] transition disabled:opacity-50 cursor-pointer shadow-md shadow-accent-gold/10"
+                >
+                  {isPending ? "Creating account..." : "Submit & Register Employee"}
+                </button>
+              </form>
             </div>
-            
-            <form onSubmit={handleCreate} className="p-5 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="OM-2026-X"
-                    value={employeeId}
-                    onChange={(e) => setEmployeeId(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground font-semibold"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Email Address *</label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground font-mono"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Phone Number *</label>
-                  <input
-                    type="text"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label>
-                  <input
-                    type="text"
-                    value={designation}
-                    onChange={(e) => setDesignation(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Joining Date</label>
-                  <input
-                    type="date"
-                    value={joiningDate}
-                    onChange={(e) => setJoiningDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Temporary Password *</label>
-                <input
-                  type="password"
-                  required
-                  placeholder="Min 8 chars, 1 uppercase, 1 symbol"
-                  value={tempPassword}
-                  onChange={(e) => setTempPassword(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground font-mono"
-                />
-              </div>
-
-              {/* Assignment Regions & Cities checkboxes */}
-              <div className="space-y-2 pt-2 border-t border-border/40">
-                <h5 className="text-[10px] font-bold uppercase text-muted-foreground">Assign Regional Coverage</h5>
-                
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-muted-foreground">Regions</span>
-                    <div className="flex flex-wrap gap-2">
-                      {["North", "South", "East", "West", "Central"].map((reg) => (
-                        <button
-                          key={reg}
-                          type="button"
-                          onClick={() => toggleRegion(reg)}
-                          className={`px-3 py-1 border rounded-lg text-xxs font-semibold cursor-pointer transition ${
-                            regions.includes(reg) 
-                              ? "bg-accent-gold border-accent-gold text-black" 
-                              : "bg-surface border-border text-muted-foreground"
-                          }`}
-                        >
-                          {reg}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-muted-foreground">Cities</span>
-                    <div className="flex flex-wrap gap-2">
-                      {["Hyderabad", "Bangalore", "Chennai", "Mumbai", "Delhi"].map((city) => (
-                        <button
-                          key={city}
-                          type="button"
-                          onClick={() => toggleCity(city)}
-                          className={`px-3 py-1 border rounded-lg text-xxs font-semibold cursor-pointer transition ${
-                            cities.includes(city) 
-                              ? "bg-accent-gold border-accent-gold text-black" 
-                              : "bg-surface border-border text-muted-foreground"
-                          }`}
-                        >
-                          {city}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Address</label>
-                <textarea
-                  placeholder="Employee home address..."
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full h-14 px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isPending}
-                className="w-full py-2.5 bg-accent-gold text-black rounded-xl text-xs font-bold hover:scale-[1.01] transition disabled:opacity-50 cursor-pointer shadow-md shadow-accent-gold/10"
-              >
-                {isPending ? "Creating account..." : "Submit & Register Employee"}
-              </button>
-            </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* B. Edit Modal */}
-      {isEditing && editOM && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0d0b08] border border-border rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-scale-in">
-            <div className="flex justify-between items-center p-5 border-b border-border">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Edit Manager Profile</h3>
-              <button onClick={() => { setIsEditing(false); setEditOM(null); }} className="text-muted-foreground hover:text-foreground cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
+      {isEditing && editOM && mounted && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] overflow-y-auto">
+          <div className="flex min-h-full items-start justify-center p-4 py-8 animate-fade-in">
+            <div className="bg-[#0d0b08] border border-border rounded-2xl w-full max-w-xl shadow-2xl flex flex-col animate-scale-in">
+              <div className="flex justify-between items-center p-5 border-b border-border">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Edit Manager Profile</h3>
+                <button onClick={() => { setIsEditing(false); setEditOM(null); }} className="text-muted-foreground hover:text-foreground cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <form onSubmit={handleEditSubmit} className="p-5 space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={editOM.profiles?.full_name || ""}
+                      onChange={(e) => setEditOM({
+                        ...editOM,
+                        profiles: editOM.profiles ? { ...editOM.profiles, full_name: e.target.value } : null
+                      })}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Phone Number</label>
+                    <input
+                      type="text"
+                      required
+                      value={editOM.profiles?.phone_number || ""}
+                      onChange={(e) => setEditOM({
+                        ...editOM,
+                        profiles: editOM.profiles ? { ...editOM.profiles, phone_number: e.target.value } : null
+                      })}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label>
+                    <input
+                      type="text"
+                      value={editOM.designation}
+                      onChange={(e) => setEditOM({ ...editOM, designation: e.target.value })}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Availability Status</label>
+                    <select
+                      value={editOM.availability_status}
+                      onChange={(e) => setEditOM({ ...editOM, availability_status: e.target.value })}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
+                    >
+                      <option value="Available">Available</option>
+                      <option value="Busy">Busy</option>
+                      <option value="On Leave">On Leave</option>
+                      <option value="Training">Training</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Regions (Comma separated)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. South, North"
+                    value={editOM.assigned_regions.join(", ")}
+                    onChange={(e) => setEditOM({
+                      ...editOM,
+                      assigned_regions: e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
+                    })}
+                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Cities (Comma separated)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Bangalore, Hyderabad"
+                    value={editOM.assigned_cities.join(", ")}
+                    onChange={(e) => setEditOM({
+                      ...editOM,
+                      assigned_cities: e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
+                    })}
+                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Address</label>
+                  <textarea
+                    value={editOM.profiles?.address || ""}
+                    onChange={(e) => setEditOM({
+                      ...editOM,
+                      profiles: editOM.profiles ? { ...editOM.profiles, address: e.target.value } : null
+                    })}
+                    className="w-full h-14 px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200 resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="w-full py-2.5 bg-accent-gold text-black rounded-xl text-xs font-bold hover:scale-[1.01] transition disabled:opacity-50 cursor-pointer shadow-md shadow-accent-gold/10"
+                >
+                  {isPending ? "Saving changes..." : "Save Profile Details"}
+                </button>
+              </form>
             </div>
-            
-            <form onSubmit={handleEditSubmit} className="p-5 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Full Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={editOM.profiles?.full_name || ""}
-                    onChange={(e) => setEditOM({
-                      ...editOM,
-                      profiles: editOM.profiles ? { ...editOM.profiles, full_name: e.target.value } : null
-                    })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Phone Number</label>
-                  <input
-                    type="text"
-                    required
-                    value={editOM.profiles?.phone_number || ""}
-                    onChange={(e) => setEditOM({
-                      ...editOM,
-                      profiles: editOM.profiles ? { ...editOM.profiles, phone_number: e.target.value } : null
-                    })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label>
-                  <input
-                    type="text"
-                    value={editOM.designation}
-                    onChange={(e) => setEditOM({ ...editOM, designation: e.target.value })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Availability Status</label>
-                  <select
-                    value={editOM.availability_status}
-                    onChange={(e) => setEditOM({ ...editOM, availability_status: e.target.value })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground font-semibold"
-                  >
-                    <option value="Available">Available</option>
-                    <option value="Busy">Busy</option>
-                    <option value="On Leave">On Leave</option>
-                    <option value="Training">Training</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Regions (Comma separated)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. South, North"
-                  value={editOM.assigned_regions.join(", ")}
-                  onChange={(e) => setEditOM({
-                    ...editOM,
-                    assigned_regions: e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
-                  })}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground font-semibold"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Cities (Comma separated)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Bangalore, Hyderabad"
-                  value={editOM.assigned_cities.join(", ")}
-                  onChange={(e) => setEditOM({
-                    ...editOM,
-                    assigned_cities: e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
-                  })}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground font-semibold"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase">Address</label>
-                <textarea
-                  value={editOM.profiles?.address || ""}
-                  onChange={(e) => setEditOM({
-                    ...editOM,
-                    profiles: editOM.profiles ? { ...editOM.profiles, address: e.target.value } : null
-                  })}
-                  className="w-full h-14 px-3 py-2 bg-background border border-border rounded-xl focus:outline-none text-foreground"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isPending}
-                className="w-full py-2.5 bg-accent-gold text-black rounded-xl text-xs font-bold hover:scale-[1.01] transition disabled:opacity-50 cursor-pointer shadow-md shadow-accent-gold/10"
-              >
-                {isPending ? "Saving changes..." : "Save Profile Details"}
-              </button>
-            </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

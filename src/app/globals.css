@@ -299,9 +299,9 @@ html::-webkit-scrollbar {
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
 ::-webkit-scrollbar-thumb  { background: #d4d4d8; border-radius: 99px; }
-.dark ::-webkit-scrollbar-thumb { background: #3c2a61; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); }
 ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #553c8b; }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.55); }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

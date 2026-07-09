@@ -74,7 +74,7 @@ export default function UsersList({ initialUsers, currentUserId }: UsersListProp
       case "admin":
         return "bg-rose-500/10 border-rose-500/25 text-rose-500";
       case "operational_manager":
-        return "bg-purple-500/10 border-purple-500/25 text-purple-500";
+        return "bg-amber-500/10 border-amber-500/25 text-amber-600 dark:text-amber-400";
       case "vendor":
         return "bg-blue-500/10 border-blue-500/25 text-blue-500";
       default:

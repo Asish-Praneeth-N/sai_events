@@ -57,8 +57,8 @@ function StatusBadge({ status }: { status: string }) {
 function Avatar({ name }: { name: string }) {
   const initials = name.split(" ").slice(0, 2).map((w) => w[0]?.toUpperCase() || "").join("") || "?";
   return (
-    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/20">
-      <span className="text-lg font-bold text-white font-heading">{initials}</span>
+    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-gold to-amber-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-accent-gold/20">
+      <span className="text-lg font-bold text-black font-heading">{initials}</span>
     </div>
   );
 }
@@ -164,7 +164,7 @@ export default function VendorDetailsCard({ vendor, customServices = [] }: Vendo
                 vendor.vendor_category_mappings.map((m, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-1 bg-purple-50 dark:bg-purple-950/20 border border-purple-200/50 dark:border-purple-800/30 text-purple-600 dark:text-purple-400 text-xs font-bold rounded-xl"
+                    className="px-2.5 py-1 bg-accent-gold/10 dark:bg-accent-gold/10 border border-accent-gold/30 dark:border-accent-gold/30 text-amber-700 dark:text-accent-gold text-xs font-bold rounded-xl"
                   >
                     {m.categories?.name}
                   </span>
@@ -275,7 +275,7 @@ export default function VendorDetailsCard({ vendor, customServices = [] }: Vendo
               >
                 <div className="flex items-start justify-between gap-2.5 mb-1.5">
                   <h4 className="text-sm font-semibold text-foreground leading-snug truncate">{service.service_name}</h4>
-                  <span className="px-2 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/50 rounded-lg flex-shrink-0">
+                  <span className="px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:text-accent-gold bg-accent-gold/10 dark:bg-accent-gold/10 border border-accent-gold/30 dark:border-accent-gold/30 rounded-lg flex-shrink-0">
                     ₹{Number(service.custom_price).toLocaleString("en-IN")}
                   </span>
                 </div>

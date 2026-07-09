@@ -38,7 +38,7 @@ const columns: Column[] = [
   { id: "submitted", title: "Submitted", statuses: ["Request Submitted", "Submitted"], color: "border-t-blue-500 text-blue-500" },
   { id: "review", title: "Under Review", statuses: ["Under Admin Review", "Under Review"], color: "border-t-amber-500 text-amber-500" },
   { id: "planning", title: "Planning", statuses: ["Planning"], color: "border-t-yellow-500 text-yellow-500" },
-  { id: "matching", title: "Vendor Selection", statuses: ["Vendor Selection In Progress", "Sent to Vendors", "Vendor Selection"], color: "border-t-purple-500 text-purple-500" },
+  { id: "matching", title: "Vendor Selection", statuses: ["Vendor Selection In Progress", "Sent to Vendors", "Vendor Selection"], color: "border-t-accent-gold text-accent-gold" },
   { id: "finalized", title: "Vendor Finalized", statuses: ["Vendor Accepted", "Vendor Approved by Admin", "Customer Confirmation Pending", "Confirmed", "Vendor Finalized", "Ready For Execution"], color: "border-t-pink-500 text-pink-500" },
   { id: "om_assigned", title: "Operational Manager Assigned", statuses: ["Operational Manager Assigned"], color: "border-t-cyan-500 text-cyan-500" },
   { id: "preparation", title: "Preparation", statuses: ["Preparation"], color: "border-t-emerald-500 text-emerald-500" },

@@ -91,7 +91,7 @@ export default function ServiceItemForm({
               value={subcategoryId}
               onChange={(e) => setSubcategoryId(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
             >
               <option value="">Select Subcategory</option>
               {subcategories.map((sub) => (
@@ -110,7 +110,7 @@ export default function ServiceItemForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Wedding Photo Package 1, Veg Dinner Buffet"
-              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
             />
           </div>
 
@@ -122,7 +122,7 @@ export default function ServiceItemForm({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide exact package list or menu options details"
-              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground resize-none transition-all duration-200"
+              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground resize-none transition-all duration-200"
             />
           </div>
 
@@ -133,7 +133,7 @@ export default function ServiceItemForm({
                 value={pricingType}
                 onChange={(e) => setPricingType(e.target.value as any)}
                 required
-                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
               >
                 <option value="flat">Flat Package Price</option>
                 <option value="per_plate">Per Plate / Guest Price</option>
@@ -149,7 +149,7 @@ export default function ServiceItemForm({
                 value={price}
                 onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
                 placeholder="e.g. 50000"
-                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200 animate-none"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200 animate-none"
               />
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function ServiceItemForm({
                 type="number"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)}
-                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
               />
             </div>
 
@@ -171,7 +171,7 @@ export default function ServiceItemForm({
                   type="checkbox"
                   checked={isAvailable}
                   onChange={(e) => setIsAvailable(e.target.checked)}
-                  className="rounded border-border text-purple-600 focus:ring-purple-500 bg-background h-4.5 w-4.5"
+                  className="rounded border-border text-accent-gold focus:ring-accent-gold bg-background h-4.5 w-4.5 cursor-pointer"
                 />
                 <span>Is Available</span>
               </label>
@@ -194,7 +194,7 @@ export default function ServiceItemForm({
             <button
               type="submit"
               disabled={isPending}
-              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white font-semibold rounded-xl transition cursor-pointer text-xs shadow-md shadow-purple-500/15"
+              className="px-5 py-2.5 bg-accent-gold hover:brightness-110 disabled:opacity-50 text-black font-bold rounded-xl transition cursor-pointer text-xs shadow-md shadow-accent-gold/15"
             >
               {isPending ? "Saving..." : "Save Item"}
             </button>

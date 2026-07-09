@@ -81,7 +81,7 @@ export default function AssignmentList({ assignments }: AssignmentListProps) {
             id="responseFilter"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-3.5 py-1.5 bg-background border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+            className="px-3.5 py-1.5 bg-background border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
           >
             <option value="all">All Responses</option>
             <option value="Pending">Pending Decision</option>
@@ -127,7 +127,7 @@ export default function AssignmentList({ assignments }: AssignmentListProps) {
                     <td className="py-4 px-3">
                       <a
                         href={`/admin/bookings/${assign.request_id}`}
-                        className="font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition"
+                        className="font-semibold text-accent-gold hover:brightness-125 transition"
                       >
                         {assign.event_requests?.event_type || "Event Request"}
                       </a>

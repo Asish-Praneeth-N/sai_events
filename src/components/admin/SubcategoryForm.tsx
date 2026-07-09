@@ -78,7 +78,7 @@ export default function SubcategoryForm({
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
             >
               <option value="">Select Category</option>
               {categories.map((cat) => (
@@ -97,7 +97,7 @@ export default function SubcategoryForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Veg, Non-Veg, Wedding, Birthday"
-              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
             />
           </div>
 
@@ -108,7 +108,7 @@ export default function SubcategoryForm({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description of this subcategory"
-              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground resize-none transition-all duration-200"
+              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground resize-none transition-all duration-200"
             />
           </div>
 
@@ -119,7 +119,7 @@ export default function SubcategoryForm({
                 type="number"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)}
-                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
               />
             </div>
 
@@ -129,7 +129,7 @@ export default function SubcategoryForm({
                   type="checkbox"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="rounded border-border text-purple-600 focus:ring-purple-500 bg-background h-4.5 w-4.5"
+                  className="rounded border-border text-accent-gold focus:ring-accent-gold bg-background h-4.5 w-4.5 cursor-pointer"
                 />
                 <span>Is Active</span>
               </label>
@@ -147,7 +147,7 @@ export default function SubcategoryForm({
             <button
               type="submit"
               disabled={isPending}
-              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white font-semibold rounded-xl transition cursor-pointer text-xs shadow-md shadow-purple-500/15"
+              className="px-5 py-2.5 bg-accent-gold hover:brightness-110 disabled:opacity-50 text-black font-bold rounded-xl transition cursor-pointer text-xs shadow-md shadow-accent-gold/15"
             >
               {isPending ? "Saving..." : "Save Subcategory"}
             </button>

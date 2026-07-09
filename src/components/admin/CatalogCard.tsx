@@ -57,7 +57,7 @@ export default function CatalogCard({ item, onEdit }: CatalogCardProps) {
         </div>
         <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{item.description}</p>
         <div className="flex items-center justify-between pt-1">
-          <span className="text-purple-600 dark:text-purple-400 font-bold text-xs font-mono">
+          <span className="text-accent-gold font-bold text-xs font-mono">
             {item.price.toLocaleString("en-IN", {
               style: "currency",
               currency: "INR",
@@ -69,7 +69,7 @@ export default function CatalogCard({ item, onEdit }: CatalogCardProps) {
           <div className="flex gap-2.5 opacity-0 group-hover:opacity-100 transition duration-200">
             <button
               onClick={() => onEdit(item)}
-              className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 cursor-pointer"
+              className="text-xs font-bold text-accent-gold hover:brightness-125 cursor-pointer"
             >
               Edit
             </button>

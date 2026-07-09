@@ -72,7 +72,7 @@ export default function MediaLibrary({ media, categories }: MediaLibraryProps) {
             id="categoryFilter"
             value={selectedCategoryId}
             onChange={(e) => setSelectedCategoryId(e.target.value)}
-            className="px-3.5 py-1.5 bg-background border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 text-foreground transition-all duration-200"
+            className="px-3.5 py-1.5 bg-background border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
           >
             <option value="all">All Service Categories</option>
             {categories.map((cat) => (
@@ -107,9 +107,10 @@ export default function MediaLibrary({ media, categories }: MediaLibraryProps) {
                 <div className="aspect-video bg-muted/30 relative overflow-hidden flex items-center justify-center border-b border-border/50">
                   {item.media_type === "video" ? (
                     <div className="text-xs text-muted-foreground flex flex-col items-center gap-1">
-                      <span className="h-8 w-8 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold">
+                      <span className="h-8 w-8 rounded-full bg-accent-gold/10 border border-accent-gold/30 flex items-center justify-center text-accent-gold font-bold">
                         ▶
                       </span>
+
                       <span>Video Asset</span>
                     </div>
                   ) : (
