@@ -1,270 +1,274 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
+import {
+  Users, Store, CalendarCheck, CheckCircle2, Clock, XCircle,
+  Eye, Loader, ArrowRight, Activity, UserPlus
+} from "lucide-react";
+
+// ─── Shared card shell ────────────────────────────────────────────────────────
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`bg-[#0d0b08] border border-white/8 rounded-2xl p-6 hover:border-[#D4AF37]/20 transition-colors duration-300 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+// ─── Stat cell inside a card ──────────────────────────────────────────────────
+function StatRow({ label, value, color = "text-white" }: { label: string; value: number; color?: string }) {
+  return (
+    <div className="flex items-center justify-between py-1.5">
+      <span className="text-[11px] text-[#F7F3EC]/45 font-light">{label}</span>
+      <span className={`text-sm font-bold ${color}`}>{value}</span>
+    </div>
+  );
+}
+
+// ─── Status badge ─────────────────────────────────────────────────────────────
+function Badge({ label, color }: { label: string; color: string }) {
+  return (
+    <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full border ${color}`}>
+      {label}
+    </span>
+  );
+}
 
 export default async function AdminDashboard() {
   const supabase = await createClient();
 
-  // 1. Fetch Customer stats
+  // ── Customers ──
   const { count: totalCustomers } = await supabase
-    .from("profiles")
-    .select("id", { count: "exact", head: true })
-    .eq("role", "customer");
+    .from("profiles").select("id", { count: "exact", head: true }).eq("role", "customer");
 
-  // 2. Fetch Vendor stats
+  // ── Vendors ──
   const { count: totalVendors } = await supabase
-    .from("profiles")
-    .select("id", { count: "exact", head: true })
-    .eq("role", "vendor");
+    .from("profiles").select("id", { count: "exact", head: true }).eq("role", "vendor");
 
   const { data: pendingVendorsData } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("role", "vendor")
-    .eq("status", "Pending");
-  const pendingVendors = pendingVendorsData?.length || 0;
+    .from("profiles").select("id").eq("role", "vendor").eq("status", "Pending");
+  const pendingVendors = pendingVendorsData?.length ?? 0;
 
   const { data: approvedVendorsData } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("role", "vendor")
-    .eq("status", "Approved");
-  const approvedVendors = approvedVendorsData?.length || 0;
+    .from("profiles").select("id").eq("role", "vendor").eq("status", "Approved");
+  const approvedVendors = approvedVendorsData?.length ?? 0;
 
-  // 3. Fetch Event Request stats
-  const { count: totalRequests } = await supabase
-    .from("event_requests")
-    .select("id", { count: "exact", head: true });
+  // ── Event Requests ──
+  const { count: totalRequests }     = await supabase.from("event_requests").select("id", { count: "exact", head: true });
+  const { count: submittedRequests } = await supabase.from("event_requests").select("id", { count: "exact", head: true }).eq("status", "Request Submitted");
+  const { count: underReviewRequests } = await supabase.from("event_requests").select("id", { count: "exact", head: true }).eq("status", "Under Admin Review");
+  const { count: selectionRequests } = await supabase.from("event_requests").select("id", { count: "exact", head: true }).eq("status", "Vendor Selection In Progress");
+  const { count: confirmedRequests } = await supabase.from("event_requests").select("id", { count: "exact", head: true }).eq("status", "Confirmed");
+  const { count: completedRequests } = await supabase.from("event_requests").select("id", { count: "exact", head: true }).eq("status", "Completed");
+  const { count: cancelledRequests } = await supabase.from("event_requests").select("id", { count: "exact", head: true }).eq("status", "Cancelled");
 
-  const { count: submittedRequests } = await supabase
-    .from("event_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "Request Submitted");
-
-  const { count: underReviewRequests } = await supabase
-    .from("event_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "Under Admin Review");
-
-  const { count: selectionRequests } = await supabase
-    .from("event_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "Vendor Selection In Progress");
-
-  const { count: confirmedRequests } = await supabase
-    .from("event_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "Confirmed");
-
-  const { count: completedRequests } = await supabase
-    .from("event_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "Completed");
-
-  const { count: cancelledRequests } = await supabase
-    .from("event_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "Cancelled");
-
-  // 4. Fetch Recent Activities
+  // ── Recent Activity ──
   const { data: recentProfiles } = await supabase
     .from("profiles")
     .select("id, full_name, role, created_at")
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(6);
 
   const { data: recentRequestsData } = await supabase
     .from("event_requests")
-    .select(`
-      id,
-      event_type,
-      created_at,
-      profiles (
-        full_name
-      )
-    `)
+    .select(`id, event_type, created_at, profiles ( full_name )`)
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(6);
 
-  const recentRequests = recentRequestsData || [];
+  const recentRequests = recentRequestsData ?? [];
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-extrabold font-heading text-foreground tracking-tight">Platform Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Real-time metrics, active bookings progression, and registration requests dashboard.
+    <div className="space-y-8">
+
+      {/* ── Page Header ──────────────────────────────────────────────────── */}
+      <div className="border-b border-white/8 pb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-[10px] font-bold text-[#D4AF37]/70 uppercase tracking-[0.28em]">
+            Platform Overview
+          </span>
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-50" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#D4AF37]" />
+          </span>
+        </div>
+        <h1
+          className="text-3xl sm:text-4xl font-light text-white tracking-tight"
+          style={{ fontFamily: "Playfair Display, serif" }}
+        >
+          Dashboard
+        </h1>
+        <p className="text-xs text-[#F7F3EC]/40 mt-1 font-light">
+          Real-time metrics across customers, vendors, and event requests.
         </p>
       </div>
 
-      {/* Stats Category Sections */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {/* A. CUSTOMERS */}
-        <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm flex flex-col justify-between h-44 hover:shadow-md transition-all duration-300 border-t-4 border-t-purple-500 animate-fade-in-up stagger-1">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between pb-1">
-              <h3 className="font-heading font-bold text-xs text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-                Customers Portal
-              </h3>
-              <span className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
+      {/* ── Top KPI Row ──────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+        {/* Customers */}
+        <Card>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/60 mb-1">Customers</p>
+              <p className="text-4xl font-light text-white" style={{ fontFamily: "Playfair Display, serif" }}>
+                {totalCustomers ?? 0}
+              </p>
             </div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-muted-foreground text-xs font-medium">Total Customers</span>
-              <span className="text-4xl font-extrabold font-heading text-foreground">{totalCustomers || 0}</span>
+            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
+              <Users className="w-5 h-5 text-[#D4AF37]" />
             </div>
           </div>
           <Link
             href="/admin/customers"
-            className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold flex items-center gap-1 transition"
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] hover:text-[#f5db91] transition-colors duration-200"
           >
-            <span>Manage Clients</span>
-            <span>→</span>
+            Manage Clients <ArrowRight className="w-3 h-3" />
           </Link>
-        </div>
+        </Card>
 
-        {/* B. VENDORS */}
-        <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm flex flex-col justify-between h-44 hover:shadow-md transition-all duration-300 border-t-4 border-t-indigo-500 animate-fade-in-up stagger-2">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between pb-1">
-              <h3 className="font-heading font-bold text-xs text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                Service Vendors
-              </h3>
-              <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+        {/* Vendors */}
+        <Card>
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/60 mb-1">Vendors</p>
+              <p className="text-4xl font-light text-white" style={{ fontFamily: "Playfair Display, serif" }}>
+                {totalVendors ?? 0}
+              </p>
             </div>
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Total Registered</span>
-                <span className="font-bold text-foreground">{totalVendors || 0}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Pending Approvals</span>
-                <span className="font-bold text-amber-500">{pendingVendors || 0}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Approved Active</span>
-                <span className="font-bold text-emerald-500">{approvedVendors || 0}</span>
-              </div>
+            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
+              <Store className="w-5 h-5 text-[#D4AF37]" />
             </div>
+          </div>
+          <div className="space-y-1 mb-4">
+            <StatRow label="Pending Approval" value={pendingVendors}  color="text-amber-400" />
+            <StatRow label="Active / Approved" value={approvedVendors} color="text-emerald-400" />
           </div>
           <Link
             href="/admin/vendors"
-            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold flex items-center gap-1 transition"
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] hover:text-[#f5db91] transition-colors duration-200"
           >
-            <span>Manage Vendors & Mappings</span>
-            <span>→</span>
+            Manage Vendors <ArrowRight className="w-3 h-3" />
           </Link>
-        </div>
+        </Card>
 
-        {/* C. BOOKINGS OVERVIEW */}
-        <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm flex flex-col justify-between h-44 hover:shadow-md transition-all duration-300 border-t-4 border-t-teal-500 animate-fade-in-up stagger-3">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between pb-1">
-              <h3 className="font-heading font-bold text-xs text-teal-600 dark:text-teal-400 uppercase tracking-wider">
-                Event Requests
-              </h3>
-              <span className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
+        {/* Event Requests */}
+        <Card>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#D4AF37]/60 mb-1">Event Requests</p>
+              <p className="text-4xl font-light text-white" style={{ fontFamily: "Playfair Display, serif" }}>
+                {totalRequests ?? 0}
+              </p>
             </div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-muted-foreground text-xs font-medium">Total Requests</span>
-              <span className="text-4xl font-extrabold font-heading text-foreground">{totalRequests || 0}</span>
+            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
+              <CalendarCheck className="w-5 h-5 text-[#D4AF37]" />
             </div>
           </div>
           <Link
             href="/admin/bookings"
-            className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-semibold flex items-center gap-1 transition"
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] hover:text-[#f5db91] transition-colors duration-200"
           >
-            <span>Manage Bookings & Status</span>
-            <span>→</span>
+            Manage Bookings <ArrowRight className="w-3 h-3" />
           </Link>
-        </div>
+        </Card>
 
       </div>
 
-      {/* D. EVENT STATES BREAKDOWN */}
-      <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm space-y-4 hover:shadow-md transition-all duration-300 animate-fade-in-up stagger-4">
-        <h3 className="font-heading font-bold text-base text-foreground">Requests Breakdown by Status</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-6 gap-4 text-center">
-          <div className="p-4 bg-muted/30 dark:bg-muted/10 rounded-2xl border border-border/30 hover:border-blue-500/30 transition-all duration-200">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Submitted</div>
-            <div className="text-2xl font-extrabold text-blue-500 dark:text-blue-400 mt-1">{submittedRequests || 0}</div>
-          </div>
-          <div className="p-4 bg-muted/30 dark:bg-muted/10 rounded-2xl border border-border/30 hover:border-amber-500/30 transition-all duration-200">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Under Review</div>
-            <div className="text-2xl font-extrabold text-amber-500 mt-1">{underReviewRequests || 0}</div>
-          </div>
-          <div className="p-4 bg-muted/30 dark:bg-muted/10 rounded-2xl border border-border/30 hover:border-purple-500/30 transition-all duration-200">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Matching</div>
-            <div className="text-2xl font-extrabold text-purple-500 dark:text-purple-400 mt-1">{selectionRequests || 0}</div>
-          </div>
-          <div className="p-4 bg-muted/30 dark:bg-muted/10 rounded-2xl border border-border/30 hover:border-teal-500/30 transition-all duration-200">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Confirmed</div>
-            <div className="text-2xl font-extrabold text-teal-500 dark:text-teal-400 mt-1">{confirmedRequests || 0}</div>
-          </div>
-          <div className="p-4 bg-muted/30 dark:bg-muted/10 rounded-2xl border border-border/30 hover:border-emerald-500/30 transition-all duration-200">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Completed</div>
-            <div className="text-2xl font-extrabold text-emerald-500 dark:text-emerald-400 mt-1">{completedRequests || 0}</div>
-          </div>
-          <div className="p-4 bg-muted/30 dark:bg-muted/10 rounded-2xl border border-border/30 hover:border-red-500/30 transition-all duration-200">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Cancelled</div>
-            <div className="text-2xl font-extrabold text-red-500 mt-1">{cancelledRequests || 0}</div>
-          </div>
+      {/* ── Request Status Breakdown ──────────────────────────────────────── */}
+      <Card>
+        <div className="flex items-center gap-2 mb-5">
+          <Activity className="w-4 h-4 text-[#D4AF37]" />
+          <h2 className="text-sm font-bold text-white uppercase tracking-[0.15em]">Request Status Pipeline</h2>
         </div>
-      </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          {[
+            { label: "Submitted",   value: submittedRequests ?? 0,   icon: Eye,          color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20"    },
+            { label: "Under Review",value: underReviewRequests ?? 0, icon: Loader,       color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/20"   },
+            { label: "Matching",    value: selectionRequests ?? 0,   icon: Users,        color: "text-[#D4AF37]",   bg: "bg-[#D4AF37]/10",   border: "border-[#D4AF37]/20"   },
+            { label: "Confirmed",   value: confirmedRequests ?? 0,   icon: CheckCircle2, color: "text-teal-400",    bg: "bg-teal-500/10",    border: "border-teal-500/20"    },
+            { label: "Completed",   value: completedRequests ?? 0,   icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+            { label: "Cancelled",   value: cancelledRequests ?? 0,   icon: XCircle,      color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/20"     },
+          ].map(({ label, value, icon: Icon, color, bg, border }) => (
+            <div
+              key={label}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl border ${bg} ${border} text-center gap-2`}
+            >
+              <Icon className={`w-4 h-4 ${color}`} />
+              <div className={`text-2xl font-light ${color}`} style={{ fontFamily: "Playfair Display, serif" }}>
+                {value}
+              </div>
+              <div className="text-[9px] font-bold text-[#F7F3EC]/40 uppercase tracking-wider leading-tight">
+                {label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
 
-      {/* E. RECENT ACTIVITY GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in-up stagger-5">
-        
-        {/* Recent Registrations */}
-        <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-          <h3 className="font-heading font-bold text-base text-foreground">Recent Member Sign-Ups</h3>
+      {/* ── Recent Activity ───────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        {/* Recent Sign-Ups */}
+        <Card>
+          <div className="flex items-center gap-2 mb-5">
+            <UserPlus className="w-4 h-4 text-[#D4AF37]" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-[0.15em]">Recent Sign-Ups</h2>
+          </div>
           {recentProfiles && recentProfiles.length > 0 ? (
-            <div className="divide-y divide-border/50">
+            <div className="space-y-0 divide-y divide-white/5">
               {recentProfiles.map((p) => (
-                <div key={p.id} className="py-3.5 flex justify-between text-xs items-center first:pt-0 last:pb-0">
-                  <div>
-                    <div className="font-semibold text-foreground">{p.full_name}</div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5">Joined {formatDate(p.created_at)}</div>
+                <div key={p.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/25 flex items-center justify-center text-[#D4AF37] text-[10px] font-bold shrink-0">
+                      {p.full_name?.[0]?.toUpperCase() ?? "?"}
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">{p.full_name}</div>
+                      <div className="text-[10px] text-[#F7F3EC]/35 mt-0.5">{formatDate(p.created_at)}</div>
+                    </div>
                   </div>
-                  <span className={`px-2.5 py-0.5 text-[10px] font-bold border rounded-full uppercase tracking-wider ${
-                    p.role === "vendor" 
-                      ? "text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/50 bg-indigo-50 dark:bg-indigo-950/20" 
-                      : "text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/50 bg-purple-50 dark:bg-purple-950/20"
-                  }`}>
-                    {p.role}
-                  </span>
+                  <Badge
+                    label={p.role}
+                    color={
+                      p.role === "vendor"
+                        ? "text-amber-400 border-amber-500/30 bg-amber-500/10"
+                        : "text-[#D4AF37] border-[#D4AF37]/30 bg-[#D4AF37]/8"
+                    }
+                  />
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground py-4">No recent sign-ups found.</p>
+            <p className="text-[11px] text-[#F7F3EC]/30 py-4 text-center">No recent sign-ups.</p>
           )}
-        </div>
+        </Card>
 
         {/* Recent Bookings */}
-        <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-          <h3 className="font-heading font-bold text-base text-foreground">Recent Booking Submissions</h3>
-          {recentRequests && recentRequests.length > 0 ? (
-            <div className="divide-y divide-border/50">
+        <Card>
+          <div className="flex items-center gap-2 mb-5">
+            <CalendarCheck className="w-4 h-4 text-[#D4AF37]" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-[0.15em]">Recent Bookings</h2>
+          </div>
+          {recentRequests.length > 0 ? (
+            <div className="space-y-0 divide-y divide-white/5">
               {recentRequests.map((r: any) => (
-                <div key={r.id} className="py-3.5 flex justify-between text-xs items-center first:pt-0 last:pb-0">
+                <div key={r.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div>
-                    <div className="font-semibold text-foreground">{r.event_type}</div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5">
-                      Client: {r.profiles?.full_name || "Unknown"} • ID: <span className="font-mono">{r.id.substring(0, 8)}</span>
+                    <div className="text-xs font-semibold text-white">{r.event_type}</div>
+                    <div className="text-[10px] text-[#F7F3EC]/35 mt-0.5">
+                      {r.profiles?.full_name ?? "Unknown"} · <span className="font-mono">{r.id.substring(0, 8)}</span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
+                  <span className="text-[9px] font-bold text-[#F7F3EC]/35 bg-white/5 border border-white/8 px-2.5 py-1 rounded-lg font-mono">
                     {formatDate(r.created_at)}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground py-4">No recent event submissions found.</p>
+            <p className="text-[11px] text-[#F7F3EC]/30 py-4 text-center">No recent event submissions.</p>
           )}
-        </div>
+        </Card>
 
       </div>
     </div>

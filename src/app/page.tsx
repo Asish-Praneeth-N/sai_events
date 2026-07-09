@@ -38,29 +38,55 @@ const SECTIONS = [
 const SectionFallback = () => <div className="w-full py-16 bg-[#090909]" />;
 
 // ─── Intro visibility logic ──────────────────────────────────────────────────
-// Show the cinematic doors ONLY on:
-//   1. First ever visit this session  (no sessionStorage key)
-//   2. An explicit browser reload     (F5 / Ctrl+R / Cmd+R)
-// Never show on:
-//   - Client-side Next.js navigation  (back from /login, /register, etc.)
-//   - back_forward browser navigation
+//
+// MODULE-LEVEL FLAG — this is the key mechanism.
+//
+// JavaScript module variables reset to their initial value on every hard page
+// load (browser re-parses and evaluates the module file from scratch).
+// They SURVIVE React re-renders and Next.js soft (SPA) navigations because
+// the module is not re-evaluated — only the component re-mounts.
+//
+// This means:
+//   Hard reload (F5)            → module re-evaluates → _alreadyMounted = false
+//   Hard navigation (link click) → module re-evaluates → _alreadyMounted = false
+//   SPA navigation back to /    → module NOT re-evaluated → _alreadyMounted = true
+//
+// Combined with sessionStorage to know if user has ever seen the intro:
+//
+//  ┌──────────────────────┬────────────────┬────────────────────────────────┐
+//  │  Navigation type     │ _alreadyMounted│ hasSeen (sessionStorage)       │
+//  ├──────────────────────┼────────────────┼────────────────────────────────┤
+//  │ First ever visit     │ false          │ false  → SHOW intro            │
+//  │ F5 / browser reload  │ false          │ true   → SHOW intro (reload)   │
+//  │ SPA back from /login │ true           │ (any)  → SKIP intro ✅         │
+//  │ Link click to /      │ false          │ true   → SKIP intro ✅         │
+//  └──────────────────────┴────────────────┴────────────────────────────────┘
+
+let _alreadyMounted = false;
+
 function shouldShowIntro(): boolean {
   if (typeof window === "undefined") return false;
 
-  const entries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
-  const navType = entries[0]?.type ?? "navigate";
+  // If this module has already run shouldShowIntro() in this JS execution
+  // context, we are inside a SPA soft navigation — never re-show the intro.
+  if (_alreadyMounted) return false;
 
-  // Only an explicit reload should re-trigger the animation
-  const isExplicitReload = navType === "reload";
+  // Mark that we've been here at least once in this JS execution context
+  _alreadyMounted = true;
 
   const seenKey = "sai_intro_seen";
   const hasSeen = sessionStorage.getItem(seenKey) === "1";
 
-  if (!hasSeen || isExplicitReload) {
+  if (!hasSeen) {
+    // First ever visit this browser session → show intro
     sessionStorage.setItem(seenKey, "1");
     return true;
   }
-  return false;
+
+  // Has seen before — only show again on an explicit F5/Ctrl+R browser reload
+  const entries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+  const navType  = entries[0]?.type ?? "navigate";
+  return navType === "reload";
 }
 
 export default function Home() {

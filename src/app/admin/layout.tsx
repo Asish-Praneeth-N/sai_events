@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import AdminSubHeader from "./AdminSubHeader";
 
 export const metadata: Metadata = {
-  title: "Sai Events Admin Portal",
+  title: "Sai Events — Admin Console",
+  description: "Internal management portal for Sai Events administrators.",
 };
 
 export default async function AdminLayout({
@@ -15,9 +16,7 @@ export default async function AdminLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -25,19 +24,20 @@ export default async function AdminLayout({
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
-    redirect("/unauthorized");
-  }
+  if (profile?.role !== "admin") redirect("/unauthorized");
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-purple-500 selection:text-white transition-colors duration-300">
-      {/* Sub Header for Admin Panel */}
+    <div className="min-h-screen bg-[#090909] text-[#F7F3EC] flex flex-col font-sans">
+      {/* Admin Navigation */}
       <AdminSubHeader />
 
-      {/* Content */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+      {/* Page content */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {children}
       </main>
+
+      {/* Subtle ambient glow at bottom */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />
     </div>
   );
 }
