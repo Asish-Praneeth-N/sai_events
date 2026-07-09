@@ -1,54 +1,51 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { LANDING_PAGE_CONFIG } from "@/constants/introConfig";
+import ScrollHeading from "@/components/Common/ScrollHeading";
+
+const categories = ["All", "Weddings", "Engagements", "Birthdays", "Corporate", "Decorations"];
 
 export default function Gallery() {
   const [filter, setFilter] = useState("All");
+  const [hasEntered, setHasEntered] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
-  const categories = ["All", "Weddings", "Engagements", "Birthdays", "Corporate", "Decorations"];
-
-  const filteredItems = filter === "All"
-    ? LANDING_PAGE_CONFIG.gallery
-    : LANDING_PAGE_CONFIG.gallery.filter(item => item.category === filter);
+  const filteredItems =
+    filter === "All"
+      ? LANDING_PAGE_CONFIG.gallery
+      : LANDING_PAGE_CONFIG.gallery.filter((item) => item.category === filter);
 
   return (
-    <section id="gallery" className="py-24 bg-[#0F172A]/30 relative overflow-hidden select-none border-t border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <motion.span
-            initial={{ opacity: 0, letterSpacing: "0.1em" }}
-            whileInView={{ opacity: 0.6, letterSpacing: "0.25em" }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="text-[10px] uppercase font-bold text-[#D4AF37] tracking-[0.25em]"
-          >
+    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+      {/* Background ambient lighting */}
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-[#D4AF37]/4 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-[300px] h-[300px] bg-[#FF9040]/3 rounded-full blur-[110px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <span className="text-[10px] uppercase font-bold text-[#D4AF37] tracking-[0.28em] block mb-3 opacity-75">
             Visual Memories
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ delay: 0.15, duration: 0.8 }}
-            className="text-3xl sm:text-5xl font-light font-heading text-white mt-3"
-            style={{ fontFamily: "Playfair Display, serif" }}
-          >
-            Our Gallery
-          </motion.h2>
+          </span>
+          <ScrollHeading
+            title="Our Gallery"
+            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+          />
+          <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mx-auto mt-4" />
         </div>
 
-        {/* Categories Filter Tabs */}
-        <div className="flex flex-wrap justify-center items-center gap-3 mb-16">
+        {/* Category Filters */}
+        <div className="flex flex-wrap justify-center items-center gap-3 mb-12">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-5 py-2 rounded-full text-xs font-medium tracking-[0.1em] uppercase transition-all duration-300 border ${
+              className={`px-5 py-2 rounded-full text-[10px] font-semibold tracking-[0.12em] uppercase transition-all duration-300 border cursor-pointer ${
                 filter === cat
-                  ? "bg-[#D4AF37] border-[#D4AF37] text-black shadow-md shadow-[#D4AF37]/15"
-                  : "bg-white/5 border-white/10 hover:border-[#D4AF37]/50 text-[#F7F3EC]/80 hover:text-white"
+                  ? "bg-[#D4AF37] border-[#D4AF37] text-black shadow-md"
+                  : "bg-white/5 border-white/10 hover:border-[#D4AF37]/50 text-white/70 hover:text-white"
               }`}
             >
               {cat}
@@ -56,44 +53,60 @@ export default function Gallery() {
           ))}
         </div>
 
-        {/* Pinterest Masonry Grid */}
+        {/* Gallery Grid — use a regular CSS grid, not CSS columns, to avoid masonry layout bugs */}
         <motion.div
-          layout
-          className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6"
+          initial={false}
+          whileInView={!hasEntered ? "visible" : false}
+          onViewportEnter={() => setHasEntered(true)}
+          viewport={{ once: true, margin: "-80px" }}
+          variants={{
+            visible: { transition: { staggerChildren: 0.06 } },
+          }}
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 w-full"
         >
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((item) => (
+            {filteredItems.map((item, idx) => (
               <motion.div
                 key={item.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.5 }}
-                className="break-inside-avoid relative overflow-hidden rounded-2xl group border border-white/5 shadow-md bg-black cursor-pointer"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  opacity: { duration: 0.4, delay: hasEntered ? 0 : idx * 0.05 },
+                  y: { duration: 0.4, delay: hasEntered ? 0 : idx * 0.05, ease: [0.16, 1, 0.3, 1] },
+                  layout: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+                }}
+                whileHover={shouldReduceMotion ? {} : { y: -4, transition: { duration: 0.3 } }}
+                className="relative overflow-hidden rounded-2xl group border border-white/5 hover:border-[#D4AF37]/30 shadow-lg bg-[#121212] cursor-pointer aspect-[4/3]"
               >
-                {/* Image */}
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-auto object-cover rounded-2xl transition-transform duration-700 ease-out group-hover:scale-108"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                  loading="lazy"
                 />
 
-                {/* Dark Hover Overlay */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-400 z-10 flex flex-col justify-end p-6">
-                  {/* Category Badge */}
-                  <span className="text-[9px] uppercase font-bold text-[#D4AF37] tracking-wider mb-1.5 inline-block">
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/65 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex flex-col justify-end p-4">
+                  <span className="text-[8px] uppercase font-bold text-[#D4AF37] tracking-wider mb-1 inline-block">
                     {item.category}
                   </span>
-
-                  {/* Image Title */}
                   <h4
-                    className="text-lg font-bold text-white translate-y-3 group-hover:translate-y-0 transition-transform duration-500 font-heading"
+                    className="text-sm font-semibold text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-300"
                     style={{ fontFamily: "Playfair Display, serif" }}
                   >
                     {item.title}
                   </h4>
+                  {item.location && (
+                    <span className="text-[10px] text-white/50 mt-1 font-light">
+                      {item.location} · {item.year}
+                    </span>
+                  )}
                 </div>
+
+                {/* Gold border accent */}
+                <div className="absolute inset-0 rounded-2xl border border-[#D4AF37]/0 group-hover:border-[#D4AF37]/25 transition-all duration-300 pointer-events-none" />
               </motion.div>
             ))}
           </AnimatePresence>

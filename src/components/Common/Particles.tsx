@@ -25,7 +25,7 @@ export default function Particles() {
       duration: Math.random() * 25 + 25, // slow speed: 25s - 50s
       delay: Math.random() * -30, // pre-delay so particles are scattered immediately
     }));
-    setParticles(generated);
+    Promise.resolve().then(() => setParticles(generated));
   }, []);
 
   return (
