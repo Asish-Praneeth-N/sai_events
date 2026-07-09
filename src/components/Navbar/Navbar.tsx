@@ -101,6 +101,18 @@ export default function Navbar({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // ─── Prevent Body Scroll when mobile drawer is open ────────────────────────
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
   // ─── Determine nav items based on role ───────────────────────────────────
   const role    = profile?.role ?? "guest";
   const navItems = role === "customer" ? CUSTOMER_NAV : role === "vendor" ? VENDOR_NAV : GUEST_NAV;
@@ -260,8 +272,9 @@ export default function Navbar({
           {/* ── Mobile Toggle ─────────────────────────────────────────── */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden text-white hover:text-[#D4AF37] p-1.5 transition-colors duration-300"
+            className="lg:hidden flex items-center justify-center w-11 h-11 rounded-xl border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:text-[#D4AF37] hover:border-[#D4AF37]/40 transition-all duration-300 cursor-pointer flex-shrink-0"
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -272,46 +285,89 @@ export default function Navbar({
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -16 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 bg-[#090909]/96 z-40 backdrop-blur-xl flex flex-col justify-center px-8"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="fixed inset-0 z-[99999] flex flex-col bg-[#080604]/90 backdrop-blur-2xl w-screen h-screen overflow-y-auto"
           >
-            <div className="flex flex-col gap-6 text-center">
-              {/* Nav links */}
+            {/* ── Top bar ── */}
+            <div className="flex items-center justify-between px-6 py-5 flex-shrink-0 border-b border-white/5">
+              <Link
+                href="#home"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2.5 no-underline"
+              >
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#f5db91] flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-black" />
+                </div>
+                <span className="font-heading font-black text-sm text-white tracking-[0.2em] uppercase">
+                  Sai Events
+                </span>
+              </Link>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-white/50 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* ── Centered nav links ── */}
+            <nav className="flex-1 flex flex-col items-center justify-center gap-6 py-8 px-6">
               {navItems.map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="text-lg uppercase font-light text-white hover:text-[#D4AF37] tracking-[0.2em] transition-colors duration-300"
+                  className="w-full text-center py-2 text-lg uppercase font-light tracking-[0.25em] text-[#F7F3EC]/80 hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors duration-200 no-underline"
                 >
                   {item.label}
                 </a>
               ))}
+            </nav>
 
-              {/* Auth actions (mobile) */}
+            {/* ── Auth CTAs ── */}
+            <div className="px-6 pb-12 pt-6 border-t border-white/5 flex flex-col gap-3 flex-shrink-0">
               {!profile && (
-                <div className="mt-4 flex flex-col gap-3">
-                  <Link href="/register" onClick={() => setMobileOpen(false)}
-                    className="inline-block px-10 py-3 bg-[#D4AF37] text-black text-sm font-bold uppercase tracking-[0.2em] rounded-xl text-center">
-                    Book Event
+                <>
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileOpen(false)}
+                    className="w-full flex items-center justify-center py-4 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black text-[11px] font-black uppercase tracking-[0.22em] rounded-2xl shadow-lg shadow-[#D4AF37]/15 no-underline"
+                  >
+                    Book Your Event
                   </Link>
-                  <Link href="/login" onClick={() => setMobileOpen(false)}
-                    className="inline-block px-10 py-3 border border-white/15 text-white text-sm font-bold uppercase tracking-[0.2em] rounded-xl text-center">
-                    Log In
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="w-full flex items-center justify-center py-4 border border-white/15 text-[#F7F3EC]/80 text-[11px] font-bold uppercase tracking-[0.22em] rounded-2xl hover:border-[#D4AF37]/40 hover:text-white transition-colors duration-200 no-underline"
+                  >
+                    Sign In
                   </Link>
-                </div>
+                  <Link
+                    href="/register?role=vendor"
+                    onClick={() => setMobileOpen(false)}
+                    className="text-center text-[10px] font-bold uppercase tracking-[0.18em] text-[#F7F3EC]/35 hover:text-[#D4AF37] transition-colors duration-200 py-2 no-underline"
+                  >
+                    Join as a Vendor →
+                  </Link>
+                </>
               )}
 
               {profile && (
-                <button
-                  onClick={handleLogout}
-                  className="mt-4 inline-block px-10 py-3 border border-red-500/30 text-red-400 text-sm font-bold uppercase tracking-[0.2em] rounded-xl cursor-pointer"
-                >
-                  Sign Out
-                </button>
+                <>
+                  <div className="text-center mb-3">
+                    <p className="text-sm font-bold text-white">{profile.full_name}</p>
+                    <p className="text-[9px] text-[#D4AF37] uppercase tracking-[0.22em] mt-0.5">{profile.role}</p>
+                  </div>
+                  <button
+                    onClick={() => { setMobileOpen(false); handleLogout(); }}
+                    className="w-full flex items-center justify-center py-4 border border-red-500/25 text-red-400 text-[11px] font-bold uppercase tracking-[0.22em] rounded-2xl cursor-pointer hover:bg-red-500/5 transition-colors duration-200 bg-transparent"
+                  >
+                    Sign Out
+                  </button>
+                </>
               )}
             </div>
           </motion.div>
