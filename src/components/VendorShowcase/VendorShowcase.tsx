@@ -32,7 +32,7 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: idx * 0.05 },
+      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const, delay: idx * 0.05 },
     },
   };
 
@@ -42,9 +42,9 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
       whileHover={
         shouldReduceMotion
           ? {}
-          : { y: -6, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } }
+          : { y: -6, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const } }
       }
-      className="group relative flex flex-col rounded-2xl border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-500 overflow-hidden bg-black/40 backdrop-blur-md cursor-pointer shadow-lg shadow-black/30"
+      className="group relative flex flex-col rounded-2xl border border-border hover:border-[#D4AF37]/30 transition-all duration-500 overflow-hidden bg-card-bg cursor-pointer shadow-lg shadow-black/30"
     >
       {/* Cover image */}
       <div className="relative h-44 overflow-hidden">
@@ -53,7 +53,7 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
           alt={vendor.businessName}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#090909] via-[#090909]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
         {/* Availability badge */}
         <div className="absolute top-4 right-4 z-10">
@@ -62,7 +62,7 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
 
         {/* Verified badge */}
         {vendor.isVerified && (
-          <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-black/60 backdrop-blur-md rounded-full px-2.5 py-0.5 border border-[#D4AF37]/30 z-10">
+          <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-background/60 backdrop-blur-md rounded-full px-2.5 py-0.5 border border-[#D4AF37]/30 z-10">
             <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span className="text-[8px] text-[#D4AF37] font-bold uppercase tracking-widest">Verified</span>
           </div>
@@ -74,17 +74,17 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
         
         {/* Owner Avatar & Business Name */}
         <div className="flex items-center gap-3.5 -mt-12 relative z-20">
-          <div className="w-14 h-14 rounded-xl border border-white/10 overflow-hidden flex-shrink-0 shadow-xl bg-black">
+          <div className="w-14 h-14 rounded-xl border border-border overflow-hidden flex-shrink-0 shadow-xl bg-black">
             <img src={vendor.profileImage} alt={vendor.ownerName} className="w-full h-full object-cover" />
           </div>
           <div className="mt-4">
             <h4 
-              className="text-base font-medium text-white leading-snug group-hover:text-[#D4AF37] transition-colors duration-300" 
+              className="text-base font-medium text-foreground leading-snug group-hover:text-[#D4AF37] transition-colors duration-300" 
               style={{ fontFamily: "Playfair Display, serif" }}
             >
               {vendor.businessName}
             </h4>
-            <span className="text-[10px] text-[#F7F3EC]/50 font-light block mt-0.5">{vendor.ownerName}</span>
+            <span className="text-[10px] text-foreground/50 font-light block mt-0.5">{vendor.ownerName}</span>
           </div>
         </div>
 
@@ -93,14 +93,14 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
           <span className="text-[9px] uppercase tracking-widest text-[#D4AF37] font-bold bg-[#D4AF37]/5 border border-[#D4AF37]/15 px-3 py-0.5 rounded-full">
             {LANDING_PAGE_CONFIG.vendorCategories.find((c) => c.id === vendor.category)?.label ?? vendor.category}
           </span>
-          <span className="flex items-center gap-1 text-[9px] text-[#F7F3EC]/40 font-light">
+          <span className="flex items-center gap-1 text-[9px] text-foreground/40 font-light">
             <MapPin className="w-2.5 h-2.5" />
             {vendor.city}
           </span>
         </div>
 
         {/* Short description */}
-        <p className="text-xs text-white/50 leading-relaxed font-light line-clamp-2">
+        <p className="text-xs text-muted-foreground leading-relaxed font-light line-clamp-2">
           {vendor.description}
         </p>
 
@@ -109,13 +109,13 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
           {/* Rating */}
           <div className="flex items-center gap-1">
             <Star className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />
-            <span className="text-xs font-bold text-white">{vendor.rating.toFixed(1)}</span>
-            <span className="text-[9px] text-[#F7F3EC]/45">({vendor.reviewCount} reviews)</span>
+            <span className="text-xs font-bold text-foreground">{vendor.rating.toFixed(1)}</span>
+            <span className="text-[9px] text-foreground/45">({vendor.reviewCount} reviews)</span>
           </div>
           {/* Events */}
-          <div className="flex items-center gap-1.5 text-[10px] text-white/60">
-            <Briefcase className="w-3.5 h-3.5 text-white/30" />
-            <span className="font-semibold text-white/80">{vendor.completedEvents}</span> Events Completed
+          <div className="flex items-center gap-1.5 text-[10px] text-foreground/60">
+            <Briefcase className="w-3.5 h-3.5 text-foreground/30" />
+            <span className="font-semibold text-foreground/80">{vendor.completedEvents}</span> Events Completed
           </div>
         </div>
 
@@ -124,7 +124,7 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
           {vendor.portfolioImages.slice(0, 3).map((imgUrl, pIdx) => (
             <div 
               key={pIdx} 
-              className="flex-1 aspect-[4/3] rounded-lg overflow-hidden border border-white/5 relative group/thumb"
+              className="flex-1 aspect-[4/3] rounded-lg overflow-hidden border border-border relative group/thumb"
             >
               <img 
                 src={imgUrl} 
@@ -136,14 +136,14 @@ function VendorCard({ vendor, idx }: { vendor: VendorProfile; idx: number }) {
         </div>
 
         {/* Card Footer: Experience & Action */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+        <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
           <div>
-            <span className="text-[8px] text-[#F7F3EC]/40 uppercase tracking-widest block mb-0.5">Experience</span>
-            <span className="text-xs font-semibold text-white/80">
+            <span className="text-[8px] text-foreground/40 uppercase tracking-widest block mb-0.5">Experience</span>
+            <span className="text-xs font-semibold text-foreground/80">
               {vendor.experienceYears} Years Exp.
             </span>
           </div>
-          <button className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#D4AF37] group-hover:text-white transition-colors duration-300">
+          <button className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#D4AF37] group-hover:text-foreground transition-colors duration-300">
             View Portfolio
             <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-300" />
           </button>
@@ -178,7 +178,7 @@ export default function VendorShowcase() {
   };
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background gradients */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-[#1a3060]/5 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />
@@ -191,12 +191,12 @@ export default function VendorShowcase() {
             Our Network
           </span>
           <h2
-            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
             style={{ fontFamily: "Playfair Display, serif" }}
           >
             Meet Our Trusted Professionals
           </h2>
-          <p className="text-xs sm:text-sm text-[#F7F3EC]/55 font-light max-w-xl mx-auto mt-4 leading-relaxed" style={{ fontFamily: "Poppins, sans-serif" }}>
+          <p className="text-xs sm:text-sm text-foreground/55 font-light max-w-xl mx-auto mt-4 leading-relaxed" style={{ fontFamily: "Poppins, sans-serif" }}>
             150+ handpicked and verified professional vendors ready to coordinate your next celebration with flawless execution.
           </p>
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mx-auto mt-4" />
@@ -215,7 +215,7 @@ export default function VendorShowcase() {
                 className={`flex items-center gap-1.5 px-4.5 py-2.5 rounded-full text-[9px] font-bold tracking-[0.15em] uppercase transition-all duration-300 border cursor-pointer ${
                   isActive
                     ? "bg-[#D4AF37] border-[#D4AF37] text-black shadow-md shadow-[#D4AF37]/15"
-                    : "bg-white/4 border-white/8 hover:border-[#D4AF37]/45 text-[#F7F3EC]/70 hover:text-white"
+                    : "bg-card-bg border-card-border hover:border-[#D4AF37]/45 text-foreground/70 hover:text-foreground"
                 }`}
               >
                 <IconComp className="w-3 h-3" />
@@ -250,12 +250,12 @@ export default function VendorShowcase() {
             </div>
 
             <h3
-              className="text-2xl sm:text-3xl font-light text-white mb-4"
+              className="text-2xl sm:text-3xl font-light text-foreground mb-4"
               style={{ fontFamily: "Playfair Display, serif" }}
             >
               Are You an Elite Event Professional?
             </h3>
-            <p className="text-xs sm:text-sm text-[#F7F3EC]/60 font-light mb-8 leading-relaxed max-w-lg mx-auto" style={{ fontFamily: "Poppins, sans-serif" }}>
+            <p className="text-xs sm:text-sm text-foreground/60 font-light mb-8 leading-relaxed max-w-lg mx-auto" style={{ fontFamily: "Poppins, sans-serif" }}>
               Collaborate with SAI EVENTS, list your premium portfolio, and get booked by elite clients planning milestone celebrations.
             </p>
             

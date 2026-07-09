@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, useTransform, useReducedMotion } from "framer-motion";
 import type { MotionValue } from "framer-motion";
-import { LANDING_PAGE_CONFIG } from "@/constants/introConfig";
+import { LANDING_PAGE_CONFIG, type ServiceItem } from "@/constants/introConfig";
 import ScrollHeading from "@/components/Common/ScrollHeading";
 import {
   cardRevealVariants,
@@ -34,7 +34,7 @@ export default function Services({ scrollProgress }: ServicesProps) {
   return (
     <section
       id="services"
-      className="w-full h-full min-h-screen py-24 relative overflow-hidden select-none flex flex-col justify-center items-center bg-[#090909]"
+      className="w-full h-full min-h-screen py-24 relative overflow-hidden select-none flex flex-col justify-center items-center bg-background"
     >
       {/* ── Layer 1: Background — warm burgundy room mood (40%) ──────────── */}
       <motion.div
@@ -64,7 +64,7 @@ export default function Services({ scrollProgress }: ServicesProps) {
 
           <ScrollHeading
             title="Our Exclusive Services"
-            className="text-3xl sm:text-5xl font-light text-white"
+            className="text-3xl sm:text-5xl font-light text-foreground"
           />
         </motion.div>
 
@@ -79,7 +79,7 @@ export default function Services({ scrollProgress }: ServicesProps) {
             animate="visible"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
           >
-            {LANDING_PAGE_CONFIG.services.map((service, i) => {
+            {LANDING_PAGE_CONFIG.services.map((service: ServiceItem, i: number) => {
               const IconComponent = (Icons as any)[service.icon] || Icons.Sparkles;
 
               return (
@@ -96,7 +96,7 @@ export default function Services({ scrollProgress }: ServicesProps) {
                           transition: { duration: 0.4, ease: CINEMATIC_EASE },
                         }
                   }
-                  className="group relative h-[340px] rounded-2xl overflow-hidden border border-white/5 hover:border-[#D4AF37]/35 transition-colors duration-500 shadow-lg bg-black/40 cursor-pointer"
+                  className="group relative h-[340px] rounded-2xl overflow-hidden border border-border hover:border-[#D4AF37]/35 transition-colors duration-500 shadow-lg bg-card-bg cursor-pointer"
                 >
                   {/* Image with hover Ken Burns */}
                   <div className="absolute inset-0 z-0">
@@ -105,24 +105,24 @@ export default function Services({ scrollProgress }: ServicesProps) {
                       alt={service.title}
                       className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
                   </div>
 
                   {/* Content Card Overlay — rises on hover */}
                   <div className="absolute bottom-0 left-0 w-full p-6 z-10 flex flex-col justify-end translate-y-3 group-hover:translate-y-0 transition-transform duration-500" style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}>
-                    <div className="w-10 h-10 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 group-hover:border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37] mb-4 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_18px_rgba(212,175,55,0.3)]">
+                    <div className="w-10 h-10 rounded-xl bg-background/60 backdrop-blur-md border border-border group-hover:border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37] mb-4 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_18px_rgba(212,175,55,0.3)]">
                       <IconComponent className="w-5 h-5" />
                     </div>
 
                     <h3
-                      className="text-xl font-bold text-white mb-2"
+                      className="text-xl font-bold text-foreground mb-2"
                       style={{ fontFamily: "Playfair Display, serif" }}
                     >
                       {service.title}
                     </h3>
 
                     <p
-                      className="text-xs text-[#F7F3EC]/70 font-light leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      className="text-xs text-muted-foreground font-light leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{ fontFamily: "Poppins, sans-serif" }}
                     >
                       {service.description}

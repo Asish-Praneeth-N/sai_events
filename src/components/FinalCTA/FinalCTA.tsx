@@ -18,7 +18,7 @@ export default function FinalCTA() {
   };
 
   return (
-    <section className="w-full bg-[#050505] py-24 sm:py-36 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-36 relative overflow-hidden select-none border-t border-border">
       {/* Background image & lighting overlay */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
         <img
@@ -26,7 +26,7 @@ export default function FinalCTA() {
           alt="Grand Finale"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-[#050505]/90" />
+        <div className="absolute inset-0 bg-background/90" />
       </div>
 
       {/* Ambient spotlights */}
@@ -41,7 +41,7 @@ export default function FinalCTA() {
 
         {/* Heading */}
         <h2
-          className="text-4xl sm:text-6xl md:text-7xl font-light text-white leading-[1.1] mb-6"
+          className="text-4xl sm:text-6xl md:text-7xl font-light text-foreground leading-[1.1] mb-6"
           style={{ fontFamily: "Playfair Display, serif" }}
         >
           Let&apos;s Create Something{" "}
@@ -53,7 +53,7 @@ export default function FinalCTA() {
 
         {/* Subtext */}
         <p
-          className="text-xs sm:text-sm text-[#F7F3EC]/50 font-light max-w-xl leading-relaxed mb-16"
+          className="text-xs sm:text-sm text-foreground/50 font-light max-w-xl leading-relaxed mb-16"
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
           Whether you&apos;re planning your dream milestone celebration or looking to grow your business as an elite professional — your journey starts with a simple invitation.
@@ -78,10 +78,10 @@ export default function FinalCTA() {
                 ? {}
                 : { y: -8, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
             }
-            className="group relative rounded-3xl border border-[#D4AF37]/25 p-8 sm:p-10 flex flex-col justify-between h-[340px] sm:h-[380px] bg-gradient-to-b from-[#110e0a] to-[#070604] shadow-2xl overflow-hidden"
+            className="group relative rounded-3xl border border-accent-gold/25 p-8 sm:p-10 flex flex-col justify-between h-[340px] sm:h-[380px] bg-gradient-to-b from-surface to-surface-raised shadow-2xl overflow-hidden"
           >
             {/* Fine border accents to look like luxury paper/molding */}
-            <div className="absolute inset-3 border border-[#D4AF37]/10 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-3 border border-accent-gold/10 rounded-2xl pointer-events-none" />
             
             <div>
               {/* Header details */}
@@ -92,12 +92,12 @@ export default function FinalCTA() {
 
               {/* Title & Desc */}
               <h3 
-                className="text-2xl sm:text-3xl font-light text-white mb-3 tracking-wide"
+                className="text-2xl sm:text-3xl font-light text-foreground mb-3 tracking-wide"
                 style={{ fontFamily: "Playfair Display, serif" }}
               >
                 Plan Your Event
               </h3>
-              <p className="text-xs text-white/55 font-mono tracking-wide leading-relaxed uppercase">
+              <p className="text-xs text-foreground/55 font-mono tracking-wide leading-relaxed uppercase">
                 A ceremonial invitation to craft your milestone wedding, engagement, or luxury event from beginning to end.
               </p>
             </div>
@@ -114,7 +114,7 @@ export default function FinalCTA() {
             </div>
 
             {/* Background watermark */}
-            <div className="absolute right-4 bottom-4 text-9xl text-white/[0.01] font-heading font-black select-none pointer-events-none">
+            <div className="absolute right-4 bottom-4 text-9xl text-foreground/[0.01] font-heading font-black select-none pointer-events-none">
               SAI
             </div>
           </motion.div>
@@ -127,25 +127,25 @@ export default function FinalCTA() {
                 ? {}
                 : { y: -8, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
             }
-            className="group relative rounded-3xl border border-white/5 p-8 sm:p-10 flex flex-col justify-between h-[340px] sm:h-[380px] bg-gradient-to-b from-[#0f0f0f] to-[#080808] shadow-2xl overflow-hidden hover:border-[#D4AF37]/20 transition-colors duration-500"
+            className="group relative rounded-3xl border border-border p-8 sm:p-10 flex flex-col justify-between h-[340px] sm:h-[380px] bg-gradient-to-b from-surface to-surface-raised shadow-2xl overflow-hidden hover:border-accent-gold/20 transition-colors duration-500"
           >
-            <div className="absolute inset-3 border border-white/[0.03] rounded-2xl pointer-events-none" />
+            <div className="absolute inset-3 border border-border/30 rounded-2xl pointer-events-none" />
 
             <div>
               {/* Header details */}
               <div className="flex justify-between items-start mb-6 relative z-10">
-                <span className="text-[9px] uppercase tracking-widest text-[#F7F3EC]/40 font-semibold">SAI EVENTS • PARTNER CIRCLE</span>
+                <span className="text-[9px] uppercase tracking-widest text-[#D4AF37] font-semibold">SAI EVENTS • PARTNER CIRCLE</span>
                 <ShieldCheck className="w-5 h-5 text-white/20 group-hover:text-[#D4AF37]/60 transition-colors duration-400" />
               </div>
 
               {/* Title & Desc */}
               <h3 
-                className="text-2xl sm:text-3xl font-light text-white mb-3 tracking-wide"
+                className="text-2xl sm:text-3xl font-light text-foreground mb-3 tracking-wide"
                 style={{ fontFamily: "Playfair Display, serif" }}
               >
                 Become a Partner
               </h3>
-              <p className="text-xs text-[#F7F3EC]/45 font-mono tracking-wide leading-relaxed uppercase">
+              <p className="text-xs text-muted-foreground/85 font-mono tracking-wide leading-relaxed uppercase">
                 Join our premium ecosystem of verified floral decorators, coordinators, makeup artists, and coordinators.
               </p>
             </div>
@@ -154,7 +154,7 @@ export default function FinalCTA() {
             <div className="relative z-10 mt-6">
               <Link
                 href="/register?role=vendor"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-white/5 border border-white/10 hover:border-[#D4AF37]/50 text-white hover:bg-[#D4AF37]/5 hover:text-[#D4AF37] font-bold text-xs uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-btn-secondary-bg border border-card-border hover:border-accent-gold/50 text-foreground hover:bg-accent-gold/5 hover:text-[#D4AF37] font-bold text-xs uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
               >
                 <Store className="w-4 h-4" />
                 Become a Vendor
@@ -162,7 +162,7 @@ export default function FinalCTA() {
             </div>
 
             {/* Background watermark */}
-            <div className="absolute right-4 bottom-4 text-9xl text-white/[0.01] font-heading font-black select-none pointer-events-none">
+            <div className="absolute right-4 bottom-4 text-9xl text-foreground/[0.01] font-heading font-black select-none pointer-events-none">
               NET
             </div>
           </motion.div>

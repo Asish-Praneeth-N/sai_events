@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
 import { LANDING_PAGE_CONFIG } from "@/constants/introConfig";
 import { Sparkles, Calendar, ArrowRight } from "lucide-react";
 import { CINEMATIC_EASE } from "@/lib/motionVariants";
@@ -21,7 +21,7 @@ export default function Hero() {
   const titleWords = LANDING_PAGE_CONFIG.hero.title.split(" ");
 
   // Simplified and fast reveal animations (no heavy blur filter)
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: {},
     visible: {
       transition: {
@@ -31,7 +31,7 @@ export default function Hero() {
     },
   };
 
-  const wordReveal = {
+  const wordReveal: Variants = {
     hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
@@ -40,7 +40,7 @@ export default function Hero() {
     },
   };
 
-  const lineReveal = {
+  const lineReveal: Variants = {
     hidden: { opacity: 0, y: 10 },
     visible: {
       opacity: 1,
@@ -49,7 +49,7 @@ export default function Hero() {
     },
   };
 
-  const ctaReveal = {
+  const ctaReveal: Variants = {
     hidden: { opacity: 0, y: 10 },
     visible: {
       opacity: 1,
@@ -60,7 +60,7 @@ export default function Hero() {
 
   return (
     <div
-      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center bg-[#090909]"
+      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center bg-background"
     >
       {/* ── Layer 1: Background Images (Fades only - GPU opacity only) ── */}
       <div className="absolute inset-0 z-0">
@@ -79,13 +79,13 @@ export default function Hero() {
               alt="Sai Events Background"
               className="w-full h-full object-cover"
             />
-            {/* Dark wash for high text readability */}
-            <div className="absolute inset-0 bg-black/55" />
+            {/* Theme-adaptive wash for high text readability */}
+            <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
           </motion.div>
         </AnimatePresence>
         
         {/* Ambient lighting gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#090909] via-transparent to-black/30 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/10 dark:to-black/30 pointer-events-none" />
       </div>
 
       {/* ── Layer 2: Main Hero Content ── */}
@@ -96,10 +96,10 @@ export default function Hero() {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6"
+          className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card-bg border border-card-border shadow-sm mb-6"
         >
           <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" />
-          <span className="text-[10px] uppercase font-bold text-[#F7F3EC] tracking-[0.25em]">
+          <span className="text-[10px] uppercase font-bold text-foreground tracking-[0.25em]">
             Luxury Events Ecosystem
           </span>
         </motion.div>
@@ -109,7 +109,7 @@ export default function Hero() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="text-4xl sm:text-6xl md:text-7xl font-extrabold font-heading text-white tracking-tight leading-[1.1] mb-6 max-w-4xl text-center select-none"
+          className="text-4xl sm:text-6xl md:text-7xl font-extrabold font-heading text-foreground tracking-tight leading-[1.1] mb-6 max-w-4xl text-center select-none"
         >
           <span className="flex flex-wrap justify-center gap-x-[0.22em]">
             {titleWords.map((word, idx) => (
@@ -135,7 +135,7 @@ export default function Hero() {
           variants={lineReveal}
           initial="hidden"
           animate="visible"
-          className="text-sm sm:text-base md:text-lg text-[#F7F3EC]/65 max-w-2xl font-light mb-10 leading-relaxed"
+          className="text-sm sm:text-base md:text-lg text-foreground/65 max-w-2xl font-light mb-10 leading-relaxed"
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
           {LANDING_PAGE_CONFIG.hero.subheading}
@@ -158,7 +158,7 @@ export default function Hero() {
 
           <a
             href="#finale"
-            className="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white font-bold text-xs uppercase tracking-[0.2em] rounded-xl border border-white/15 hover:border-white/30 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 text-center flex items-center justify-center gap-2 group cursor-pointer"
+            className="w-full sm:w-auto px-8 py-4 bg-btn-secondary-bg hover:bg-btn-secondary-hover text-foreground font-bold text-xs uppercase tracking-[0.2em] rounded-xl border border-card-border hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 text-center flex items-center justify-center gap-2 group cursor-pointer"
           >
             Become a Vendor
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
@@ -167,7 +167,7 @@ export default function Hero() {
       </div>
 
       {/* Decorative divider */}
-      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#090909] to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </div>
   );
 }

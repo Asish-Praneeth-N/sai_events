@@ -27,12 +27,12 @@ export default function HowItWorks() {
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
     },
   });
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1a1308]/50 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />
@@ -45,12 +45,12 @@ export default function HowItWorks() {
             Your Journey
           </span>
           <h2
-            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
             style={{ fontFamily: "Playfair Display, serif" }}
           >
             How It Works
           </h2>
-          <p className="text-xs sm:text-sm text-[#F7F3EC]/55 font-light max-w-md mx-auto mt-4 leading-relaxed" style={{ fontFamily: "Poppins, sans-serif" }}>
+          <p className="text-xs sm:text-sm text-foreground/55 font-light max-w-md mx-auto mt-4 leading-relaxed" style={{ fontFamily: "Poppins, sans-serif" }}>
             Six simple steps from your first idea to the final celebration.
           </p>
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mx-auto mt-4" />
@@ -78,7 +78,7 @@ export default function HowItWorks() {
                   className={`flex flex-col sm:flex-row items-center sm:items-start gap-6 ${isRight ? "sm:flex-row-reverse" : ""}`}
                 >
                   {/* Center Node dot (desktop) */}
-                  <div className="hidden sm:flex absolute left-1/2 -translate-x-1/2 mt-3.5 w-8 h-8 rounded-full bg-[#090909] border-2 border-[#D4AF37]/50 items-center justify-center z-10 shadow-[0_0_12px_rgba(212,175,55,0.25)]">
+                  <div className="hidden sm:flex absolute left-1/2 -translate-x-1/2 mt-3.5 w-8 h-8 rounded-full bg-background border-2 border-[#D4AF37]/50 items-center justify-center z-10 shadow-[0_0_12px_rgba(212,175,55,0.25)]">
                     <span className="text-[10px] font-black text-[#D4AF37]">{String(step.step).padStart(2, "0")}</span>
                   </div>
 
@@ -87,7 +87,7 @@ export default function HowItWorks() {
                     variants={cardVariants(isRight)}
                     className={`w-full sm:w-[44%] ${isRight ? "sm:text-right" : ""}`}
                   >
-                    <div className="flex flex-col sm:items-start gap-4 p-6 rounded-2xl bg-white/3 border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-500 backdrop-blur-md group">
+                    <div className="flex flex-col sm:items-start gap-4 p-6 rounded-2xl bg-card-bg border border-card-border hover:border-[#D4AF37]/30 transition-all duration-500 shadow-sm group">
                       <div className="flex items-center gap-3">
                         {/* Step number (mobile) */}
                         <div className="flex sm:hidden w-8 h-8 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/35 items-center justify-center flex-shrink-0">
@@ -96,7 +96,7 @@ export default function HowItWorks() {
 
                         {/* Icon */}
                         <div
-                          className={`w-10 h-10 rounded-xl bg-black/60 border border-white/8 group-hover:border-[#D4AF37]/45 flex items-center justify-center text-[#D4AF37] transition-all duration-300 ${
+                          className={`w-10 h-10 rounded-xl bg-background/60 border border-border group-hover:border-[#D4AF37]/45 flex items-center justify-center text-[#D4AF37] transition-all duration-300 ${
                             isRight ? "sm:ml-auto" : ""
                           }`}
                         >
@@ -106,13 +106,13 @@ export default function HowItWorks() {
 
                       <div className="space-y-1.5">
                         <h3
-                          className="text-base sm:text-lg font-bold text-white"
+                          className="text-base sm:text-lg font-bold text-foreground"
                           style={{ fontFamily: "Playfair Display, serif" }}
                         >
                           {step.title}
                         </h3>
                         <p
-                          className="text-xs sm:text-sm text-[#F7F3EC]/55 leading-relaxed font-light"
+                          className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-light"
                           style={{ fontFamily: "Poppins, sans-serif" }}
                         >
                           {step.description}
@@ -139,7 +139,7 @@ export default function HowItWorks() {
           </Link>
           <Link
             href="/register?role=vendor"
-            className="px-8 py-3.5 bg-white/5 border border-white/10 hover:border-[#D4AF37]/40 text-white font-bold text-xs uppercase tracking-[0.2em] rounded-xl hover:bg-white/8 transition-all duration-300"
+            className="px-8 py-3.5 bg-btn-secondary-bg border border-card-border hover:border-[#D4AF37]/40 text-foreground font-bold text-xs uppercase tracking-[0.2em] rounded-xl hover:bg-btn-secondary-hover transition-all duration-300"
           >
             Become a Vendor
           </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { LANDING_PAGE_CONFIG } from "@/constants/introConfig";
 import { Mail, Phone, MapPin, Clock, Send, Map } from "lucide-react";
 import ScrollHeading from "@/components/Common/ScrollHeading";
@@ -33,7 +33,7 @@ export default function Contact() {
     { Icon: Clock, label: "Office Hours", value: LANDING_PAGE_CONFIG.contact.workingHours, isLink: false },
   ];
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: {},
     visible: {
       transition: {
@@ -42,17 +42,17 @@ export default function Contact() {
     },
   };
 
-  const entryVariants = {
+  const entryVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
     },
   };
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background gradients */}
       <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-[#287878]/5 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />
@@ -67,7 +67,7 @@ export default function Contact() {
           </span>
           <ScrollHeading
             title="Connect With Our Team"
-            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
           />
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mx-auto mt-4" />
         </div>
@@ -87,7 +87,7 @@ export default function Contact() {
           >
             <div className="space-y-6">
               <h3
-                className="text-2xl font-light text-white tracking-wide"
+                className="text-2xl font-light text-foreground tracking-wide"
                 style={{ fontFamily: "Playfair Display, serif" }}
               >
                 Contact Information
@@ -96,22 +96,22 @@ export default function Contact() {
               <div className="space-y-5">
                 {contactInfoItems.map(({ Icon, label, value, href, isLink }, i) => (
                   <div key={label} className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/4 border border-white/5 flex items-center justify-center text-[#D4AF37] shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-card-bg border border-card-border flex items-center justify-center text-[#D4AF37] shrink-0">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-[10px] text-white/40 uppercase tracking-widest block font-bold mb-0.5">
+                      <span className="text-[10px] text-foreground/45 uppercase tracking-widest block font-bold mb-0.5">
                         {label}
                       </span>
                       {isLink && href ? (
                         <a
                           href={href}
-                          className="text-sm text-[#F7F3EC] hover:text-[#D4AF37] transition-colors duration-300 font-light"
+                          className="text-sm text-foreground hover:text-[#D4AF37] transition-colors duration-300 font-light"
                         >
                           {value}
                         </a>
                       ) : (
-                        <span className="text-sm text-[#F7F3EC] leading-snug block font-light">{value}</span>
+                        <span className="text-sm text-foreground leading-snug block font-light">{value}</span>
                       )}
                     </div>
                   </div>
@@ -120,7 +120,7 @@ export default function Contact() {
             </div>
 
             {/* Office map preview box */}
-            <div className="relative h-[200px] rounded-2xl overflow-hidden border border-white/5 shadow-xl bg-[#0F172A]/40 flex flex-col items-center justify-center p-6 text-center">
+            <div className="relative h-[200px] rounded-2xl overflow-hidden border border-border shadow-xl bg-surface-raised flex flex-col items-center justify-center p-6 text-center">
               <div
                 className="absolute inset-0 z-0 opacity-15 bg-cover bg-center"
                 style={{ backgroundImage: "url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=500&q=80')" }}
@@ -131,10 +131,10 @@ export default function Contact() {
                   <div className="absolute inset-0 rounded-full border border-[#D4AF37] animate-ping opacity-10" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white tracking-widest uppercase">
+                  <h4 className="text-xs font-bold text-foreground tracking-widest uppercase">
                     Jubilee Hills Office
                   </h4>
-                  <p className="text-[10px] text-[#F7F3EC]/60 mt-1 max-w-[220px] mx-auto leading-relaxed">
+                  <p className="text-[10px] text-foreground/60 mt-1 max-w-[220px] mx-auto leading-relaxed">
                     Sai Events Tower, Hyderabad, Telangana, India
                   </p>
                 </div>
@@ -142,7 +142,7 @@ export default function Contact() {
                   href="https://maps.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-1 text-[9px] uppercase font-bold tracking-widest text-[#D4AF37] hover:text-white flex items-center gap-1.5 transition-colors duration-300 cursor-pointer"
+                  className="mt-1 text-[9px] uppercase font-bold tracking-widest text-[#D4AF37] hover:text-foreground flex items-center gap-1.5 transition-colors duration-300 cursor-pointer"
                 >
                   <Map className="w-3.5 h-3.5" />
                   Open in Maps
@@ -156,9 +156,9 @@ export default function Contact() {
             variants={entryVariants}
             className="lg:col-span-7"
           >
-            <div className="p-8 rounded-3xl bg-white/4 border border-white/5 backdrop-blur-md shadow-2xl">
+            <div className="p-8 rounded-3xl bg-card-bg border border-card-border shadow-2xl">
               <h3
-                className="text-2xl font-light text-white mb-6 tracking-wide"
+                className="text-2xl font-light text-foreground mb-6 tracking-wide"
                 style={{ fontFamily: "Playfair Display, serif" }}
               >
                 Send A Message
@@ -174,9 +174,9 @@ export default function Contact() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                     placeholder=" "
-                    className="peer w-full bg-white/4 border border-white/5 focus:border-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-white placeholder-transparent focus:outline-none transition-colors duration-300"
+                    className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
                   />
-                  <label className="absolute left-4 top-4 text-xs font-light text-white/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
+                  <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
                     Your Name
                   </label>
                 </div>
@@ -191,9 +191,9 @@ export default function Contact() {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
                       placeholder=" "
-                      className="peer w-full bg-white/4 border border-white/5 focus:border-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-white placeholder-transparent focus:outline-none transition-colors duration-300"
+                      className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
                     />
-                    <label className="absolute left-4 top-4 text-xs font-light text-white/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
+                    <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
                       Email Address
                     </label>
                   </div>
@@ -207,9 +207,9 @@ export default function Contact() {
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       required
                       placeholder=" "
-                      className="peer w-full bg-white/4 border border-white/5 focus:border-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-white placeholder-transparent focus:outline-none transition-colors duration-300"
+                      className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
                     />
-                    <label className="absolute left-4 top-4 text-xs font-light text-white/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
+                    <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
                       Phone Number
                     </label>
                   </div>
@@ -220,14 +220,14 @@ export default function Contact() {
                   name="eventType"
                   value={formData.eventType}
                   onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                  className="w-full bg-white/4 border border-white/5 focus:border-[#D4AF37] rounded-xl px-4 py-4 text-xs text-white focus:outline-none transition-colors duration-300 uppercase tracking-widest font-bold"
+                  className="w-full bg-input-bg border border-card-border focus:border-[#D4AF37] rounded-xl px-4 py-4 text-xs text-foreground focus:outline-none transition-colors duration-300 uppercase tracking-widest font-bold"
                 >
-                  <option value="wedding"    className="bg-[#090909] text-white">Weddings</option>
-                  <option value="engagement" className="bg-[#090909] text-white">Engagements</option>
-                  <option value="birthday"   className="bg-[#090909] text-white">Birthdays</option>
-                  <option value="corporate"  className="bg-[#090909] text-white">Corporate Events</option>
-                  <option value="baby-shower" className="bg-[#090909] text-white">Baby Showers</option>
-                  <option value="decoration" className="bg-[#090909] text-white">Decorations & Design</option>
+                  <option value="wedding"    className="bg-surface text-foreground">Weddings</option>
+                  <option value="engagement" className="bg-surface text-foreground">Engagements</option>
+                  <option value="birthday"   className="bg-surface text-foreground">Birthdays</option>
+                  <option value="corporate"  className="bg-surface text-foreground">Corporate Events</option>
+                  <option value="baby-shower" className="bg-surface text-foreground">Baby Showers</option>
+                  <option value="decoration" className="bg-surface text-foreground">Decorations & Design</option>
                 </select>
 
                 {/* Message */}
@@ -239,9 +239,9 @@ export default function Contact() {
                     required
                     rows={4}
                     placeholder=" "
-                    className="peer w-full bg-white/4 border border-white/5 focus:border-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-white placeholder-transparent focus:outline-none transition-colors duration-300 resize-none"
+                    className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300 resize-none"
                   />
-                  <label className="absolute left-4 top-4 text-xs font-light text-white/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
+                  <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
                     Tell Us About Your Event
                   </label>
                 </div>

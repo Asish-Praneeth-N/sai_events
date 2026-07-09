@@ -18,7 +18,7 @@ export default function Gallery() {
       : LANDING_PAGE_CONFIG.gallery.filter((item) => item.category === filter);
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background ambient lighting */}
       <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-[#D4AF37]/4 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/3 w-[300px] h-[300px] bg-[#FF9040]/3 rounded-full blur-[110px] pointer-events-none" />
@@ -31,7 +31,7 @@ export default function Gallery() {
           </span>
           <ScrollHeading
             title="Our Gallery"
-            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
           />
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mx-auto mt-4" />
         </div>
@@ -45,7 +45,7 @@ export default function Gallery() {
               className={`px-5 py-2 rounded-full text-[10px] font-semibold tracking-[0.12em] uppercase transition-all duration-300 border cursor-pointer ${
                 filter === cat
                   ? "bg-[#D4AF37] border-[#D4AF37] text-black shadow-md"
-                  : "bg-white/5 border-white/10 hover:border-[#D4AF37]/50 text-white/70 hover:text-white"
+                  : "bg-card-bg border-card-border hover:border-[#D4AF37]/50 text-foreground/70 hover:text-foreground"
               }`}
             >
               {cat}
@@ -80,7 +80,7 @@ export default function Gallery() {
                   layout: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const },
                 }}
                 whileHover={shouldReduceMotion ? {} : { y: -4, transition: { duration: 0.3 } }}
-                className="relative overflow-hidden rounded-2xl group border border-white/5 hover:border-[#D4AF37]/30 shadow-lg bg-[#121212] cursor-pointer aspect-[4/3]"
+                className="relative overflow-hidden rounded-2xl group border border-border hover:border-[#D4AF37]/30 shadow-lg bg-surface-raised cursor-pointer aspect-[4/3]"
               >
                 <img
                   src={item.image}

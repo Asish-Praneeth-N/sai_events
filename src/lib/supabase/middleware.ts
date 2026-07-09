@@ -35,6 +35,28 @@ export async function updateSession(request: NextRequest) {
   const url = request.nextUrl.clone();
   const path = url.pathname;
 
+  let role: string | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    role = profile?.role || null;
+  }
+
+  // Admin routing isolation: once authenticated as admin, must stay inside /admin/*
+  if (user && role === "admin" && !path.startsWith("/admin")) {
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect /admin base route directly to dashboard
+  if (path === "/admin" || path === "/admin/") {
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+  }
+
   const isProtectedPath =
     path.startsWith("/admin") ||
     path.startsWith("/customer") ||
@@ -47,15 +69,6 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }
-
-    // Role verification check against public.profiles
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    const role = profile?.role;
 
     if (path.startsWith("/admin") && role !== "admin") {
       url.pathname = "/unauthorized";
@@ -73,16 +86,8 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect authenticated users trying to hit auth forms
   if (isAuthPath && user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    const role = profile?.role;
-
     if (role === "admin") {
-      url.pathname = "/admin/catalog";
+      url.pathname = "/admin/dashboard";
     } else if (role === "vendor") {
       url.pathname = "/vendor/profile";
     } else {

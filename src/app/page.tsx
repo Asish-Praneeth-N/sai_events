@@ -35,7 +35,7 @@ const SECTIONS = [
   { label: "Contact",    id: "contact" },
 ];
 
-const SectionFallback = () => <div className="w-full py-16 bg-[#090909]" />;
+const SectionFallback = () => <div className="w-full py-16 bg-background" />;
 
 // ─── Intro visibility logic ──────────────────────────────────────────────────
 //
@@ -178,7 +178,7 @@ export default function Home() {
           opacity: { duration: 1.6, ease: "easeOut" },
           scale:   { duration: 3.2, ease: [0.22, 1, 0.36, 1] },
         }}
-        className="relative bg-[#090909] text-[#F7F3EC] overflow-x-hidden film-grain font-sans min-h-screen"
+        className="relative bg-background text-foreground overflow-x-hidden film-grain font-sans min-h-screen"
         style={{ transformOrigin: "center center", willChange: "transform, opacity" }}
       >
         <Navbar activeSection={activeSection} sections={SECTIONS} />
@@ -194,7 +194,7 @@ export default function Home() {
         {/* Section dot navigation — only visible once content is revealed */}
         {contentReady && (
           <div className="fixed right-5 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col items-center gap-3.5 select-none pointer-events-auto">
-            <div className="absolute top-0 bottom-0 w-px bg-white/5 rounded-full" />
+            <div className="absolute top-0 bottom-0 w-px bg-border/40 dark:bg-white/5 rounded-full" />
             {SECTIONS.map((sec, idx) => {
               const isActive = activeSection === idx;
               return (
@@ -217,7 +217,7 @@ export default function Home() {
                     className={`rounded-full transition-all duration-400 ${
                       isActive
                         ? "w-2.5 h-2.5 bg-[#D4AF37] shadow-[0_0_8px_rgba(212,175,55,0.5)]"
-                        : "w-1.5 h-1.5 bg-white/15 group-hover:bg-white/30"
+                        : "w-1.5 h-1.5 bg-foreground/15 dark:bg-white/15 group-hover:bg-foreground/30 dark:group-hover:bg-white/30"
                     }`}
                   />
                 </div>

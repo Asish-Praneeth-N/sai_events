@@ -145,10 +145,10 @@ export default function CinematicDoors({ onComplete, onOpening }: CinematicDoors
         transition={{ duration: doorDuration, ease: DOOR_EASE }}
         className="absolute top-0 left-0 w-1/2 h-full z-10"
         style={{
-          background: "linear-gradient(to right, #0b0705 0%, #191009 40%, #201209 70%, #160d07 100%)",
+          background: "var(--door-bg-left)",
           // On mobile skip the expensive multi-layer box-shadow
           boxShadow: m ? "none" : "inset -6px 0 40px rgba(0,0,0,0.85), 14px 0 60px rgba(0,0,0,0.95)",
-          borderRight: "1px solid #251508",
+          borderRight: "1px solid var(--door-border)",
           willChange: "transform",
           backfaceVisibility: "hidden",
         }}
@@ -156,7 +156,7 @@ export default function CinematicDoors({ onComplete, onOpening }: CinematicDoors
         {/* Door frame — skip inner SVG on mobile to reduce paint complexity */}
         <div
           className="absolute inset-[5%] sm:inset-[6%]"
-          style={{ border: "4px solid #0c0804", boxShadow: m ? "none" : "inset 0 0 25px rgba(0,0,0,0.9), 0 0 0 1px rgba(212,175,55,0.07)" }}
+          style={{ border: "4px solid var(--door-frame-border)", boxShadow: m ? "none" : "inset 0 0 25px rgba(0,0,0,0.9), 0 0 0 1px rgba(212,175,55,0.07)" }}
         >
           <div className="absolute inset-[8%]" style={{ border: "1px solid rgba(212,175,55,0.1)" }} />
           {!m && <DoorVines flip={false} />}
@@ -185,16 +185,16 @@ export default function CinematicDoors({ onComplete, onOpening }: CinematicDoors
         transition={{ duration: doorDuration, ease: DOOR_EASE }}
         className="absolute top-0 right-0 w-1/2 h-full z-10"
         style={{
-          background: "linear-gradient(to left, #0b0705 0%, #191009 40%, #201209 70%, #160d07 100%)",
+          background: "var(--door-bg-right)",
           boxShadow: m ? "none" : "inset 6px 0 40px rgba(0,0,0,0.85), -14px 0 60px rgba(0,0,0,0.95)",
-          borderLeft: "1px solid #251508",
+          borderLeft: "1px solid var(--door-border)",
           willChange: "transform",
           backfaceVisibility: "hidden",
         }}
       >
         <div
           className="absolute inset-[5%] sm:inset-[6%]"
-          style={{ border: "4px solid #0c0804", boxShadow: m ? "none" : "inset 0 0 25px rgba(0,0,0,0.9), 0 0 0 1px rgba(212,175,55,0.07)" }}
+          style={{ border: "4px solid var(--door-frame-border)", boxShadow: m ? "none" : "inset 0 0 25px rgba(0,0,0,0.9), 0 0 0 1px rgba(212,175,55,0.07)" }}
         >
           <div className="absolute inset-[8%]" style={{ border: "1px solid rgba(212,175,55,0.1)" }} />
           {!m && <DoorVines flip />}
@@ -248,7 +248,7 @@ export default function CinematicDoors({ onComplete, onOpening }: CinematicDoors
         className="absolute inset-y-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
         animate={isOpening ? { opacity: 0 } : { opacity: 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        style={{ width: 2, background: "linear-gradient(180deg,#030200,#090704,#030200)" }}
+        style={{ width: 2, background: "var(--seam-bg)" }}
       />
     </div>
   );
@@ -291,8 +291,8 @@ function DoorHandle({ side }: { side: "left" | "right" }) {
         className="w-full h-full rounded-full"
         style={{
           background: isRight
-            ? "linear-gradient(to right,#6b4a00,#C8A020 28%,#F0D060 52%,#C8A020 74%,#6b4a00)"
-            : "linear-gradient(to left, #6b4a00,#C8A020 28%,#F0D060 52%,#C8A020 74%,#6b4a00)",
+            ? "var(--door-handle-bg-right)"
+            : "var(--door-handle-bg-left)",
         }}
       />
     </div>

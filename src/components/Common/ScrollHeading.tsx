@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 interface ScrollHeadingProps {
   title: string;
@@ -12,7 +12,7 @@ export default function ScrollHeading({ title, className }: ScrollHeadingProps) 
   const words = title.split(" ");
   const shouldReduceMotion = useReducedMotion();
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: {},
     visible: {
       transition: {
@@ -21,7 +21,7 @@ export default function ScrollHeading({ title, className }: ScrollHeadingProps) 
     },
   };
 
-  const wordVariants = {
+  const wordVariants: Variants = {
     hidden: { 
       opacity: 0, 
       y: shouldReduceMotion ? 0 : 15 

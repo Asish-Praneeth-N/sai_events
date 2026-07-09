@@ -2,6 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { updateVendorStatus } from "@/app/admin/actions";
+import { 
+  Store, User, Phone, Mail, MapPin, Award, ShieldCheck, 
+  XOctagon, Power, Eye, CheckCircle2 
+} from "lucide-react";
+import Link from "next/link";
 
 interface Mapping {
   category_id: string;
@@ -35,7 +40,7 @@ export default function VendorsList({ vendors }: VendorsListProps) {
   const approvedVendors = vendors.filter((v) => v.status !== "Pending");
 
   const handleStatusChange = async (id: string, nextStatus: "Approved" | "Rejected" | "Active" | "Inactive") => {
-    if (!confirm(`Are you sure you want to change status to ${nextStatus}?`)) {
+    if (!confirm(`Are you sure you want to change vendor status to ${nextStatus}?`)) {
       return;
     }
     setLoadingId(id);
@@ -50,210 +55,240 @@ export default function VendorsList({ vendors }: VendorsListProps) {
     });
   };
 
-  const getStatusBadgeColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "Approved":
       case "Active":
-        return "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/30 text-emerald-600 dark:text-emerald-400";
+        return (
+          <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10">
+            <ShieldCheck className="w-3 h-3" /> Active
+          </span>
+        );
       case "Pending":
-        return "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/30 text-amber-600 dark:text-amber-400";
+        return (
+          <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-amber-500 bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10 animate-pulse">
+            <ClockIcon /> Pending
+          </span>
+        );
       case "Rejected":
       case "Inactive":
-        return "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/30 text-red-600 dark:text-red-400";
+        return (
+          <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-red-500 bg-red-500/5 px-2 py-0.5 rounded border border-red-500/10">
+            <XOctagon className="w-3 h-3" /> Suspended
+          </span>
+        );
       default:
-        return "bg-muted text-muted-foreground border-border/50";
+        return null;
     }
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Tabs */}
+    <div className="space-y-6">
+      
+      {/* Tab selectors */}
       <div className="flex gap-6 border-b border-border/50 pb-2">
         <button
           onClick={() => setActiveTab("pending")}
-          className={`pb-2 text-sm font-bold border-b-2 transition-all duration-200 cursor-pointer ${
+          className={`pb-2 text-xs uppercase font-bold tracking-wider border-b-2 transition-all cursor-pointer ${
             activeTab === "pending"
-              ? "border-purple-500 text-purple-600 dark:text-purple-400"
+              ? "border-accent-gold text-accent-gold"
               : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Pending Onboard Requests ({pendingVendors.length})
+          Pending Registrations ({pendingVendors.length})
         </button>
         <button
           onClick={() => setActiveTab("approved")}
-          className={`pb-2 text-sm font-bold border-b-2 transition-all duration-200 cursor-pointer ${
+          className={`pb-2 text-xs uppercase font-bold tracking-wider border-b-2 transition-all cursor-pointer ${
             activeTab === "approved"
-              ? "border-purple-500 text-purple-600 dark:text-purple-400"
+              ? "border-accent-gold text-accent-gold"
               : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Approved Vendors ({approvedVendors.length})
+          Approved Suppliers ({approvedVendors.length})
         </button>
       </div>
 
-      {/* Lists */}
-      <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
-        {activeTab === "pending" ? (
-          pendingVendors.length === 0 ? (
-            <div className="text-center py-16 text-sm text-muted-foreground border border-dashed border-border rounded-2xl bg-muted/10">
-              No pending vendor registration approvals.
-            </div>
-          ) : (
-            <div className="overflow-x-auto -mx-6 px-6">
-              <table className="w-full text-left border-collapse min-w-[800px]">
-                <thead>
-                  <tr className="border-b border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    <th className="pb-4 px-3">Business / Owner</th>
-                    <th className="pb-4 px-3">Contact</th>
-                    <th className="pb-4 px-3">Categories</th>
-                    <th className="pb-4 px-3">Location</th>
-                    <th className="pb-4 px-3">Status</th>
-                    <th className="pb-4 px-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50 text-sm">
-                  {pendingVendors.map((vendor) => (
-                    <tr key={vendor.id} className="hover:bg-muted/30 transition-colors duration-150">
-                      <td className="py-4 px-3">
-                        <div className="font-semibold text-foreground">{vendor.business_name || "N/A"}</div>
-                        <div className="text-[10px] text-muted-foreground mt-0.5">Owner: {vendor.full_name}</div>
-                      </td>
-                      <td className="py-4 px-3">
-                        <div className="text-foreground font-medium">{vendor.phone_number}</div>
-                        <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{vendor.email}</div>
-                      </td>
-                      <td className="py-4 px-3">
-                        <div className="flex flex-wrap gap-1 max-w-[200px]">
-                          {vendor.vendor_category_mappings.map((m, idx) => (
-                            <span
-                              key={idx}
-                              className="px-2 py-0.5 bg-muted border border-border/50 text-muted-foreground rounded-md text-[10px] font-bold"
-                            >
-                              {m.categories?.name}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="py-4 px-3 text-muted-foreground max-w-[150px] truncate">
-                        {vendor.address || "N/A"}
-                      </td>
-                      <td className="py-4 px-3">
-                        <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border rounded-full ${getStatusBadgeColor(vendor.status)}`}>
-                          {vendor.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-3 text-right">
-                        <div className="flex justify-end gap-2.5">
-                          <button
-                            onClick={() => handleStatusChange(vendor.id, "Rejected")}
-                            disabled={loadingId === vendor.id}
-                            className="px-3 py-1.5 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-semibold rounded-xl transition cursor-pointer"
-                          >
-                            Reject
-                          </button>
-                          <button
-                            onClick={() => handleStatusChange(vendor.id, "Approved")}
-                            disabled={loadingId === vendor.id}
-                            className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-md shadow-emerald-500/10"
-                          >
-                            Approve
-                          </button>
-                          <a
-                            href={`/admin/vendors/${vendor.id}`}
-                            className="px-3 py-1.5 bg-surface hover:bg-surface-raised border border-border hover:border-zinc-300 dark:hover:border-zinc-700 text-foreground text-xs font-semibold rounded-xl transition-all duration-200"
-                          >
-                            View
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )
-        ) : approvedVendors.length === 0 ? (
-          <div className="text-center py-16 text-sm text-muted-foreground border border-dashed border-border rounded-2xl bg-muted/10">
-            No approved vendors registered.
+      {/* Grid of Cards */}
+      {activeTab === "pending" ? (
+        pendingVendors.length === 0 ? (
+          <div className="text-center py-16 text-xs text-muted-foreground border border-dashed border-border rounded-2xl bg-muted/5">
+            No pending registration approvals.
           </div>
         ) : (
-          <div className="overflow-x-auto -mx-6 px-6">
-            <table className="w-full text-left border-collapse min-w-[800px]">
-              <thead>
-                <tr className="border-b border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  <th className="pb-4 px-3">Business Name</th>
-                  <th className="pb-4 px-3">Owner Contact</th>
-                  <th className="pb-4 px-3">Categories</th>
-                  <th className="pb-4 px-3">Location</th>
-                  <th className="pb-4 px-3">Status</th>
-                  <th className="pb-4 px-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50 text-sm">
-                {approvedVendors.map((vendor) => (
-                  <tr key={vendor.id} className="hover:bg-muted/30 transition-colors duration-150">
-                    <td className="py-4 px-3">
-                      <div className="font-semibold text-foreground">{vendor.business_name || "N/A"}</div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">ID: {vendor.id.substring(0, 8)}...</div>
-                    </td>
-                    <td className="py-4 px-3">
-                      <div className="text-foreground font-semibold">{vendor.full_name}</div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">{vendor.phone_number} • {vendor.email}</div>
-                    </td>
-                    <td className="py-4 px-3">
-                      <div className="flex flex-wrap gap-1 max-w-[200px]">
-                        {vendor.vendor_category_mappings.map((m, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 bg-muted border border-border/50 text-muted-foreground rounded-md text-[10px] font-bold"
-                          >
-                            {m.categories?.name}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="py-4 px-3 text-muted-foreground max-w-[150px] truncate">
-                      {vendor.address || "N/A"}
-                    </td>
-                    <td className="py-4 px-3">
-                      <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border rounded-full ${getStatusBadgeColor(vendor.status)}`}>
-                        {vendor.status}
-                      </span>
-                    </td>
-                    <td className="py-4 px-3 text-right">
-                      <div className="flex justify-end gap-2.5">
-                        {vendor.status === "Approved" || vendor.status === "Active" ? (
-                          <button
-                            onClick={() => handleStatusChange(vendor.id, "Inactive")}
-                            disabled={loadingId === vendor.id}
-                            className="px-3 py-1.5 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-semibold rounded-xl transition cursor-pointer"
-                          >
-                            Deactivate
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleStatusChange(vendor.id, "Active")}
-                            disabled={loadingId === vendor.id}
-                            className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-semibold rounded-xl transition cursor-pointer"
-                          >
-                            Activate
-                          </button>
-                        )}
-                        <a
-                          href={`/admin/vendors/${vendor.id}`}
-                          className="px-3 py-1.5 bg-surface hover:bg-surface-raised border border-border hover:border-zinc-300 dark:hover:border-zinc-700 text-foreground text-xs font-semibold rounded-xl transition-all duration-200"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {pendingVendors.map((vendor) => (
+              <div 
+                key={vendor.id}
+                className="bg-surface border border-border rounded-2xl p-5 hover:border-accent-gold/25 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+              >
+                <div className="space-y-4">
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="min-w-0">
+                      <h4 className="text-sm font-bold text-foreground truncate">{vendor.business_name || "N/A"}</h4>
+                      <p className="text-[10px] text-muted-foreground truncate mt-0.5">Owner: {vendor.full_name}</p>
+                    </div>
+                    <div className="shrink-0">{getStatusBadge(vendor.status)}</div>
+                  </div>
+
+                  {/* Vendor Details */}
+                  <div className="space-y-2 text-[10px] text-muted-foreground pt-3 border-t border-border/50">
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                      <span>{vendor.phone_number}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-3.5 h-3.5 text-accent-gold shrink-0 font-mono" />
+                      <span className="truncate">{vendor.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                      <span className="truncate">{vendor.address || "N/A"}</span>
+                    </div>
+                  </div>
+
+                  {/* Categories mappings */}
+                  <div className="space-y-2">
+                    <span className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground block">
+                      Services Provided
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {vendor.vendor_category_mappings.map((m, idx) => (
+                        <span 
+                          key={idx}
+                          className="px-2 py-0.5 bg-background border border-border text-muted-foreground rounded text-[9px] font-bold"
                         >
-                          View Details
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          {m.categories?.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="grid grid-cols-2 gap-3 pt-5 border-t border-border/50 mt-5">
+                  <button
+                    onClick={() => handleStatusChange(vendor.id, "Rejected")}
+                    disabled={loadingId === vendor.id}
+                    className="w-full py-2 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-xs font-bold transition hover:bg-red-500/20 cursor-pointer"
+                  >
+                    Reject
+                  </button>
+                  <button
+                    onClick={() => handleStatusChange(vendor.id, "Approved")}
+                    disabled={loadingId === vendor.id}
+                    className="w-full py-2 bg-accent-gold text-black rounded-xl text-xs font-bold transition hover:scale-[1.01] cursor-pointer"
+                  >
+                    Approve
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        )
+      ) : approvedVendors.length === 0 ? (
+        <div className="text-center py-16 text-xs text-muted-foreground border border-dashed border-border rounded-2xl bg-muted/5">
+          No approved suppliers mapped.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {approvedVendors.map((vendor) => (
+            <div 
+              key={vendor.id}
+              className="bg-surface border border-border rounded-2xl p-5 hover:border-accent-gold/25 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="space-y-4">
+                {/* Card Header */}
+                <div className="flex items-start justify-between gap-2.5">
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-bold text-foreground truncate">{vendor.business_name || "N/A"}</h4>
+                    <p className="text-[10px] text-muted-foreground truncate mt-0.5">Owner: {vendor.full_name}</p>
+                  </div>
+                  <div className="shrink-0">{getStatusBadge(vendor.status)}</div>
+                </div>
+
+                {/* Vendor Details */}
+                <div className="space-y-2 text-[10px] text-muted-foreground pt-3 border-t border-border/50">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                    <span>{vendor.phone_number}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-3.5 h-3.5 text-accent-gold shrink-0 font-mono" />
+                    <span className="truncate">{vendor.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                    <span className="truncate">{vendor.address || "N/A"}</span>
+                  </div>
+                </div>
+
+                {/* Categories mappings */}
+                <div className="space-y-2">
+                  <span className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground block">
+                    Services Provided
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {vendor.vendor_category_mappings.map((m, idx) => (
+                      <span 
+                        key={idx}
+                        className="px-2 py-0.5 bg-background border border-border text-muted-foreground rounded text-[9px] font-bold"
+                      >
+                        {m.categories?.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="grid grid-cols-2 gap-3 pt-5 border-t border-border/50 mt-5">
+                {vendor.status === "Approved" || vendor.status === "Active" ? (
+                  <button
+                    onClick={() => handleStatusChange(vendor.id, "Inactive")}
+                    disabled={loadingId === vendor.id}
+                    className="w-full py-2 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-xs font-bold transition hover:bg-red-500/20 cursor-pointer"
+                  >
+                    Deactivate
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleStatusChange(vendor.id, "Active")}
+                    disabled={loadingId === vendor.id}
+                    className="w-full py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-xl text-xs font-bold transition hover:bg-emerald-500/20 cursor-pointer"
+                  >
+                    Activate
+                  </button>
+                )}
+                <Link
+                  href={`/admin/vendors/${vendor.id}`}
+                  className="w-full py-2 border border-border bg-background hover:bg-surface-raised rounded-xl text-xs font-bold text-foreground text-center transition flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5 text-accent-gold" />
+                  <span>Profile</span>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+// Inline small clock icon helper
+function ClockIcon() {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      fill="none" 
+      viewBox="0 0 24 24" 
+      strokeWidth={2} 
+      stroke="currentColor" 
+      className="w-3 h-3"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    </svg>
   );
 }

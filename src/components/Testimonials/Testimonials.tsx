@@ -38,7 +38,7 @@ export default function Testimonials() {
     center: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
     },
     exit: (dir: number) => ({
       opacity: 0,
@@ -50,7 +50,7 @@ export default function Testimonials() {
   const current = LANDING_PAGE_CONFIG.testimonials[index];
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#F0E6D0]/3 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-[#D4AF37]/5 rounded-full blur-[80px] pointer-events-none" />
@@ -65,7 +65,7 @@ export default function Testimonials() {
           </span>
           <ScrollHeading
             title="Client Testimonials"
-            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
           />
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mx-auto mt-4" />
         </div>
@@ -73,7 +73,7 @@ export default function Testimonials() {
         {/* Carousel Slider */}
         <div className="relative min-h-[300px] flex items-center justify-center w-full">
           {/* Decorative quote mark background */}
-          <div className="absolute top-0 left-4 text-white/[0.03] pointer-events-none select-none">
+          <div className="absolute top-0 left-4 text-foreground/[0.03] pointer-events-none select-none">
             <Quote className="w-28 h-28 stroke-[0.8px]" />
           </div>
 
@@ -100,7 +100,7 @@ export default function Testimonials() {
 
                 {/* Italic text review */}
                 <p
-                  className="text-lg sm:text-xl md:text-2xl font-light text-[#F7F3EC] leading-relaxed mb-8 italic"
+                  className="text-lg sm:text-xl md:text-2xl font-light text-foreground leading-relaxed mb-8 italic"
                   style={{ fontFamily: "Playfair Display, serif" }}
                 >
                   &ldquo;{current.content}&rdquo;
@@ -115,7 +115,7 @@ export default function Testimonials() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h4 className="text-xs font-bold text-white tracking-[0.18em] uppercase">
+                  <h4 className="text-xs font-bold text-foreground tracking-[0.18em] uppercase">
                     {current.name}
                   </h4>
                   <span className="text-[9px] text-[#D4AF37] uppercase tracking-[0.15em] font-semibold mt-0.5">
@@ -129,7 +129,7 @@ export default function Testimonials() {
           {/* Slider navigation buttons */}
           <button
             onClick={handlePrev}
-            className="absolute left-0 p-2.5 rounded-xl bg-white/4 border border-white/5 hover:border-[#D4AF37]/50 text-white/75 hover:text-white transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+            className="absolute left-0 p-2.5 rounded-xl bg-card-bg border border-card-border hover:border-[#D4AF37]/50 text-foreground/75 hover:text-foreground transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
             aria-label="Previous testimonial"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -137,7 +137,7 @@ export default function Testimonials() {
 
           <button
             onClick={handleNext}
-            className="absolute right-0 p-2.5 rounded-xl bg-white/4 border border-white/5 hover:border-[#D4AF37]/50 text-white/75 hover:text-white transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+            className="absolute right-0 p-2.5 rounded-xl bg-card-bg border border-card-border hover:border-[#D4AF37]/50 text-foreground/75 hover:text-foreground transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
             aria-label="Next testimonial"
           >
             <ChevronRight className="w-5 h-5" />
@@ -156,7 +156,7 @@ export default function Testimonials() {
               className={`h-[3px] rounded-full transition-all duration-400 cursor-pointer ${
                 index === idx
                   ? "w-8 bg-[#D4AF37] shadow-[0_0_6px_rgba(212,175,55,0.35)]"
-                  : "w-1.5 bg-white/20 hover:bg-white/40"
+                  : "w-1.5 bg-foreground/20 hover:bg-foreground/40"
               }`}
               aria-label={`Go to testimonial ${idx + 1}`}
             />

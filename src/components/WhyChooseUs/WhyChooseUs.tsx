@@ -15,7 +15,7 @@ export default function WhyChooseUs() {
   };
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Ambient background blur */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-[#0a1a0f]/15 rounded-full blur-[130px] pointer-events-none" />
 
@@ -26,7 +26,7 @@ export default function WhyChooseUs() {
             Our Philosophy
           </span>
           <h2
-            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
             style={{ fontFamily: "Playfair Display, serif" }}
           >
             How We Craft Your Moments
@@ -37,7 +37,7 @@ export default function WhyChooseUs() {
         {/* Split Showcase Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Large Premium Photo (5 cols) */}
-          <div className="lg:col-span-5 h-[350px] sm:h-[450px] lg:h-[520px] rounded-3xl overflow-hidden border border-white/5 shadow-2xl relative bg-[#121212]">
+          <div className="lg:col-span-5 h-[350px] sm:h-[450px] lg:h-[520px] rounded-3xl overflow-hidden border border-border shadow-2xl relative bg-surface-raised">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeBeat}
@@ -73,8 +73,8 @@ export default function WhyChooseUs() {
                   onMouseEnter={() => setActiveBeat(idx)}
                   className={`group p-6 rounded-2xl border transition-all duration-500 cursor-pointer flex gap-5 items-start relative overflow-hidden ${
                     isActive
-                      ? "bg-white/4 border-[#D4AF37]/45 shadow-[0_10px_30px_rgba(0,0,0,0.4)]"
-                      : "bg-transparent border-white/5 hover:bg-white/[0.02] hover:border-white/10"
+                      ? "bg-card-bg border-accent-gold/45 shadow-card-shadow"
+                      : "bg-transparent border-border hover:bg-card-bg/25 hover:border-accent-gold/20"
                   }`}
                 >
                   {/* Left Active border accent indicator */}
@@ -88,7 +88,7 @@ export default function WhyChooseUs() {
                   <div className="flex flex-col items-center gap-1.5 pt-0.5">
                     <span 
                       className={`text-xs uppercase tracking-widest font-mono font-bold transition-colors duration-400 ${
-                        isActive ? "text-[#D4AF37]" : "text-white/30"
+                        isActive ? "text-[#D4AF37]" : "text-foreground/30"
                       }`}
                     >
                       {String(idx + 1).padStart(2, "0")}
@@ -96,8 +96,8 @@ export default function WhyChooseUs() {
                     <div 
                       className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-500 ${
                         isActive 
-                          ? "bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]" 
-                          : "bg-white/5 border-white/5 text-white/40 group-hover:text-white/60"
+                          ? "bg-accent-gold/10 border-accent-gold/30 text-accent-gold" 
+                          : "bg-foreground/5 border-border text-foreground/40 group-hover:text-foreground/60"
                       }`}
                     >
                       <IconComp className="w-4 h-4" />
@@ -108,7 +108,7 @@ export default function WhyChooseUs() {
                   <div className="flex-1 space-y-1.5">
                     <h3 
                       className={`text-lg sm:text-xl font-medium transition-colors duration-300 ${
-                        isActive ? "text-white" : "text-white/70 group-hover:text-white"
+                        isActive ? "text-foreground" : "text-foreground/70 group-hover:text-foreground"
                       }`}
                       style={{ fontFamily: "Playfair Display, serif" }}
                     >
@@ -116,7 +116,7 @@ export default function WhyChooseUs() {
                     </h3>
                     <p 
                       className={`text-xs sm:text-sm font-light leading-relaxed transition-colors duration-300 ${
-                        isActive ? "text-white/65" : "text-[#F7F3EC]/40 group-hover:text-white/50"
+                        isActive ? "text-foreground/65" : "text-muted-foreground/60 group-hover:text-foreground/75"
                       }`}
                       style={{ fontFamily: "Poppins, sans-serif" }}
                     >

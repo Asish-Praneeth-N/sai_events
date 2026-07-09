@@ -61,12 +61,12 @@ export default function Stats() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
     },
   };
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background gradients */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#4060C0]/5 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute top-1/4 right-1/4 w-[250px] h-[250px] bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
@@ -79,7 +79,7 @@ export default function Stats() {
             By The Numbers
           </span>
           <h2
-            className="text-3xl sm:text-5xl font-light text-white tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
             style={{ fontFamily: "Playfair Display, serif" }}
           >
             Our Legacy In Metrics
@@ -109,7 +109,7 @@ export default function Stats() {
                       transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
                     }
               }
-              className="flex flex-col items-center p-8 rounded-2xl bg-white/3 border border-white/5 backdrop-blur-md transition-colors duration-300 shadow-lg"
+              className="flex flex-col items-center p-8 rounded-2xl bg-card-bg border border-card-border transition-colors duration-300 shadow-lg"
             >
               {/* Stat number ticker */}
               <h3 
@@ -123,7 +123,7 @@ export default function Stats() {
               {/* Gold divider line */}
               <div className="w-8 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mb-4" />
 
-              <span className="text-[10px] sm:text-xs text-[#F7F3EC]/55 uppercase tracking-[0.22em] font-semibold leading-relaxed">
+              <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.22em] font-semibold leading-relaxed">
                 {stat.label}
               </span>
             </motion.div>

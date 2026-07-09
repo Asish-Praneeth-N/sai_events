@@ -29,13 +29,13 @@ export default function About() {
       y: 0,
       transition: {
         duration: 0.65,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
   });
 
   return (
-    <section className="w-full bg-[#090909] py-24 sm:py-32 relative overflow-hidden select-none border-t border-white/5">
+    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background gradients */}
       <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-[#6428B0]/5 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute bottom-1/3 left-1/4 w-[320px] h-[320px] bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />
@@ -49,10 +49,10 @@ export default function About() {
           </span>
           <ScrollHeading
             title={LANDING_PAGE_CONFIG.about.heading}
-            className="text-3xl sm:text-5xl font-light text-white mb-5 tracking-tight"
+            className="text-3xl sm:text-5xl font-light text-foreground mb-5 tracking-tight"
           />
           <p
-            className="text-xs sm:text-sm text-[#F7F3EC]/60 leading-relaxed font-light mt-4 max-w-xl mx-auto"
+            className="text-xs sm:text-sm text-foreground/60 leading-relaxed font-light mt-4 max-w-xl mx-auto"
             style={{ fontFamily: "Poppins, sans-serif" }}
           >
             {LANDING_PAGE_CONFIG.about.description}
@@ -81,14 +81,14 @@ export default function About() {
                   className={`flex flex-col md:flex-row items-start ${isLeft ? "md:flex-row-reverse" : ""} relative`}
                 >
                   {/* Timeline bullet node */}
-                  <div className="absolute left-4 md:left-1/2 top-2.5 w-3.5 h-3.5 rounded-full bg-black border-2 border-[#D4AF37] -translate-x-1/2 z-10 shadow-[0_0_10px_rgba(212,175,55,0.4)]" />
+                  <div className="absolute left-4 md:left-1/2 top-2.5 w-3.5 h-3.5 rounded-full bg-background border-2 border-[#D4AF37] -translate-x-1/2 z-10 shadow-[0_0_10px_rgba(212,175,55,0.4)]" />
 
                   {/* Card wrapper */}
                   <motion.div
                     variants={getNodeVariants(isLeft)}
                     className={`w-full md:w-[45%] pl-10 md:pl-0 ${isLeft ? "md:text-right md:pr-12" : "md:pl-12"}`}
                   >
-                    <div className="p-6 rounded-2xl bg-white/3 border border-white/5 hover:border-[#D4AF37]/35 transition-all duration-500 shadow-xl backdrop-blur-md group">
+                    <div className="p-6 rounded-2xl bg-card-bg border border-card-border hover:border-[#D4AF37]/35 transition-all duration-500 shadow-xl group">
                       <span
                         className="text-[#D4AF37] font-black text-xl sm:text-2xl mb-1 block"
                         style={{ fontFamily: "Playfair Display, serif" }}
@@ -96,13 +96,13 @@ export default function About() {
                         {node.year}
                       </span>
                       <h4
-                        className="text-base sm:text-lg font-medium text-white mb-2"
+                        className="text-base sm:text-lg font-medium text-foreground mb-2"
                         style={{ fontFamily: "Playfair Display, serif" }}
                       >
                         {node.title}
                       </h4>
                       <p
-                        className="text-xs sm:text-sm text-[#F7F3EC]/55 leading-relaxed font-light"
+                        className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-light"
                         style={{ fontFamily: "Poppins, sans-serif" }}
                       >
                         {node.description}

@@ -44,7 +44,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased bg-[#090909] text-foreground selection:bg-[#D4AF37] selection:text-black transition-colors duration-200">
+      <body className="antialiased bg-background text-foreground selection:bg-[#D4AF37] selection:text-black">
         <CustomCursor />
         {children}
       </body>

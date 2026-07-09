@@ -161,6 +161,51 @@ export const LANDING_PAGE_CONFIG = {
     ],
   },
 
+  services: [
+    {
+      id: "wedding",
+      title: "Weddings",
+      description: "Elegant wedding stage decoration, floral setups, and bespoke coordination for your special day.",
+      image: "/images/wedding.png",
+      icon: "Heart"
+    },
+    {
+      id: "engagement",
+      title: "Engagements",
+      description: "Sophisticated ring ceremonies and pre-wedding celebrations created with premium aesthetics.",
+      image: "/images/engagement.png",
+      icon: "Sparkles"
+    },
+    {
+      id: "birthday",
+      title: "Birthdays",
+      description: "Vibrant birthday parties, custom theme backgrounds, and beautiful cake table setups.",
+      image: "/images/birthday.png",
+      icon: "Cake"
+    },
+    {
+      id: "corporate",
+      title: "Corporate",
+      description: "Professional seminars, corporate galas, product launches, and audio-visual setups.",
+      image: "/images/corporate.png",
+      icon: "Briefcase"
+    },
+    {
+      id: "baby-shower",
+      title: "Baby Showers",
+      description: "Gentle pastel themes, balloon installations, and happy setups for mothers-to-be.",
+      image: "/images/decor.png",
+      icon: "Baby"
+    },
+    {
+      id: "decoration",
+      title: "Decorations",
+      description: "Custom lighting configurations, themed floral decor, and premium table arrangements.",
+      image: "/images/catering.png",
+      icon: "Palette"
+    }
+  ] as ServiceItem[],
+
   // ─── Why Choose Us (Scene 4 — The Story) ──────────────────────────────────
   whyChooseUs: [
     {
