@@ -32,7 +32,7 @@ export default function HowItWorks() {
   });
 
   return (
-    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
+    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1a1308]/50 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />

@@ -35,7 +35,7 @@ export default function About() {
   });
 
   return (
-    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
+    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background gradients */}
       <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-[#6428B0]/5 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute bottom-1/3 left-1/4 w-[320px] h-[320px] bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />

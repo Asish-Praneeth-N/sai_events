@@ -3,16 +3,17 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Search, Bell, Sparkles, Plus, User, LogOut } from "lucide-react";
+import { Search, Bell, Sparkles, Plus, User, LogOut, Menu } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 interface AdminHeaderProps {
   adminName: string;
   onSearchClick: () => void;
+  onMenuClick: () => void;
 }
 
-export default function AdminHeader({ adminName, onSearchClick }: AdminHeaderProps) {
+export default function AdminHeader({ adminName, onSearchClick, onMenuClick }: AdminHeaderProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const router = useRouter();
@@ -24,19 +25,30 @@ export default function AdminHeader({ adminName, onSearchClick }: AdminHeaderPro
   };
 
   return (
-    <header className="h-16 border-b border-border bg-[#0d0b08]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
+    <header className="h-16 border-b border-border bg-surface/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
       
-      {/* ── Search Bar Trigger ── */}
-      <button 
-        onClick={onSearchClick}
-        className="flex items-center gap-3 px-3 py-1.5 w-64 rounded-xl border border-border bg-background hover:bg-surface-raised text-muted-foreground text-left text-xs transition duration-150 cursor-pointer focus:outline-none"
-      >
-        <Search className="w-3.5 h-3.5" />
-        <span className="flex-1">Search anything...</span>
-        <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded-md border border-border bg-surface text-[9px] font-bold">
-          Ctrl K
-        </kbd>
-      </button>
+      <div className="flex items-center gap-3">
+        {/* Mobile menu trigger */}
+        <button
+          onClick={onMenuClick}
+          className="p-2 border border-border bg-background hover:bg-surface-raised text-muted-foreground hover:text-foreground rounded-xl transition duration-150 md:hidden cursor-pointer"
+          aria-label="Open sidebar menu"
+        >
+          <Menu className="w-4 h-4" />
+        </button>
+
+        {/* ── Search Bar Trigger ── */}
+        <button 
+          onClick={onSearchClick}
+          className="flex items-center gap-3 px-3 py-1.5 w-10 sm:w-64 rounded-xl border border-border bg-background hover:bg-surface-raised text-muted-foreground text-left text-xs transition duration-150 cursor-pointer focus:outline-none justify-center sm:justify-start"
+        >
+          <Search className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="hidden sm:inline flex-1">Search anything...</span>
+          <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded-md border border-border bg-surface text-[9px] font-bold">
+            Ctrl K
+          </kbd>
+        </button>
+      </div>
 
       {/* ── Actions Hub ── */}
       <div className="flex items-center gap-4">

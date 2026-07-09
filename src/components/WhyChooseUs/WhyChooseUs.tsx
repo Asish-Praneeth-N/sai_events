@@ -15,7 +15,7 @@ export default function WhyChooseUs() {
   };
 
   return (
-    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
+    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Ambient background blur */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-[#0a1a0f]/15 rounded-full blur-[130px] pointer-events-none" />
 

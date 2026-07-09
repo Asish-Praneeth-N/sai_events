@@ -35,26 +35,26 @@
 
 @layer base {
   :root {
-    --background: #F7F4EE;
-    --foreground: #2C2925;
-    --border: #E8DDD0;
-    --surface: #F4EFE7;
-    --surface-raised: #FCFAF7;
-    --muted: #F4EFE7;
-    --muted-foreground: #6C655A;
-    --accent-gold: #D4AF37;
-    --muted-gold: #f5db91;
-    --overlay: rgba(247, 244, 238, 0.9);
-    --hero-overlay: rgba(247, 244, 238, 0.20);
-    --navbar-bg: rgba(247, 244, 238, 0.88);
+    --background: #FAF6F0; /* Soft peachy off-white */
+    --foreground: #3A2F28; /* Deep warm charcoal/espresso brown */
+    --border: #F0E2D6; /* Soft peach-beige border */
+    --surface: #F5EAE0; /* Peachy-cream surface */
+    --surface-raised: #FCF9F6; /* Cream-white surface */
+    --muted: #F5EAE0;
+    --muted-foreground: #827265; /* Warm dusty brown/taupe */
+    --accent-gold: #D87A5E; /* Dusky orange/terracotta instead of gold */
+    --muted-gold: #F4CBBF; /* Light dusky peach instead of light gold */
+    --overlay: rgba(250, 246, 240, 0.92);
+    --hero-overlay: rgba(250, 246, 240, 0.25);
+    --navbar-bg: rgba(250, 246, 240, 0.88);
 
     /* Card/Inputs UI Details */
-    --card-bg: #FCFAF7;
-    --card-border: #E8DDD0;
-    --card-shadow: 0 10px 30px rgba(108, 101, 90, 0.04);
-    --input-bg: #FCFAF7;
-    --btn-secondary-bg: #FCFAF7;
-    --btn-secondary-hover: #F4EFE7;
+    --card-bg: #FCF9F6;
+    --card-border: #F0E2D6;
+    --card-shadow: 0 10px 30px rgba(130, 114, 101, 0.05);
+    --input-bg: #FCF9F6;
+    --btn-secondary-bg: #FCF9F6;
+    --btn-secondary-hover: #F5EAE0;
 
     /* Cinematic Doors - Brand Element: ALWAYS luxurious dark walnut wood */
     --door-bg-left: linear-gradient(to right, #0b0705 0%, #191009 40%, #201209 70%, #160d07 100%);
@@ -103,6 +103,10 @@
 
 body {
   background-color: var(--background);
+  background-image: radial-gradient(circle at 15% 15%, rgba(216, 122, 94, 0.22) 0%, transparent 55%),
+                    radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.98) 0%, transparent 65%),
+                    linear-gradient(135deg, rgba(252, 248, 244, 0.95) 0%, rgba(255, 255, 255, 1) 100%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;

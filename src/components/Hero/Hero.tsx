@@ -60,7 +60,7 @@ export default function Hero() {
 
   return (
     <div
-      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center bg-background"
+      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center bg-transparent"
     >
       {/* ── Layer 1: Background Images (Fades only - GPU opacity only) ── */}
       <div className="absolute inset-0 z-0">

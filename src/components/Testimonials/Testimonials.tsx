@@ -50,7 +50,7 @@ export default function Testimonials() {
   const current = LANDING_PAGE_CONFIG.testimonials[index];
 
   return (
-    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
+    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#F0E6D0]/3 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-[#D4AF37]/5 rounded-full blur-[80px] pointer-events-none" />

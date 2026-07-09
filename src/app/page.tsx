@@ -178,7 +178,7 @@ export default function Home() {
           opacity: { duration: 1.6, ease: "easeOut" },
           scale:   { duration: 3.2, ease: [0.22, 1, 0.36, 1] },
         }}
-        className="relative bg-background text-foreground overflow-x-hidden film-grain font-sans min-h-screen"
+        className="relative bg-transparent text-foreground overflow-x-hidden film-grain font-sans min-h-screen"
         style={{ transformOrigin: "center center", willChange: "transform, opacity" }}
       >
         <Navbar activeSection={activeSection} sections={SECTIONS} />

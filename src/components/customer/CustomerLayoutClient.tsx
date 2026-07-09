@@ -2,21 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import AdminSidebar from "./AdminSidebar";
-import AdminHeader from "./AdminHeader";
-import CommandPalette from "./CommandPalette";
+import CustomerSidebar from "./CustomerSidebar";
+import CustomerHeader from "./CustomerHeader";
+import CustomerSearchPalette from "./CustomerSearchPalette";
 
-interface AdminLayoutClientProps {
+interface CustomerLayoutClientProps {
   children: React.ReactNode;
-  adminName: string;
-  adminEmail: string;
+  customerName: string;
+  customerEmail: string;
 }
 
-export default function AdminLayoutClient({
+export default function CustomerLayoutClient({
   children,
-  adminName,
-  adminEmail,
-}: AdminLayoutClientProps) {
+  customerName,
+  customerEmail,
+}: CustomerLayoutClientProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -26,6 +26,7 @@ export default function AdminLayoutClient({
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  // Keyboard shortcut Ctrl+K listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
@@ -38,11 +39,11 @@ export default function AdminLayoutClient({
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground font-sans relative overflow-x-hidden">
+    <div className="flex min-h-screen bg-background text-foreground font-sans relative overflow-x-hidden transition-colors duration-300">
       
       {/* ── Desktop Sidebar ── */}
-      <div className="hidden md:flex flex-shrink-0">
-        <AdminSidebar adminName={adminName} adminEmail={adminEmail} />
+      <div className="hidden md:flex flex-shrink-0 h-screen sticky top-0 z-30">
+        <CustomerSidebar customerName={customerName} customerEmail={customerEmail} />
       </div>
 
       {/* ── Mobile Sidebar Drawer ── */}
@@ -50,14 +51,14 @@ export default function AdminLayoutClient({
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden animate-fade-in"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 md:hidden animate-fade-in"
             onClick={() => setMobileMenuOpen(false)}
           />
           {/* Drawer container */}
           <div className="fixed inset-y-0 left-0 w-64 bg-surface z-55 md:hidden animate-scale-in origin-left flex shadow-2xl">
-            <AdminSidebar 
-              adminName={adminName} 
-              adminEmail={adminEmail} 
+            <CustomerSidebar 
+              customerName={customerName} 
+              customerEmail={customerEmail} 
               onClose={() => setMobileMenuOpen(false)} 
             />
           </div>
@@ -68,20 +69,20 @@ export default function AdminLayoutClient({
       <div className="flex-1 flex flex-col min-w-0 w-full">
         
         {/* ── Top Header ── */}
-        <AdminHeader 
-          adminName={adminName} 
+        <CustomerHeader 
+          customerName={customerName} 
           onSearchClick={() => setSearchOpen(true)} 
           onMenuClick={() => setMobileMenuOpen(true)} 
         />
 
         {/* ── Page Content Container ── */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 md:py-10 max-w-7xl w-full mx-auto animate-fade-in-up">
           {children}
         </main>
       </div>
 
       {/* ── Global Ctrl+K Search Overlay ── */}
-      <CommandPalette isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <CustomerSearchPalette isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }

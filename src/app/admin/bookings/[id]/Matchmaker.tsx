@@ -12,7 +12,7 @@ import {
 import { 
   User, Calendar, MapPin, Users, Shield, Clock, BookOpen, 
   Send, CheckCircle2, MessageSquare, FileText, Activity, AlertTriangle, 
-  ArrowRight, ShieldCheck, UserX, UserCheck, RefreshCw, Layers
+  ArrowRight, ShieldCheck, UserX, UserCheck, RefreshCw, Layers, Briefcase
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 

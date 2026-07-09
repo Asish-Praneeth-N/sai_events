@@ -76,7 +76,7 @@ describe("Home Page", () => {
   it("renders the main page experience", () => {
     render(<Home />);
     
-    // Check if the page rendering wrapper structure is present (the dots navigation titles are present in DOM)
-    expect(screen.getByTitle("Entrance")).toBeInTheDocument();
+    // Check if the page experience is rendering (the brand title is present in DOM)
+    expect(screen.getByText("SAI EVENTS")).toBeInTheDocument();
   });
 });

@@ -18,7 +18,7 @@ export default function FinalCTA() {
   };
 
   return (
-    <section className="w-full bg-background py-24 sm:py-36 relative overflow-hidden select-none border-t border-border">
+    <section className="w-full bg-transparent py-24 sm:py-36 relative overflow-hidden select-none border-t border-border">
       {/* Background image & lighting overlay */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
         <img
@@ -26,7 +26,7 @@ export default function FinalCTA() {
           alt="Grand Finale"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-background/90" />
+        <div className="absolute inset-0 bg-background/45 backdrop-blur-md" />
       </div>
 
       {/* Ambient spotlights */}

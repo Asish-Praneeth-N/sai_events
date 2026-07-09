@@ -13,7 +13,7 @@ export default async function AdminOperationalManagersPage() {
       .from("operational_managers")
       .select(`
         *,
-        profiles (
+        profiles:id (
           id,
           full_name,
           email,

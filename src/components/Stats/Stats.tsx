@@ -66,7 +66,7 @@ export default function Stats() {
   };
 
   return (
-    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
+    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background gradients */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#4060C0]/5 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute top-1/4 right-1/4 w-[250px] h-[250px] bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />

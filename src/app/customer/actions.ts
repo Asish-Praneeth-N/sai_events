@@ -143,3 +143,61 @@ export async function cancelEventRequest(requestId: string) {
 
   revalidatePath("/customer/dashboard");
 }
+
+export async function uploadCustomerDocument(
+  eventId: string,
+  fileName: string,
+  fileUrl: string,
+  fileType: string
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  // Validate owner or admin
+  const { data: request, error: getError } = await supabase
+    .from("event_requests")
+    .select("customer_id")
+    .eq("id", eventId)
+    .single();
+
+  if (getError) throw new Error("Event request not found");
+  if (request.customer_id !== user.id) throw new Error("Unauthorized action.");
+
+  const { data, error } = await supabase
+    .from("documents")
+    .insert({
+      event_id: eventId,
+      uploaded_by: user.id,
+      file_name: fileName,
+      file_url: fileUrl,
+      file_type: fileType,
+    })
+    .select("*")
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/customer/dashboard");
+  return data;
+}
+
+export async function deleteCustomerDocument(documentId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const { error } = await supabase
+    .from("documents")
+    .delete()
+    .eq("id", documentId)
+    .eq("uploaded_by", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/customer/dashboard");
+  return { success: true };
+}
+

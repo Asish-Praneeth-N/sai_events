@@ -52,7 +52,7 @@ export default function Contact() {
   };
 
   return (
-    <section className="w-full bg-background py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
+    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
       {/* Background gradients */}
       <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-[#287878]/5 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />

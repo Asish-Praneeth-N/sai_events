@@ -7,15 +7,16 @@ import { createClient } from "@/lib/supabase/client";
 import { 
   Sparkles, ChevronLeft, ChevronRight, LayoutDashboard, GitBranch,
   Store, Users, BookOpen, Image, Bell, Settings, User, LogOut,
-  Shield, Send, Briefcase, TrendingUp, History
+  Shield, Send, Briefcase, TrendingUp, History, X, UserCheck
 } from "lucide-react";
 
 interface AdminSidebarProps {
   adminName: string;
   adminEmail: string;
+  onClose?: () => void;
 }
 
-export default function AdminSidebar({ adminName, adminEmail }: AdminSidebarProps) {
+export default function AdminSidebar({ adminName, adminEmail, onClose }: AdminSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -49,6 +50,7 @@ export default function AdminSidebar({ adminName, adminEmail }: AdminSidebarProp
         { href: "/admin/operational-managers", label: "Operations Team", icon: Briefcase },
         { href: "/admin/vendors", label: "Vendors Registry", icon: Store },
         { href: "/admin/customers", label: "Clients Directory", icon: Users },
+        { href: "/admin/users", label: "Users Management", icon: UserCheck },
         { href: "/admin/catalog", label: "Service Catalog", icon: BookOpen }
       ]
     },
@@ -71,7 +73,7 @@ export default function AdminSidebar({ adminName, adminEmail }: AdminSidebarProp
 
   return (
     <aside 
-      className={`bg-[#0d0b08] border-r border-border flex flex-col transition-all duration-300 relative z-30 select-none ${
+      className={`bg-surface border-r border-border flex flex-col transition-all duration-300 relative z-30 select-none h-full ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
@@ -92,6 +94,15 @@ export default function AdminSidebar({ adminName, adminEmail }: AdminSidebarProp
             </div>
           )}
         </Link>
+        {onClose && (
+          <button 
+            onClick={onClose}
+            className="p-1 text-muted-foreground hover:text-foreground rounded-lg hover:bg-surface-raised cursor-pointer md:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* ── Navigation Items ── */}
@@ -129,7 +140,7 @@ export default function AdminSidebar({ adminName, adminEmail }: AdminSidebarProp
       {/* ── Collapse Trigger Button ── */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full border border-border bg-[#0d0b08] hover:bg-surface-raised flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer z-40"
+        className="absolute -right-3 top-20 w-6 h-6 rounded-full border border-border bg-surface hover:bg-surface-raised flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer z-40 md:flex hidden"
       >
         {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
       </button>

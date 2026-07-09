@@ -67,7 +67,7 @@ export default async function AdminReportsPage() {
         current_workload,
         performance_score,
         completion_rate,
-        profiles ( full_name )
+        profiles:id ( full_name )
       `);
     if (omsError) throw new Error(omsError.message);
     

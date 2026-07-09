@@ -171,7 +171,7 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
       current_workload,
       performance_score,
       completion_rate,
-      profiles (
+      profiles:id (
         full_name,
         phone_number,
         email

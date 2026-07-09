@@ -4,16 +4,32 @@ import { describe, it, expect, vi } from "vitest";
 import CinematicDoors from "../CinematicDoors";
 
 // Mock framer-motion animations
-vi.mock("framer-motion", async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock("framer-motion", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react");
   return {
-    ...(actual as any),
-    motion: {
-      div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-      span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
-      h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
-      p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
-    },
+    motion: new Proxy(
+      {},
+      {
+        get: (target, key) => {
+          const Component = React.forwardRef(({ children, ...props }: any, ref: any) => {
+            const cleanProps = { ...props };
+            delete cleanProps.transition;
+            delete cleanProps.variants;
+            delete cleanProps.initial;
+            delete cleanProps.animate;
+            delete cleanProps.exit;
+            delete cleanProps.whileHover;
+            delete cleanProps.whileTap;
+            delete cleanProps.viewport;
+            const Tag = key as any;
+            return <Tag ref={ref} {...cleanProps}>{children}</Tag>;
+          });
+          Component.displayName = `motion.${String(key)}`;
+          return Component;
+        },
+      }
+    ),
     AnimatePresence: ({ children }: any) => <>{children}</>,
   };
 });

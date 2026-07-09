@@ -47,10 +47,10 @@ export default async function PlanEventPage() {
   })) as any[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in-up">
       <div>
-        <h1 className="text-3xl font-bold font-heading text-zinc-900 dark:text-white">Plan New Event</h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+        <h1 className="text-3xl font-light font-heading text-foreground">Plan New Event</h1>
+        <p className="text-xs text-muted-foreground mt-1 font-light">
           Specify your event parameters and select services from our verified service catalog.
         </p>
       </div>
