@@ -25,7 +25,9 @@ interface EventAssignment {
 
 interface ServiceItem {
   name: string;
+  subcategories?: { category_id: string } | null;
 }
+
 
 interface RequestItem {
   quantity: number;

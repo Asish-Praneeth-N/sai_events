@@ -6,8 +6,9 @@ import MediaUploader from "@/components/admin/MediaUploader";
 import { 
   Store, Plus, Trash2, ShieldCheck, DollarSign, FolderOpen, 
   Sparkles, Layers, Image as ImageIcon, ChevronDown, Check, X, AlertCircle,
-  Tag, Info
+  Tag, Info, CheckCircle2
 } from "lucide-react";
+
 
 interface CustomMedia { media_url: string; }
 interface CustomService {

@@ -112,7 +112,8 @@ export default async function AdminReportsPage() {
 
         vendorPerformance.push({
           name: vendor.business_name || vendor.full_name,
-          category: vendor.vendor_category_mappings?.[0]?.categories?.name || "Service",
+          category: (vendor.vendor_category_mappings?.[0]?.categories as any)?.name || "Service",
+
           invitations: sentCount || 0,
           acceptanceRate
         });
