@@ -44,7 +44,6 @@ export default function Footer() {
     { label: "Home",              href: "#home"         },
     { label: "Services",          href: "#services"     },
     { label: "Gallery",           href: "#gallery"      },
-    { label: "Vendors",           href: "#vendors"      },
     { label: "About",             href: "#about"        },
     { label: "Book Consultation", href: "#contact"      },
   ];

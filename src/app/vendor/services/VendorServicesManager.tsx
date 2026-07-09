@@ -5,7 +5,8 @@ import { addCustomService, deleteCustomService } from "./actions";
 import MediaUploader from "@/components/admin/MediaUploader";
 import { 
   Store, Plus, Trash2, ShieldCheck, DollarSign, FolderOpen, 
-  Sparkles, Layers, Image as ImageIcon, ChevronDown, Check, X, AlertCircle
+  Sparkles, Layers, Image as ImageIcon, ChevronDown, Check, X, AlertCircle,
+  Tag, Info
 } from "lucide-react";
 
 interface CustomMedia { media_url: string; }
@@ -28,8 +29,6 @@ interface Props {
 
 export default function VendorServicesManager({ initialServices, categories, subcategories }: Props) {
   const [services, setServices] = useState<CustomService[]>(initialServices);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(categories.map(c => c.name)));
-
   const [selectedCategoryId, setSelectedCategoryId] = useState(() => categories[0]?.id || "");
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(() => {
     const firstCatId = categories[0]?.id;
@@ -47,31 +46,12 @@ export default function VendorServicesManager({ initialServices, categories, sub
   const [success, setSuccess] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // Group services
-  const grouped: Record<string, Record<string, CustomService[]>> = {};
-  services.forEach((s) => {
-    const cat = s.category_name.trim();
-    const sub = s.subcategory_name.trim();
-    if (!grouped[cat]) grouped[cat] = {};
-    if (!grouped[cat][sub]) grouped[cat][sub] = [];
-    grouped[cat][sub].push(s);
-  });
-
   const filteredSubs = subcategories.filter((s) => s.category_id === selectedCategoryId);
 
   const handleCategoryChange = (catId: string) => {
     setSelectedCategoryId(catId);
     const firstSub = subcategories.find((s) => s.category_id === catId);
     setSelectedSubcategoryId(firstSub?.id || "");
-  };
-
-  const toggleCategory = (catName: string) => {
-    setExpandedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(catName)) next.delete(catName);
-      else next.add(catName);
-      return next;
-    });
   };
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -101,7 +81,7 @@ export default function VendorServicesManager({ initialServices, categories, sub
       setServiceName("");
       setCustomPrice("");
       setMediaUrls([]);
-      setSuccess("Custom service package successfully published.");
+      setSuccess("Custom service package successfully published to your catalog.");
       setShowAddForm(false);
       setTimeout(() => window.location.reload(), 1500);
     } catch (err: any) {
@@ -129,12 +109,12 @@ export default function VendorServicesManager({ initialServices, categories, sub
   const AddForm = (
     <form
       onSubmit={handleAdd}
-      className="rounded-3xl bg-surface border border-border/80 shadow-md overflow-hidden animate-scale-in"
+      className="rounded-[28px] bg-surface border border-border/80 shadow-xl overflow-hidden animate-scale-in"
     >
-      <div className="px-6 py-5 bg-gradient-to-r from-zinc-900 to-zinc-950 border-b border-border/40 flex items-center justify-between">
+      <div className="px-6 py-5 bg-gradient-to-br from-zinc-900 to-zinc-950 border-b border-border/40 flex items-center justify-between">
         <div>
           <span className="text-[8px] uppercase font-bold tracking-[0.25em] text-accent-gold">SAI CATALOG MANAGER</span>
-          <h3 className="text-sm font-bold text-white font-heading mt-0.5">Add Custom Offer</h3>
+          <h3 className="text-sm font-bold text-white font-heading mt-0.5">Publish New Offer</h3>
         </div>
         <button
           type="button"
@@ -145,7 +125,7 @@ export default function VendorServicesManager({ initialServices, categories, sub
         </button>
       </div>
 
-      <div className="p-6 space-y-4 text-xs font-medium">
+      <div className="p-6 space-y-5 text-xs font-medium">
         {categories.length === 0 ? (
           <p className="text-xs text-muted-foreground italic text-center py-6">No service channels configured.</p>
         ) : (
@@ -164,7 +144,7 @@ export default function VendorServicesManager({ initialServices, categories, sub
 
             {/* Subcategory Select */}
             <div className="space-y-1.5">
-              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Sub-channel classification</label>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Classification</label>
               <select
                 value={selectedSubcategoryId}
                 onChange={(e) => setSelectedSubcategoryId(e.target.value)}
@@ -181,22 +161,22 @@ export default function VendorServicesManager({ initialServices, categories, sub
 
             {/* Service Name */}
             <div className="space-y-1.5">
-              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Package Descriptor</label>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Package Name</label>
               <input
                 type="text"
                 required
                 value={serviceName}
                 onChange={(e) => setServiceName(e.target.value)}
-                placeholder="e.g. Premium Stage Sound Calibration"
-                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground text-xs"
+                placeholder="e.g. Premium Venue Sound Calibration"
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground text-xs font-light"
               />
             </div>
 
             {/* Custom Price */}
             <div className="space-y-1.5">
-              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Custom Rate</label>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Service Rate</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">₹</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500 font-mono">₹</span>
                 <input
                   type="number"
                   required
@@ -212,7 +192,7 @@ export default function VendorServicesManager({ initialServices, categories, sub
             {/* Photos Showcase */}
             <div className="space-y-1.5">
               <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">
-                Showcase media <span className="text-zinc-500 font-normal lowercase font-sans">(optional, max 3)</span>
+                Catalog Photos <span className="text-zinc-500 font-normal lowercase font-sans">(max 3)</span>
               </label>
               <MediaUploader value={mediaUrls} onChange={setMediaUrls} limit={3} />
             </div>
@@ -231,37 +211,36 @@ export default function VendorServicesManager({ initialServices, categories, sub
   );
 
   return (
-    <div className="space-y-8 select-none">
+    <div className="space-y-8 select-none max-w-7xl mx-auto">
       
       {/* Toast notifications */}
       {error && (
-        <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs rounded-2xl flex items-center justify-between gap-3 animate-fade-in max-w-4xl">
+        <div className="p-4 bg-red-950/20 border border-red-500/30 text-red-400 text-xs rounded-2xl flex items-center justify-between gap-3 animate-fade-in">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
             <span>{error}</span>
           </div>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs rounded-2xl flex items-center gap-3 animate-fade-in max-w-4xl">
+        <div className="p-4 bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 text-xs rounded-2xl flex items-center gap-3 animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
           <span>{success}</span>
         </div>
       )}
 
-      {/* Desktop form toggle / catalog layout wrapper */}
+      {/* Grid view layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left: Catalog List */}
+        {/* Left: Custom catalog grid */}
         <div className="lg:col-span-8 space-y-6">
           <div className="flex justify-between items-center px-1">
-            <div className="space-y-0.5">
-              <span className="text-[9.5px] uppercase font-bold tracking-[0.25em] text-accent-gold">Business Catalog</span>
-              <h2 className="text-xl font-light font-heading text-foreground">Services Configuration</h2>
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground font-sans">Business catalog</span>
+              <h2 className="text-3xl font-light font-heading text-foreground">Services configuration</h2>
             </div>
             
-            {/* Mobile form drawer toggle */}
             {!showAddForm && (
               <button
                 onClick={() => setShowAddForm(true)}
@@ -274,131 +253,120 @@ export default function VendorServicesManager({ initialServices, categories, sub
 
           {showAddForm && <div className="lg:hidden">{AddForm}</div>}
 
-          {Object.keys(grouped).length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 rounded-3xl border border-dashed border-border/80 bg-surface/50 text-center p-6 shadow-sm">
+          {services.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 rounded-[32px] border border-dashed border-border/80 bg-surface/50 text-center p-6 shadow-sm">
               <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-border/60 flex items-center justify-center mb-5 text-accent-gold shadow-md">
                 <Layers className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-foreground">Business catalog is empty</h3>
+              <h3 className="text-sm font-bold text-foreground">Catalog is empty</h3>
               <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed font-light">
-                Define your custom packages, rates, and reference photos to list your offerings for assignments.
+                Define your custom packages, pricing, and showcase attachments to receive event dispatch proposals.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {Object.entries(grouped).map(([catName, subGroups]) => {
-                const isExpanded = expandedCategories.has(catName);
-                const serviceCount = Object.values(subGroups).flat().length;
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-1">
+              {services.map((item) => {
+                const isDeleting = deleteConfirmId === item.id;
+                // Elegant visual CSS background gradient placeholder if there is no image
+                const hasMedia = item.vendor_custom_service_media && item.vendor_custom_service_media.length > 0;
+                const coverImage = hasMedia ? item.vendor_custom_service_media[0].media_url : "";
 
                 return (
-                  <div key={catName} className="rounded-3xl bg-surface border border-border/80 shadow-sm overflow-hidden transition-all duration-300">
-                    
-                    {/* Header trigger */}
-                    <button
-                      type="button"
-                      onClick={() => toggleCategory(catName)}
-                      className="w-full flex items-center justify-between px-6 py-5 bg-background/30 hover:bg-surface-raised cursor-pointer transition duration-150"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-[3px] h-4 bg-accent-gold rounded-full shrink-0" />
-                        <span className="text-sm font-bold text-foreground font-heading">{catName} Group</span>
-                        <span className="px-2 py-0.5 bg-background border border-border text-accent-gold text-[9px] font-bold rounded-lg font-mono">
-                          {serviceCount} {serviceCount === 1 ? "Offer" : "Offers"}
+                  <div 
+                    key={item.id}
+                    className="group bg-surface border border-border/80 hover:border-accent-gold/25 rounded-3xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-lg flex flex-col justify-between hover-lift relative min-h-[300px]"
+                  >
+                    {/* Cover display media showcase */}
+                    <div className="h-44 relative w-full overflow-hidden bg-gradient-to-br from-[#27201b] to-[#120e0d]">
+                      {coverImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img 
+                          src={coverImage} 
+                          alt={item.service_name} 
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
+                          <ImageIcon className="w-10 h-10" />
+                        </div>
+                      )}
+                      
+                      {/* Top tags overlay */}
+                      <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+                        <span className="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[8.5px] font-bold uppercase tracking-widest text-accent-gold border border-accent-gold/20 select-none">
+                          {item.category_name}
                         </span>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${
-                        isExpanded ? "rotate-180 text-accent-gold" : ""
-                      }`} />
-                    </button>
-
-                    {/* Accordion Body */}
-                    {isExpanded && (
-                      <div className="p-6 space-y-6 border-t border-border/40 bg-surface/30 animate-scale-in">
-                        {Object.entries(subGroups).map(([subName, items]) => (
-                          <div key={subName} className="space-y-3.5">
-                            
-                            <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-accent-gold/60 shrink-0" />
-                              <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{subName}</h4>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              {items.map((item) => {
-                                const isDeleting = deleteConfirmId === item.id;
-                                return (
-                                  <div 
-                                    key={item.id}
-                                    className="p-5 bg-background border border-border/60 hover:border-accent-gold/15 rounded-2xl flex flex-col justify-between gap-4 transition duration-300 shadow-sm group relative"
-                                  >
-                                    <div className="flex items-start justify-between gap-3">
-                                      <h5 className="text-xs font-bold text-foreground leading-normal max-w-[190px]">{item.service_name}</h5>
-                                      
-                                      {/* Delete action hooks */}
-                                      {!isDeleting ? (
-                                        <button
-                                          type="button"
-                                          onClick={() => setDeleteConfirmId(item.id)}
-                                          className="p-1.5 rounded-lg text-zinc-300 hover:text-red-400 hover:bg-red-950/10 opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer shrink-0"
-                                        >
-                                          <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                      ) : (
-                                        <div className="flex items-center gap-1 animate-scale-in shrink-0">
-                                          <button
-                                            type="button"
-                                            onClick={() => setDeleteConfirmId(null)}
-                                            className="px-2 py-1 text-[8.5px] font-bold border border-border text-muted-foreground rounded-lg"
-                                          >
-                                            Keep
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() => handleDeleteConfirm(item.id)}
-                                            disabled={deleteLoading}
-                                            className="px-2 py-1 text-[8.5px] font-bold bg-red-600 text-white rounded-lg"
-                                          >
-                                            Delete
-                                          </button>
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    {/* Footer details pricing */}
-                                    <div className="border-t border-border/40 pt-3 mt-1 flex flex-col gap-3">
-                                      <div className="flex justify-between items-center text-xs font-mono">
-                                        <span className="text-[8px] uppercase font-bold text-zinc-400 font-sans tracking-wider">Custom Rate</span>
-                                        <span className="font-bold text-accent-gold text-xs">
-                                          ₹{Number(item.custom_price).toLocaleString("en-IN")}
-                                        </span>
-                                      </div>
-
-                                      {/* Media Showcase attachments */}
-                                      {item.vendor_custom_service_media?.length > 0 && (
-                                        <div className="flex gap-2.5 flex-wrap">
-                                          {item.vendor_custom_service_media.map((med, idx) => (
-                                            <button
-                                              key={idx}
-                                              type="button"
-                                              onClick={() => window.open(med.media_url, "_blank")}
-                                              className="w-10 h-10 rounded-xl overflow-hidden border border-border hover:border-accent-gold/25 hover:scale-105 transition cursor-pointer bg-muted shrink-0"
-                                            >
-                                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                                              <img src={med.media_url} alt="Showcase" className="w-full h-full object-cover" />
-                                            </button>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-
-                                  </div>
-                                );
-                              })}
-                            </div>
-
+                        
+                        {!isDeleting ? (
+                          <button
+                            type="button"
+                            onClick={() => setDeleteConfirmId(item.id)}
+                            className="p-2 rounded-xl bg-black/60 hover:bg-red-950/80 hover:text-red-400 border border-white/10 text-zinc-300 transition cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-1.5 bg-black/80 backdrop-blur-md p-1 rounded-xl border border-white/10 animate-scale-in">
+                            <button
+                              type="button"
+                              onClick={() => setDeleteConfirmId(null)}
+                              className="px-2.5 py-1 text-[8.5px] font-bold text-muted-foreground rounded-lg hover:text-foreground"
+                            >Keep</button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteConfirm(item.id)}
+                              disabled={deleteLoading}
+                              className="px-2.5 py-1 text-[8.5px] font-bold bg-red-600 hover:bg-red-500 text-white rounded-lg"
+                            >Delete</button>
                           </div>
-                        ))}
+                        )}
                       </div>
-                    )}
+
+                      {/* Small visual showcase media slides count indicator overlay */}
+                      {item.vendor_custom_service_media && item.vendor_custom_service_media.length > 1 && (
+                        <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md text-[8.5px] font-mono text-zinc-400 font-bold border border-white/5">
+                          +{item.vendor_custom_service_media.length - 1} images
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content text metadata info */}
+                    <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                      <div className="space-y-1.5">
+                        <span className="text-[9px] uppercase tracking-widest font-extrabold text-muted-foreground font-mono block">
+                          {item.subcategory_name}
+                        </span>
+                        <h4 className="text-sm font-bold text-foreground leading-normal line-clamp-2">
+                          {item.service_name}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center justify-between border-t border-border/40 pt-4 mt-3">
+                        <div className="space-y-0.5">
+                          <span className="text-[8px] uppercase tracking-widest font-extrabold text-muted-foreground block font-sans">Custom Rate</span>
+                          <span className="text-sm font-bold font-mono text-accent-gold">
+                            ₹{Number(item.custom_price).toLocaleString("en-IN")}
+                          </span>
+                        </div>
+
+                        {/* Pop up attachments of media files */}
+                        {item.vendor_custom_service_media && item.vendor_custom_service_media.length > 0 && (
+                          <div className="flex gap-1.5 flex-wrap">
+                            {item.vendor_custom_service_media.map((med, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => window.open(med.media_url, "_blank")}
+                                className="w-8 h-8 rounded-lg overflow-hidden border border-border hover:border-accent-gold/25 hover:scale-105 transition cursor-pointer bg-muted shrink-0"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={med.media_url} alt="Reference Showcase" className="w-full h-full object-cover" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
                   </div>
                 );
@@ -407,7 +375,7 @@ export default function VendorServicesManager({ initialServices, categories, sub
           )}
         </div>
 
-        {/* Right: Sticky desktop form panel */}
+        {/* Right: Sticky desktop add offer form panel */}
         <div className="hidden lg:block lg:col-span-4 sticky top-28">
           {AddForm}
         </div>

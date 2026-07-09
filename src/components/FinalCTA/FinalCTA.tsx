@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Calendar, Store, ArrowRight, ShieldCheck, Award } from "lucide-react";
+import { Calendar, Phone, ArrowRight, ShieldCheck, Award } from "lucide-react";
 import Link from "next/link";
 
 export default function FinalCTA() {
@@ -56,7 +56,7 @@ export default function FinalCTA() {
           className="text-xs sm:text-sm text-foreground/50 font-light max-w-xl leading-relaxed mb-16"
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
-          Whether you&apos;re planning your dream milestone celebration or looking to grow your business as an elite professional — your journey starts with a simple invitation.
+          Whether you&apos;re planning your dream celebration or a milestone corporate moment — your extraordinary event begins with a simple conversation.
         </p>
 
         {/* Two Invitation Cards Side-by-Side */}
@@ -119,7 +119,7 @@ export default function FinalCTA() {
             </div>
           </motion.div>
 
-          {/* Card 2: Vendor Invitation (Become a Vendor) */}
+          {/* Card 2: Contact CTA */}
           <motion.div
             variants={cardVariants}
             whileHover={
@@ -134,7 +134,7 @@ export default function FinalCTA() {
             <div>
               {/* Header details */}
               <div className="flex justify-between items-start mb-6 relative z-10">
-                <span className="text-[9px] uppercase tracking-widest text-[#D4AF37] font-semibold">SAI EVENTS • PARTNER CIRCLE</span>
+                <span className="text-[9px] uppercase tracking-widest text-[#D4AF37] font-semibold">SAI EVENTS &bull; CONSULTATIONS</span>
                 <ShieldCheck className="w-5 h-5 text-white/20 group-hover:text-[#D4AF37]/60 transition-colors duration-400" />
               </div>
 
@@ -143,27 +143,27 @@ export default function FinalCTA() {
                 className="text-2xl sm:text-3xl font-light text-foreground mb-3 tracking-wide"
                 style={{ fontFamily: "Playfair Display, serif" }}
               >
-                Become a Partner
+                Speak to Our Team
               </h3>
               <p className="text-xs text-muted-foreground/85 font-mono tracking-wide leading-relaxed uppercase">
-                Join our premium ecosystem of verified floral decorators, coordinators, makeup artists, and coordinators.
+                Have questions about pricing, availability, or a custom event scope? Our coordinators are here to guide you.
               </p>
             </div>
 
             {/* Action */}
             <div className="relative z-10 mt-6">
-              <Link
-                href="/register?role=vendor"
+              <a
+                href="#contact"
                 className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-btn-secondary-bg border border-card-border hover:border-accent-gold/50 text-foreground hover:bg-accent-gold/5 hover:text-[#D4AF37] font-bold text-xs uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
               >
-                <Store className="w-4 h-4" />
-                Become a Vendor
-              </Link>
+                <Phone className="w-4 h-4" />
+                Get in Touch
+              </a>
             </div>
 
             {/* Background watermark */}
             <div className="absolute right-4 bottom-4 text-9xl text-foreground/[0.01] font-heading font-black select-none pointer-events-none">
-              NET
+              SAI
             </div>
           </motion.div>
         </motion.div>

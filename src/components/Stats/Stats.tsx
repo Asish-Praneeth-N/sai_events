@@ -14,6 +14,7 @@ function CinematicCounter({ value, isActive }: CounterProps) {
   const [count, setCount] = useState(0);
   const hasRun = useRef(false);
   const shouldReduceMotion = useReducedMotion();
+  const isDecimal = !Number.isInteger(value);
 
   useEffect(() => {
     if (!isActive || hasRun.current) return;
@@ -32,14 +33,18 @@ function CinematicCounter({ value, isActive }: CounterProps) {
       const progress = Math.min((ts - startTs) / duration, 1);
       // Decelerating ticker loop
       const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      setCount(Math.floor(eased * value));
+      // Preserve decimals for non-integer values (e.g. 4.7 rating)
+      const current = isDecimal
+        ? Math.round(eased * value * 10) / 10
+        : Math.floor(eased * value);
+      setCount(current);
       if (progress < 1) requestAnimationFrame(step);
     };
 
     requestAnimationFrame(step);
-  }, [isActive, value, shouldReduceMotion]);
+  }, [isActive, value, shouldReduceMotion, isDecimal]);
 
-  return <span>{count}</span>;
+  return <span>{isDecimal ? count.toFixed(1) : count}</span>;
 }
 
 // ─── Main Component ─────────────────────────────────────────────────────────

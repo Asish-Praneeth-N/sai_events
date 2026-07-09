@@ -485,36 +485,36 @@ export const LANDING_PAGE_CONFIG = {
     {
       id: "book",
       step: 1,
-      title: "Book Your Event",
-      description: "Share your event details — date, type, guest count, and vision with our team.",
+      title: "Share Your Vision",
+      description: "Tell us about your event — date, type, guest count, and your dream. We listen to every detail.",
       icon: "CalendarCheck",
     },
     {
       id: "choose",
       step: 2,
-      title: "Choose Event Type",
-      description: "Select from our curated event categories. Each tailored to different tastes and budgets.",
+      title: "Choose Your Experience",
+      description: "Select from our curated event categories. Each crafted to suit different tastes and budgets.",
       icon: "ListFilter",
     },
     {
-      id: "suggestions",
+      id: "plan",
       step: 3,
-      title: "Receive Vendor Suggestions",
-      description: "Our platform matches you with verified, reviewed vendors who fit your exact requirements.",
-      icon: "UserCheck",
+      title: "We Plan Everything",
+      description: "Our expert team evaluates your requirements and builds a complete, tailored event blueprint.",
+      icon: "ClipboardList",
     },
     {
-      id: "compare",
+      id: "assemble",
       step: 4,
-      title: "Compare & Decide",
-      description: "Review portfolios, ratings, pricing, and availability. Choose with complete confidence.",
-      icon: "BarChart3",
+      title: "Expert Team Assembled",
+      description: "SAI EVENTS deploys our in-house specialist teams — handpicked for your exact event category.",
+      icon: "Users",
     },
     {
-      id: "finalize",
+      id: "coordinate",
       step: 5,
-      title: "Finalize & Confirm",
-      description: "Lock in your vendors, confirm logistics, and let our coordinators handle the rest.",
+      title: "Dedicated Coordinator Assigned",
+      description: "A personal Operational Manager coordinates every detail and keeps you informed at every step.",
       icon: "CheckCircle2",
     },
     {
@@ -535,7 +535,7 @@ export const LANDING_PAGE_CONFIG = {
     timeline: [
       { year: "2014", title: "The Beginning",         description: "Founded with a passion for designing beautiful intimate weddings in Hyderabad."     },
       { year: "2017", title: "Going Corporate",        description: "Expanded our catalog to cover luxury corporate galas, seminars, and product launches." },
-      { year: "2020", title: "Unified Platform",       description: "Launched our digital portal to connect vendors, coordinators, and clients seamlessly." },
+      { year: "2020", title: "Unified Platform",       description: "Launched our digital operations portal — connecting our specialist teams, coordinators, and clients seamlessly." },
       { year: "2023", title: "Pan-Indian Operations",  description: "Coordinated over 300+ major multi-day luxury weddings across destination venues."    },
       { year: "2026", title: "Cinematic Luxury",       description: "Unveiling our high-end premium ecosystem — the experience you are walking through now." },
     ] as TimelineMilestone[],
@@ -543,10 +543,10 @@ export const LANDING_PAGE_CONFIG = {
 
   // ─── Updated Stats (four counters) ────────────────────────────────────────
   stats: [
-    { value: 500,   suffix: "+",  label: "Events Designed",    icon: "CalendarCheck"  },
-    { value: 150,   suffix: "+",  label: "Verified Vendors",   icon: "ShieldCheck"    },
-    { value: 10000, suffix: "+",  label: "Happy Guests",       icon: "Users"          },
-    { value: 4.9,   suffix: "★",  label: "Customer Rating",    icon: "Star"           },
+    { value: 500,   suffix: "+",  label: "Events Delivered",   icon: "CalendarCheck"  },
+    { value: 150,   suffix: "+",  label: "Specialist Services", icon: "ShieldCheck"    },
+    { value: 10000, suffix: "+",  label: "Happy Guests",        icon: "Users"          },
+    { value: 4.7,   suffix: "★",  label: "Customer Rating",     icon: "Star"           },
   ] as StatItem[],
 
   // ─── Testimonials ──────────────────────────────────────────────────────────
@@ -587,7 +587,7 @@ export const LANDING_PAGE_CONFIG = {
       role: "Engagement Couple",
       rating: 5,
       content:
-        "Our engagement ceremony was beyond our wildest dreams. The floral setup, lighting, and the photographer they recommended captured every precious moment perfectly.",
+        "Our engagement ceremony was beyond our wildest dreams. The floral setup, lighting, and photography all came together flawlessly — the SAI EVENTS team captured every precious moment perfectly.",
       image: "/images/engagement.png",
       eventType: "Engagement Ceremony",
     },

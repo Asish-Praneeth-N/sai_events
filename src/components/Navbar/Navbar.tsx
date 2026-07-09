@@ -255,12 +255,6 @@ export default function Navbar({
                   Log In
                 </Link>
                 <Link
-                  href="/register?role=vendor"
-                  className="text-[10px] uppercase font-bold tracking-[0.14em] text-foreground/65 hover:text-[#D4AF37] px-4 py-2 rounded-xl border border-border hover:border-[#D4AF37]/40 transition-all duration-300"
-                >
-                  Vendor
-                </Link>
-                <Link
                   href="/register"
                   className="px-5 py-2 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black font-bold text-[10px] uppercase tracking-[0.16em] rounded-xl hover:scale-[1.03] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] transition-all duration-300"
                 >
@@ -348,13 +342,6 @@ export default function Navbar({
                     className="w-full flex items-center justify-center py-4 border border-border text-foreground/80 text-[11px] font-bold uppercase tracking-[0.22em] rounded-2xl hover:border-[#D4AF37]/40 hover:text-foreground transition-colors duration-200 no-underline"
                   >
                     Sign In
-                  </Link>
-                  <Link
-                    href="/register?role=vendor"
-                    onClick={() => setMobileOpen(false)}
-                    className="text-center text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/35 hover:text-[#D4AF37] transition-colors duration-200 py-2 no-underline"
-                  >
-                    Join as a Vendor →
                   </Link>
                 </>
               )}
