@@ -28,10 +28,13 @@ export default async function VendorBookingsPage() {
         location,
         guest_count,
         status,
-        profiles (
-          full_name,
-          phone_number,
-          email
+        event_assignments (
+          id,
+          profiles:assigned_operational_manager_id (
+            full_name,
+            phone_number,
+            email
+          )
         ),
         request_items (
           quantity,

@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { addCustomService, deleteCustomService } from "./actions";
 import MediaUploader from "@/components/admin/MediaUploader";
+import { 
+  Store, Plus, Trash2, ShieldCheck, DollarSign, FolderOpen, 
+  Sparkles, Layers, Image as ImageIcon, ChevronDown, Check, X, AlertCircle
+} from "lucide-react";
 
 interface CustomMedia { media_url: string; }
 interface CustomService {
@@ -22,40 +26,9 @@ interface Props {
   subcategories: Subcategory[];
 }
 
-type ToastState = { message: string; type: "success" | "error" } | null;
-
-function Toast({ toast, onDismiss }: { toast: NonNullable<ToastState>; onDismiss: () => void }) {
-  return (
-    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm animate-slide-down ${
-      toast.type === "success"
-        ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400"
-        : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400"
-    }`}>
-      {toast.type === "success" ? (
-        <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.25a.75.75 0 011.5 0v4.5a.75.75 0 01-1.5 0v-4.5zm.75 7.5a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
-        </svg>
-      )}
-      <span className="flex-1">{toast.message}</span>
-      <button onClick={onDismiss} className="opacity-60 hover:opacity-100 cursor-pointer">
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-  );
-}
-
-const inputClass =
-  "w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl text-sm text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition duration-200";
-
 export default function VendorServicesManager({ initialServices, categories, subcategories }: Props) {
   const [services, setServices] = useState<CustomService[]>(initialServices);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(categories.map(c => c.name)));
 
   const [selectedCategoryId, setSelectedCategoryId] = useState(() => categories[0]?.id || "");
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(() => {
@@ -69,8 +42,10 @@ export default function VendorServicesManager({ initialServices, categories, sub
   const [addLoading, setAddLoading] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [toast, setToast] = useState<ToastState>(null);
-  const [showAddForm, setShowAddForm] = useState(false); // for mobile toggle
+
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   // Group services
   const grouped: Record<string, Record<string, CustomService[]>> = {};
@@ -83,11 +58,6 @@ export default function VendorServicesManager({ initialServices, categories, sub
   });
 
   const filteredSubs = subcategories.filter((s) => s.category_id === selectedCategoryId);
-
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
-  };
 
   const handleCategoryChange = (catId: string) => {
     setSelectedCategoryId(catId);
@@ -107,14 +77,18 @@ export default function VendorServicesManager({ initialServices, categories, sub
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddLoading(true);
+    setError(null);
+    setSuccess(null);
+
     try {
       const catObj = categories.find((c) => c.id === selectedCategoryId);
       const subObj = subcategories.find((s) => s.id === selectedSubcategoryId);
       if (!catObj) throw new Error("Select a category.");
       if (!subObj) throw new Error("Select a subcategory.");
-      if (!serviceName.trim()) throw new Error("Service name is required.");
+      if (!serviceName.trim()) throw new Error("Service package name is required.");
+      
       const price = Number(customPrice);
-      if (isNaN(price) || price < 0) throw new Error("Enter a valid price ≥ 0.");
+      if (isNaN(price) || price < 0) throw new Error("Enter a valid custom price ≥ 0.");
 
       await addCustomService({
         categoryName: catObj.name,
@@ -127,23 +101,26 @@ export default function VendorServicesManager({ initialServices, categories, sub
       setServiceName("");
       setCustomPrice("");
       setMediaUrls([]);
-      showToast("Service added to your catalog.", "success");
-      window.location.reload();
+      setSuccess("Custom service package successfully published.");
+      setShowAddForm(false);
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err: any) {
-      showToast(err.message || "Failed to add service.", "error");
+      setError(err.message || "Failed to publish service.");
       setAddLoading(false);
     }
   };
 
   const handleDeleteConfirm = async (id: string) => {
     setDeleteLoading(true);
+    setError(null);
     try {
       await deleteCustomService(id);
       setServices((prev) => prev.filter((s) => s.id !== id));
       setDeleteConfirmId(null);
-      showToast("Service removed.", "success");
+      setSuccess("Service package deleted.");
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      showToast(err.message || "Failed to remove service.", "error");
+      setError(err.message || "Failed to remove service.");
     } finally {
       setDeleteLoading(false);
     }
@@ -152,91 +129,90 @@ export default function VendorServicesManager({ initialServices, categories, sub
   const AddForm = (
     <form
       onSubmit={handleAdd}
-      className="rounded-3xl bg-surface border border-border shadow-sm overflow-hidden"
+      className="rounded-3xl bg-surface border border-border/80 shadow-md overflow-hidden animate-scale-in"
     >
-      {/* Form header */}
-      <div className="px-5 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-between">
+      <div className="px-6 py-5 bg-gradient-to-r from-zinc-900 to-zinc-950 border-b border-border/40 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-bold text-white font-heading">Add Custom Service</h3>
-          <p className="text-[10px] text-purple-200 mt-0.5">Define a package with your own pricing</p>
+          <span className="text-[8px] uppercase font-bold tracking-[0.25em] text-accent-gold">SAI CATALOG MANAGER</span>
+          <h3 className="text-sm font-bold text-white font-heading mt-0.5">Add Custom Offer</h3>
         </div>
         <button
           type="button"
           onClick={() => setShowAddForm(false)}
-          className="lg:hidden p-1 rounded-lg text-purple-200 hover:text-white hover:bg-white/10 transition cursor-pointer"
+          className="lg:hidden p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-surface-raised cursor-pointer"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="p-5 space-y-4">
+      <div className="p-6 space-y-4 text-xs font-medium">
         {categories.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic text-center py-4">No categories configured by admin yet.</p>
+          <p className="text-xs text-muted-foreground italic text-center py-6">No service channels configured.</p>
         ) : (
           <>
-            {/* Category */}
+            {/* Category Select */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Category</label>
-              <select id="catSelect" value={selectedCategoryId} onChange={(e) => handleCategoryChange(e.target.value)} className={inputClass}>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Service Category</label>
+              <select
+                value={selectedCategoryId}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground cursor-pointer text-xs"
+              >
                 {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
 
-            {/* Subcategory */}
+            {/* Subcategory Select */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Subcategory</label>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Sub-channel classification</label>
               <select
-                id="subSelect"
                 value={selectedSubcategoryId}
                 onChange={(e) => setSelectedSubcategoryId(e.target.value)}
                 disabled={filteredSubs.length === 0}
-                className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`}
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground disabled:opacity-40 disabled:cursor-not-allowed text-xs"
               >
-                {filteredSubs.length === 0
-                  ? <option value="">No subcategories</option>
-                  : filteredSubs.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)
-                }
+                {filteredSubs.length === 0 ? (
+                  <option value="">No subcategories</option>
+                ) : (
+                  filteredSubs.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)
+                )}
               </select>
             </div>
 
             {/* Service Name */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Package Name</label>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Package Descriptor</label>
               <input
-                id="serviceInput"
                 type="text"
                 required
                 value={serviceName}
                 onChange={(e) => setServiceName(e.target.value)}
-                placeholder="e.g. Candid Wedding Package"
-                className={inputClass}
+                placeholder="e.g. Premium Stage Sound Calibration"
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground text-xs"
               />
             </div>
 
-            {/* Price */}
+            {/* Custom Price */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Your Price</label>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Custom Rate</label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 pointer-events-none">₹</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">₹</span>
                 <input
-                  id="priceInput"
                   type="number"
                   required
                   min="0"
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
                   placeholder="e.g. 15000"
-                  className={`${inputClass} pl-8`}
+                  className="w-full px-4 py-3 pl-8 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground font-mono text-xs"
                 />
               </div>
             </div>
 
-            {/* Media */}
+            {/* Photos Showcase */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                Showcase Photos <span className="text-zinc-400 dark:text-zinc-500 normal-case font-normal">(optional, max 3)</span>
+              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">
+                Showcase media <span className="text-zinc-500 font-normal lowercase font-sans">(optional, max 3)</span>
               </label>
               <MediaUploader value={mediaUrls} onChange={setMediaUrls} limit={3} />
             </div>
@@ -244,24 +220,9 @@ export default function VendorServicesManager({ initialServices, categories, sub
             <button
               type="submit"
               disabled={addLoading || filteredSubs.length === 0}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all duration-200 shadow-md shadow-purple-500/20 hover:shadow-purple-500/30 hover:-translate-y-0.5 cursor-pointer"
+              className="w-full py-3 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition cursor-pointer shadow-md shadow-[#D4AF37]/10"
             >
-              {addLoading ? (
-                <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Adding…
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Publish Service
-                </>
-              )}
+              {addLoading ? "Publishing Catalog Offer..." : "Publish Service Package"}
             </button>
           </>
         )}
@@ -270,162 +231,175 @@ export default function VendorServicesManager({ initialServices, categories, sub
   );
 
   return (
-    <div className="space-y-4 animate-fade-in-up">
-      {toast && <Toast toast={toast} onDismiss={() => setToast(null)} />}
-
-      {/* Mobile: Add button */}
-      {!showAddForm && (
-        <div className="lg:hidden">
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer shadow-md shadow-purple-500/20"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add New Service
-          </button>
+    <div className="space-y-8 select-none">
+      
+      {/* Toast notifications */}
+      {error && (
+        <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs rounded-2xl flex items-center justify-between gap-3 animate-fade-in max-w-4xl">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
         </div>
       )}
 
-      {/* Mobile form */}
-      {showAddForm && <div className="lg:hidden">{AddForm}</div>}
+      {success && (
+        <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs rounded-2xl flex items-center gap-3 animate-fade-in max-w-4xl">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+          <span>{success}</span>
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* ── Left: Service Catalog ── */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Catalog header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Your Catalog</h2>
-              {services.length > 0 && (
-                <span className="px-2 py-0.5 text-[10px] font-bold bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/50 text-purple-700 dark:text-purple-400 rounded-full">
-                  {services.length} {services.length === 1 ? "item" : "items"}
-                </span>
-              )}
+      {/* Desktop form toggle / catalog layout wrapper */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Left: Catalog List */}
+        <div className="lg:col-span-8 space-y-6">
+          <div className="flex justify-between items-center px-1">
+            <div className="space-y-0.5">
+              <span className="text-[9.5px] uppercase font-bold tracking-[0.25em] text-accent-gold">Business Catalog</span>
+              <h2 className="text-xl font-light font-heading text-foreground">Services Configuration</h2>
             </div>
+            
+            {/* Mobile form drawer toggle */}
+            {!showAddForm && (
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="lg:hidden px-4.5 py-2.5 bg-gradient-to-r from-accent-gold to-amber-500 text-black text-[10px] font-bold uppercase tracking-wider rounded-xl transition cursor-pointer flex items-center gap-1 shadow-md shadow-[#D4AF37]/10"
+              >
+                <Plus className="w-4 h-4" /> Add Offer
+              </button>
+            )}
           </div>
 
+          {showAddForm && <div className="lg:hidden">{AddForm}</div>}
+
           {Object.keys(grouped).length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 rounded-3xl border border-dashed border-border bg-surface text-center p-6 shadow-sm">
-              <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
+            <div className="flex flex-col items-center justify-center py-24 rounded-3xl border border-dashed border-border/80 bg-surface/50 text-center p-6 shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-border/60 flex items-center justify-center mb-5 text-accent-gold shadow-md">
+                <Layers className="w-6 h-6" />
               </div>
-              <p className="text-sm font-bold text-foreground">Your catalog is empty</p>
-              <p className="text-xs text-muted-foreground mt-1">Add your first service using the form</p>
+              <h3 className="text-sm font-bold text-foreground">Business catalog is empty</h3>
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed font-light">
+                Define your custom packages, rates, and reference photos to list your offerings for assignments.
+              </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {Object.entries(grouped).map(([catName, subGroups]) => {
                 const isExpanded = expandedCategories.has(catName);
                 const serviceCount = Object.values(subGroups).flat().length;
 
                 return (
-                  <div key={catName} className="rounded-3xl bg-surface border border-border shadow-sm overflow-hidden">
-                    {/* Category header (accordion toggle) */}
+                  <div key={catName} className="rounded-3xl bg-surface border border-border/80 shadow-sm overflow-hidden transition-all duration-300">
+                    
+                    {/* Header trigger */}
                     <button
                       type="button"
                       onClick={() => toggleCategory(catName)}
-                      className="w-full flex items-center justify-between px-5 py-4 bg-zinc-50/50 dark:bg-zinc-950/40 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 transition-colors duration-200 cursor-pointer"
+                      className="w-full flex items-center justify-between px-6 py-5 bg-background/30 hover:bg-surface-raised cursor-pointer transition duration-150"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-1 h-5 rounded-full bg-gradient-to-b from-purple-500 to-indigo-500 flex-shrink-0" />
-                        <span className="text-sm font-bold text-foreground">{catName}</span>
-                        <span className="text-[10px] px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-full font-bold">
-                          {serviceCount}
+                        <div className="w-[3px] h-4 bg-accent-gold rounded-full shrink-0" />
+                        <span className="text-sm font-bold text-foreground font-heading">{catName} Group</span>
+                        <span className="px-2 py-0.5 bg-background border border-border text-accent-gold text-[9px] font-bold rounded-lg font-mono">
+                          {serviceCount} {serviceCount === 1 ? "Offer" : "Offers"}
                         </span>
                       </div>
-                      <svg
-                        className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
+                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${
+                        isExpanded ? "rotate-180 text-accent-gold" : ""
+                      }`} />
                     </button>
 
-                    {/* Accordion body */}
+                    {/* Accordion Body */}
                     {isExpanded && (
-                      <div className="p-5 space-y-5 border-t border-border/40 animate-slide-down">
+                      <div className="p-6 space-y-6 border-t border-border/40 bg-surface/30 animate-scale-in">
                         {Object.entries(subGroups).map(([subName, items]) => (
-                          <div key={subName} className="space-y-3">
+                          <div key={subName} className="space-y-3.5">
+                            
                             <div className="flex items-center gap-2">
-                              <div className="w-0.5 h-3.5 rounded-full bg-indigo-400 dark:bg-indigo-500 flex-shrink-0" />
-                              <h4 className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{subName}</h4>
+                              <span className="w-1.5 h-1.5 rounded-full bg-accent-gold/60 shrink-0" />
+                              <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{subName}</h4>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               {items.map((item) => {
                                 const isDeleting = deleteConfirmId === item.id;
                                 return (
-                                  <div
+                                  <div 
                                     key={item.id}
-                                    className="group relative p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/40 border border-border shadow-sm hover:border-zinc-300 dark:hover:border-zinc-800 transition-all duration-200"
+                                    className="p-5 bg-background border border-border/60 hover:border-accent-gold/15 rounded-2xl flex flex-col justify-between gap-4 transition duration-300 shadow-sm group relative"
                                   >
-                                    <div className="flex items-start justify-between gap-2 mb-2">
-                                      <h5 className="text-sm font-bold text-foreground leading-snug">{item.service_name}</h5>
+                                    <div className="flex items-start justify-between gap-3">
+                                      <h5 className="text-xs font-bold text-foreground leading-normal max-w-[190px]">{item.service_name}</h5>
+                                      
+                                      {/* Delete action hooks */}
                                       {!isDeleting ? (
                                         <button
-                                          onClick={() => setDeleteConfirmId(item.id)}
                                           type="button"
-                                          className="flex-shrink-0 p-1 rounded-lg text-zinc-300 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-200 opacity-0 group-hover:opacity-100 cursor-pointer"
-                                          title="Remove"
+                                          onClick={() => setDeleteConfirmId(item.id)}
+                                          className="p-1.5 rounded-lg text-zinc-300 hover:text-red-400 hover:bg-red-950/10 opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer shrink-0"
                                         >
-                                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                          </svg>
+                                          <Trash2 className="w-3.5 h-3.5" />
                                         </button>
                                       ) : (
-                                        <div className="flex items-center gap-1.5 animate-scale-in flex-shrink-0">
+                                        <div className="flex items-center gap-1 animate-scale-in shrink-0">
                                           <button
-                                            onClick={() => setDeleteConfirmId(null)}
                                             type="button"
-                                            className="px-2 py-1 text-[10px] font-bold border border-border text-muted-foreground rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition cursor-pointer"
+                                            onClick={() => setDeleteConfirmId(null)}
+                                            className="px-2 py-1 text-[8.5px] font-bold border border-border text-muted-foreground rounded-lg"
                                           >
                                             Keep
                                           </button>
                                           <button
+                                            type="button"
                                             onClick={() => handleDeleteConfirm(item.id)}
                                             disabled={deleteLoading}
-                                            type="button"
-                                            className="px-2 py-1 text-[10px] font-bold text-white bg-red-600 hover:bg-red-500 rounded-lg transition cursor-pointer disabled:opacity-50"
+                                            className="px-2 py-1 text-[8.5px] font-bold bg-red-600 text-white rounded-lg"
                                           >
-                                            {deleteLoading ? "…" : "Delete"}
+                                            Delete
                                           </button>
                                         </div>
                                       )}
                                     </div>
 
-                                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-500/5 border border-purple-200/50 dark:border-purple-900/30 rounded-xl mb-3">
-                                      <span className="text-xs font-bold text-purple-600 dark:text-purple-400">
-                                        ₹{Number(item.custom_price).toLocaleString("en-IN")}
-                                      </span>
+                                    {/* Footer details pricing */}
+                                    <div className="border-t border-border/40 pt-3 mt-1 flex flex-col gap-3">
+                                      <div className="flex justify-between items-center text-xs font-mono">
+                                        <span className="text-[8px] uppercase font-bold text-zinc-400 font-sans tracking-wider">Custom Rate</span>
+                                        <span className="font-bold text-accent-gold text-xs">
+                                          ₹{Number(item.custom_price).toLocaleString("en-IN")}
+                                        </span>
+                                      </div>
+
+                                      {/* Media Showcase attachments */}
+                                      {item.vendor_custom_service_media?.length > 0 && (
+                                        <div className="flex gap-2.5 flex-wrap">
+                                          {item.vendor_custom_service_media.map((med, idx) => (
+                                            <button
+                                              key={idx}
+                                              type="button"
+                                              onClick={() => window.open(med.media_url, "_blank")}
+                                              className="w-10 h-10 rounded-xl overflow-hidden border border-border hover:border-accent-gold/25 hover:scale-105 transition cursor-pointer bg-muted shrink-0"
+                                            >
+                                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                                              <img src={med.media_url} alt="Showcase" className="w-full h-full object-cover" />
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
                                     </div>
 
-                                    {/* Image thumbs */}
-                                    {item.vendor_custom_service_media?.length > 0 && (
-                                      <div className="flex gap-1.5 flex-wrap">
-                                        {item.vendor_custom_service_media.map((med, idx) => (
-                                          <button
-                                            key={idx}
-                                            type="button"
-                                            onClick={() => window.open(med.media_url, "_blank")}
-                                            className="w-9 h-9 rounded-lg overflow-hidden border border-border bg-zinc-100 dark:bg-zinc-900 hover:scale-110 transition-transform duration-200 cursor-pointer"
-                                          >
-                                            <img src={med.media_url} alt="Showcase" className="w-full h-full object-cover" />
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
                                   </div>
                                 );
                               })}
                             </div>
+
                           </div>
                         ))}
                       </div>
                     )}
+
                   </div>
                 );
               })}
@@ -433,11 +407,13 @@ export default function VendorServicesManager({ initialServices, categories, sub
           )}
         </div>
 
-        {/* ── Right: Add Form (desktop) ── */}
-        <div className="hidden lg:block lg:col-span-1">
-          <div className="sticky top-28">{AddForm}</div>
+        {/* Right: Sticky desktop form panel */}
+        <div className="hidden lg:block lg:col-span-4 sticky top-28">
+          {AddForm}
         </div>
+
       </div>
+
     </div>
   );
 }

@@ -15,11 +15,14 @@ interface Booking {
     location: string;
     guest_count: number;
     status: string;
-    profiles: {
-      full_name: string;
-      phone_number: string;
-      email: string;
-    } | null;
+    event_assignments: {
+      id: string;
+      profiles: {
+        full_name: string;
+        phone_number: string;
+        email: string;
+      } | null;
+    }[];
     request_items: {
       quantity: number;
       unit_price: number;
@@ -548,36 +551,45 @@ export default function CalendarClient({ bookings }: { bookings: Booking[] }) {
                           </div>
                         )}
 
-                        {/* Client details - unlocked if Confirmed/Approved */}
+                        {/* Coordinator details - unlocked if Confirmed/Approved */}
                         {isApproved ? (
-                          <div className="border-t border-border/50 pt-3 mt-3 space-y-2">
-                            <span className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-wider">Customer Details</span>
-                            <div className="p-3 bg-gradient-to-tr from-emerald-500/[0.04] to-teal-500/[0.04] border border-emerald-500/10 rounded-xl space-y-1.5">
-                              <p className="font-bold text-xs text-zinc-800 dark:text-zinc-200">
-                                {req.profiles?.full_name}
-                              </p>
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[10px] text-muted-foreground">
-                                <a href={`tel:${req.profiles?.phone_number}`} className="flex items-center gap-1.5 hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-semibold">
-                                  <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                  </svg>
-                                  {req.profiles?.phone_number}
-                                </a>
-                                <a href={`mailto:${req.profiles?.email}`} className="flex items-center gap-1.5 hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-semibold truncate max-w-[170px]">
-                                  <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                  </svg>
-                                  {req.profiles?.email}
-                                </a>
+                          req.event_assignments?.[0]?.profiles ? (
+                            <div className="border-t border-border/40 pt-3.5 mt-3 space-y-2">
+                              <span className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-wider block">Assigned Coordinator</span>
+                              <div className="p-3 bg-zinc-50/50 dark:bg-zinc-900/30 border border-border/60 rounded-xl space-y-1.5">
+                                <p className="font-bold text-xs text-foreground">
+                                  {req.event_assignments[0].profiles.full_name}
+                                </p>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[10px] text-muted-foreground font-mono">
+                                  <a href={`tel:${req.event_assignments[0].profiles.phone_number}`} className="flex items-center gap-1.5 hover:text-accent-gold transition-colors font-semibold">
+                                    <svg className="w-3.5 h-3.5 text-accent-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                    </svg>
+                                    {req.event_assignments[0].profiles.phone_number}
+                                  </a>
+                                  <a href={`mailto:${req.event_assignments[0].profiles.email}`} className="flex items-center gap-1.5 hover:text-accent-gold transition-colors font-semibold truncate max-w-[170px]" title={req.event_assignments[0].profiles.email}>
+                                    <svg className="w-3.5 h-3.5 text-accent-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    {req.event_assignments[0].profiles.email}
+                                  </a>
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div className="border-t border-border/40 pt-3 mt-3 flex items-center gap-2 text-[9px] text-muted-foreground">
+                              <svg className="w-4 h-4 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                              <span>Assigning coordinator partner...</span>
+                            </div>
+                          )
                         ) : (
-                          <div className="border-t border-border/50 pt-3 mt-3 flex items-center gap-2 text-[9px] text-muted-foreground">
+                          <div className="border-t border-border/40 pt-3 mt-3 flex items-center gap-2 text-[9px] text-muted-foreground">
                             <svg className="w-4 h-4 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
-                            <span>Contact info unlocks when booking is Confirmed.</span>
+                            <span>Coordinator allocation pending confirmation.</span>
                           </div>
                         )}
                       </div>

@@ -64,7 +64,26 @@ export default function AuthForm({ mode }: AuthFormProps) {
           throw signInError;
         }
 
-        router.refresh();
+        // Read role from DB and redirect to the correct workspace
+        const { data: { user: authedUser } } = await supabase.auth.getUser();
+        if (authedUser) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", authedUser.id)
+            .single();
+
+          const role = profile?.role;
+          if (role === "admin") {
+            router.push("/admin/dashboard");
+          } else if (role === "vendor") {
+            router.push("/vendor");
+          } else {
+            router.push("/customer");
+          }
+        } else {
+          router.refresh();
+        }
       } else {
         if (password !== confirmPassword) {
           throw new Error("Passwords do not match.");
