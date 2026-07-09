@@ -25,24 +25,26 @@ export default function LoginPage() {
       </div>
 
       {/* ── Path Toggle: Customer vs Vendor ── */}
-      <div className="flex rounded-xl overflow-hidden border border-white/8 mb-6">
+      <div className="flex p-1 bg-white/5 border border-white/10 rounded-xl w-full mb-6">
         <button
+          type="button"
           onClick={() => setPath("customer")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] uppercase font-bold tracking-[0.14em] transition-all duration-300 cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] rounded-lg transition-all duration-250 cursor-pointer ${
             path === "customer"
-              ? "bg-[#D4AF37] text-black"
-              : "bg-transparent text-[#F7F3EC]/55 hover:text-white"
+              ? "bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black shadow-md shadow-[#D4AF37]/20"
+              : "text-[#F7F3EC]/45 hover:text-[#F7F3EC]/80"
           }`}
         >
           <Calendar className="w-3.5 h-3.5" />
           Customer
         </button>
         <button
+          type="button"
           onClick={() => setPath("vendor")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] uppercase font-bold tracking-[0.14em] transition-all duration-300 cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] rounded-lg transition-all duration-250 cursor-pointer ${
             path === "vendor"
-              ? "bg-[#D4AF37] text-black"
-              : "bg-transparent text-[#F7F3EC]/55 hover:text-white"
+              ? "bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black shadow-md shadow-[#D4AF37]/20"
+              : "text-[#F7F3EC]/45 hover:text-[#F7F3EC]/80"
           }`}
         >
           <Store className="w-3.5 h-3.5" />

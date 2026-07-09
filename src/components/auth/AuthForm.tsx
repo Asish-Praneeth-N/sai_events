@@ -5,16 +5,17 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { UserRole } from "@/lib/types";
 import RoleSwitcher from "./RoleSwitcher";
+import { Eye, EyeOff } from "lucide-react";
 
 interface AuthFormProps {
   mode: "login" | "register";
 }
 
 const inputClass =
-  "w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37]/60 text-[#F7F3EC] placeholder-white/25 transition duration-200 text-sm font-light";
+  "w-full px-4 py-3 bg-[#130f0c]/60 border border-white/8 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/45 focus:border-[#D4AF37]/70 text-[#F7F3EC] placeholder-white/20 transition-all duration-300 text-sm font-light";
 
 const labelClass =
-  "text-[10px] font-bold text-[#F7F3EC]/45 uppercase tracking-[0.18em]";
+  "text-[9px] font-bold text-[#D4AF37]/80 uppercase tracking-[0.2em]";
 
 export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
@@ -28,6 +29,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
   const [role, setRole] = useState<UserRole>("customer");
   const [businessName, setBusinessName] = useState("");
   const [address, setAddress] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -213,15 +217,24 @@ export default function AuthForm({ mode }: AuthFormProps) {
         <label htmlFor="password" className={labelClass}>
           Password
         </label>
-        <input
-          id="password"
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          className={inputClass}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className={`${inputClass} pr-12`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
+          >
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       {mode === "register" && (
@@ -229,15 +242,24 @@ export default function AuthForm({ mode }: AuthFormProps) {
           <label htmlFor="confirmPassword" className={labelClass}>
             Confirm Password
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••"
-            className={inputClass}
-          />
+          <div className="relative">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              className={`${inputClass} pr-12`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
+            >
+              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       )}
 
