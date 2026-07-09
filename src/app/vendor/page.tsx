@@ -1,42 +1,33 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import VendorDashboardClient from "@/components/vendor/VendorDashboardClient";
+import VendorCommandCenter from "@/components/vendor/VendorCommandCenter";
 
 export default async function VendorDashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
-  // 1. Fetch vendor profile details
+  // Profile
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, phone_number, business_name, address, status, email, created_at, role, availability_status")
+    .select("id, full_name, phone_number, business_name, address, status, email, created_at, availability_status")
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "vendor") {
-    redirect("/unauthorized");
-  }
+  if (!profile) redirect("/login");
 
-  // If status is Pending or Rejected, the layout will intercept it. But as a secondary check:
-  if (profile.status === "Pending" || profile.status === "Rejected") {
-    redirect("/vendor/profile"); // fallback
-  }
-
-  // 2. Fetch category mappings
+  // Category mappings
   const { data: categoryMappings } = await supabase
     .from("vendor_category_mappings")
     .select("categories(name)")
     .eq("vendor_id", user.id);
 
   const categories = (categoryMappings || [])
-    .map((m) => m.categories?.name)
+    .map((m: any) => m.categories?.name)
     .filter(Boolean) as string[];
 
-  // 3. Fetch all vendor assignments to calculate stats & list cards
+  // All assignments (for stats + dashboard cards)
   const { data: assignments } = await supabase
     .from("vendor_assignments")
     .select(`
@@ -54,30 +45,48 @@ export default async function VendorDashboardPage() {
         total_budget,
         event_assignments(
           id,
-          profiles:assigned_operational_manager_id (
+          profiles:assigned_operational_manager_id(
             full_name,
             phone_number,
             email
           )
+        ),
+        request_items(
+          quantity,
+          unit_price,
+          pricing_type,
+          service_items(
+            name,
+            subcategory_id,
+            subcategories(category_id)
+          )
         )
       )
     `)
-    .eq("vendor_id", user.id);
+    .eq("vendor_id", user.id)
+    .order("created_at", { ascending: false });
 
-  // 4. Fetch notifications for activity log
+  // Notifications (activity feed)
   const { data: notifications } = await supabase
     .from("notifications")
     .select("id, message, created_at, status")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(8);
+
+  // Portfolio count
+  const { count: portfolioCount } = await supabase
+    .from("vendor_portfolio")
+    .select("*", { count: "exact", head: true })
+    .eq("vendor_id", user.id);
 
   return (
-    <VendorDashboardClient
-      profile={profile}
+    <VendorCommandCenter
+      profile={profile as any}
       categories={categories}
-      assignments={assignments || []}
-      notifications={notifications || []}
+      assignments={(assignments || []) as any[]}
+      notifications={(notifications || []) as any[]}
+      portfolioCount={portfolioCount || 0}
     />
   );
 }

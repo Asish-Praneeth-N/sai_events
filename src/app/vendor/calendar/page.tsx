@@ -73,11 +73,12 @@ export default async function VendorCalendarPage() {
   const bookings = (bookingsData || []) as any[];
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold font-heading text-zinc-900 dark:text-white">Event Calendar</h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-          Manage your schedule, track upcoming confirmed bookings, and review past completed events.
+        <p className="text-[9.5px] uppercase tracking-widest font-bold text-muted-foreground">Scheduling</p>
+        <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Calendar</h1>
+        <p className="text-xs text-muted-foreground font-light mt-1">
+          Your confirmed schedule, upcoming events, and availability.
         </p>
       </div>
 

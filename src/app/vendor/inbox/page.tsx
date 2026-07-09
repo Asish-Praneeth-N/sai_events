@@ -57,20 +57,21 @@ export default async function VendorInboxPage() {
   const assignments = (assignmentsData || []) as any[];
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold font-heading text-zinc-900 dark:text-white">Leads Inbox</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            New opportunities waiting for your response.
+          <p className="text-[9.5px] uppercase tracking-widest font-bold text-muted-foreground">SAI EVENTS DISPATCH</p>
+          <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Invitations</h1>
+          <p className="text-xs text-muted-foreground font-light mt-1">
+            New event leads assigned by SAI EVENTS for your review. All client identity is anonymised.
           </p>
         </div>
         {assignments.length > 0 && (
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-              {assignments.length} pending {assignments.length === 1 ? "lead" : "leads"}
+          <div className="flex items-center gap-2 px-3.5 py-2 bg-amber-500/8 border border-amber-500/25 rounded-xl shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-xs font-bold text-amber-400">
+              {assignments.length} pending {assignments.length === 1 ? "invitation" : "invitations"}
             </span>
           </div>
         )}

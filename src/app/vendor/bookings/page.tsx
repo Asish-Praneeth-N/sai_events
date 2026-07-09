@@ -68,27 +68,28 @@ export default async function VendorBookingsPage() {
   const pendingCount = bookings.filter((b) => b.status === "Accepted").length;
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold font-heading text-zinc-900 dark:text-white">Bookings</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Track your accepted leads and confirmed events.
+          <p className="text-[9.5px] uppercase tracking-widest font-bold text-muted-foreground">Project Management</p>
+          <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Assignments</h1>
+          <p className="text-xs text-muted-foreground font-light mt-1">
+            Your accepted leads and confirmed events.
           </p>
         </div>
         {bookings.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
             {confirmedCount > 0 && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/8 border border-emerald-500/25 rounded-xl">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">{confirmedCount} Confirmed</span>
+                <span className="text-xs font-bold text-emerald-400">{confirmedCount} Confirmed</span>
               </div>
             )}
             {pendingCount > 0 && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">{pendingCount} Awaiting</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/8 border border-amber-500/25 rounded-xl">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-xs font-bold text-amber-400">{pendingCount} Awaiting</span>
               </div>
             )}
           </div>

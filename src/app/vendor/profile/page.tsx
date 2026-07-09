@@ -46,11 +46,21 @@ export default async function VendorProfilePage() {
   };
 
   return (
-    <VendorProfileForm
-      initialProfile={initialProfile}
-      categories={categories || []}
-      initialMappings={mappings?.map((m) => m.category_id) || []}
-      portfolioItems={portfolioItems || []}
-    />
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <p className="text-[9.5px] uppercase tracking-widest font-bold text-muted-foreground">Account</p>
+        <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Business Profile</h1>
+        <p className="text-xs text-muted-foreground font-light mt-1">
+          Manage your business details, service categories, and showcase gallery.
+        </p>
+      </div>
+
+      <VendorProfileForm
+        initialProfile={initialProfile}
+        categories={categories || []}
+        initialMappings={mappings?.map((m) => m.category_id) || []}
+        portfolioItems={portfolioItems || []}
+      />
+    </div>
   );
 }
