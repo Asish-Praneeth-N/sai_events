@@ -135,7 +135,80 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
     .eq("request_id", id);
   const assignments = assignmentsData || [];
 
-  // 5. Structure the category groups for the Matchmaker component
+  // 6. Fetch current OM assignments (Event Assignments)
+  const { data: omAssignmentsData } = await supabase
+    .from("event_assignments")
+    .select(`
+      id,
+      assigned_operational_manager_id,
+      assignment_date,
+      status,
+      handover_notes,
+      internal_notes,
+      expected_completion,
+      escalation_level,
+      escalation_reason,
+      reassignment_history,
+      profiles:assigned_operational_manager_id (
+        id,
+        full_name,
+        phone_number,
+        email
+      )
+    `)
+    .eq("event_id", id);
+  const omAssignments = omAssignmentsData || [];
+
+  // 7. Fetch available Operational Managers for assignment matching
+  const { data: availableOMsData } = await supabase
+    .from("operational_managers")
+    .select(`
+      id,
+      employee_id,
+      designation,
+      availability_status,
+      employment_status,
+      current_workload,
+      performance_score,
+      completion_rate,
+      profiles (
+        full_name,
+        phone_number,
+        email
+      )
+    `)
+    .eq("availability_status", "Available")
+    .eq("employment_status", "Active");
+  const availableOMs = (availableOMsData || []).map((om: any) => ({
+    id: om.id,
+    employee_id: om.employee_id,
+    designation: om.designation,
+    availability_status: om.availability_status,
+    employment_status: om.employment_status,
+    current_workload: om.current_workload,
+    performance_score: Number(om.performance_score),
+    completion_rate: Number(om.completion_rate),
+    full_name: om.profiles?.full_name || "Unknown Manager",
+    phone_number: om.profiles?.phone_number || "N/A",
+    email: om.profiles?.email || "N/A"
+  }));
+
+  // 8. Fetch timelines log
+  const { data: timelineData } = await supabase
+    .from("timelines")
+    .select(`
+      id,
+      milestone_name,
+      description,
+      is_internal,
+      created_at,
+      profiles ( full_name )
+    `)
+    .eq("event_id", id)
+    .order("created_at", { ascending: false });
+  const timelineLogs = timelineData || [];
+
+  // 9. Structure the category groups for the Matchmaker component
   const groups = categoryIds.map((catId) => {
     const group = categoryGroupsMap[catId];
     
@@ -175,9 +248,9 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 pb-5 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold font-heading text-foreground tracking-tight">Manage Booking Matchmaking</h1>
+          <h1 className="text-3xl font-extrabold font-heading text-foreground tracking-tight">Manage Event Case</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Request ID: <span className="font-mono">{request.id}</span> • Event: <span className="font-semibold text-foreground">{request.event_type}</span>
+            Case ID: <span className="font-mono">{request.id}</span> • Event: <span className="font-semibold text-foreground">{request.event_type}</span>
           </p>
         </div>
       </div>
@@ -192,6 +265,9 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
           address: request.location || "N/A",
         }}
         groups={groups}
+        omAssignments={omAssignments as any[]}
+        availableOMs={availableOMs}
+        timelineLogs={timelineLogs as any[]}
       />
     </div>
   );

@@ -29,6 +29,17 @@ export async function updateVendorStatus(
 
   if (error) throw new Error(error.message);
 
+  const actionMap: Record<string, string> = {
+    Approved: "Vendor Approved",
+    Rejected: "Vendor Rejected",
+    Active: "Vendor Activated",
+    Inactive: "Vendor Suspended",
+  };
+  const auditAction = actionMap[status] || "Vendor Status Updated";
+
+  // Log audit record
+  await logAuditRecord(auditAction, "vendor", vendorId, { status });
+
   // Send a system notification log
   try {
     const { data: vendorProfile } = await supabase
@@ -52,7 +63,32 @@ export async function updateVendorStatus(
   revalidatePath("/admin");
 }
 
-// 2. Notification Logging Actions
+// 2. Audit Logging Actions
+export async function logAuditRecord(
+  action: string,
+  entityType: string,
+  entityId: string,
+  details: any = {}
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { error } = await supabase
+    .from("audit_logs")
+    .insert({
+      action,
+      entity_type: entityType,
+      entity_id: entityId,
+      performed_by: user?.id || null,
+      details,
+    });
+
+  if (error) {
+    console.warn("Failed to write audit log:", error.message);
+  }
+}
+
+// 3. Notification Logging Actions
 export async function logNotification(data: {
   userId: string | null;
   userType: string;
@@ -77,7 +113,7 @@ export async function logNotification(data: {
   }
 }
 
-// 3. Media Object Deletion Action
+// 4. Media Object Deletion Action
 export async function deleteMediaObject(mediaId: string, storagePath: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

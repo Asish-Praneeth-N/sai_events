@@ -6,7 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { 
   Sparkles, ChevronLeft, ChevronRight, LayoutDashboard, GitBranch,
-  Store, Users, BookOpen, Image, Bell, Settings, User, LogOut
+  Store, Users, BookOpen, Image, Bell, Settings, User, LogOut,
+  Shield, Send, Briefcase, TrendingUp, History
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -40,17 +41,22 @@ export default function AdminSidebar({ adminName, adminEmail }: AdminSidebarProp
       ]
     },
     {
-      group: "Operations",
+      group: "Workforce & Operations",
       items: [
-        { href: "/admin/bookings", label: "Bookings", icon: GitBranch },
-        { href: "/admin/vendors", label: "Vendors", icon: Store },
-        { href: "/admin/customers", label: "Customers", icon: Users },
-        { href: "/admin/catalog", label: "Catalog", icon: BookOpen }
+        { href: "/admin/bookings", label: "Event Cases", icon: GitBranch },
+        { href: "/admin/assignments", label: "Event Assignments", icon: Shield },
+        { href: "/admin/vendor-invitations", label: "Vendor Invitations", icon: Send },
+        { href: "/admin/operational-managers", label: "Operations Team", icon: Briefcase },
+        { href: "/admin/vendors", label: "Vendors Registry", icon: Store },
+        { href: "/admin/customers", label: "Clients Directory", icon: Users },
+        { href: "/admin/catalog", label: "Service Catalog", icon: BookOpen }
       ]
     },
     {
-      group: "Assets & System",
+      group: "System & Reports",
       items: [
+        { href: "/admin/reports", label: "Analytics & Reports", icon: TrendingUp },
+        { href: "/admin/status-history", label: "Audit Trail", icon: History },
         { href: "/admin/media", label: "Media Library", icon: Image },
         { href: "/admin/notifications", label: "Notifications", icon: Bell }
       ]

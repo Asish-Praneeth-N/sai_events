@@ -32,9 +32,9 @@ export default async function AdminBookingsPage() {
       
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-light font-heading text-foreground">Bookings Pipeline</h1>
+        <h1 className="text-3xl font-light font-heading text-foreground">Event Cases Pipeline</h1>
         <p className="text-sm text-muted-foreground mt-1 font-light">
-          Track and orchestrate the planning lifecycle of customer event reservations.
+          Track and orchestrate the planning lifecycle of customer event cases.
         </p>
       </div>
 

@@ -35,12 +35,16 @@ interface Column {
 }
 
 const columns: Column[] = [
-  { id: "submitted", title: "Submitted", statuses: ["Request Submitted"], color: "border-t-blue-500 text-blue-500" },
-  { id: "review", title: "Under Review", statuses: ["Under Admin Review"], color: "border-t-amber-500 text-amber-500" },
-  { id: "matching", title: "Vendor Selection", statuses: ["Vendor Selection In Progress", "Sent to Vendors"], color: "border-t-purple-500 text-purple-500" },
-  { id: "accepted", title: "Vendor Accepted", statuses: ["Vendor Accepted"], color: "border-t-pink-500 text-pink-500" },
-  { id: "confirmed", title: "Confirmed", statuses: ["Vendor Approved by Admin", "Customer Confirmation Pending", "Confirmed"], color: "border-t-emerald-500 text-emerald-500" },
-  { id: "completed", title: "Completed", statuses: ["Completed"], color: "border-t-teal-500 text-teal-500" },
+  { id: "submitted", title: "Submitted", statuses: ["Request Submitted", "Submitted"], color: "border-t-blue-500 text-blue-500" },
+  { id: "review", title: "Under Review", statuses: ["Under Admin Review", "Under Review"], color: "border-t-amber-500 text-amber-500" },
+  { id: "planning", title: "Planning", statuses: ["Planning"], color: "border-t-yellow-500 text-yellow-500" },
+  { id: "matching", title: "Vendor Selection", statuses: ["Vendor Selection In Progress", "Sent to Vendors", "Vendor Selection"], color: "border-t-purple-500 text-purple-500" },
+  { id: "finalized", title: "Vendor Finalized", statuses: ["Vendor Accepted", "Vendor Approved by Admin", "Customer Confirmation Pending", "Confirmed", "Vendor Finalized", "Ready For Execution"], color: "border-t-pink-500 text-pink-500" },
+  { id: "om_assigned", title: "Operational Manager Assigned", statuses: ["Operational Manager Assigned"], color: "border-t-cyan-500 text-cyan-500" },
+  { id: "preparation", title: "Preparation", statuses: ["Preparation"], color: "border-t-emerald-500 text-emerald-500" },
+  { id: "execution", title: "Execution", statuses: ["Execution"], color: "border-t-indigo-500 text-indigo-500" },
+  { id: "completed", title: "Completed", statuses: ["Completed"], color: "border-t-green-500 text-green-500" },
+  { id: "closed", title: "Closed", statuses: ["Closed"], color: "border-t-teal-500 text-teal-500" },
   { id: "cancelled", title: "Cancelled", statuses: ["Cancelled"], color: "border-t-red-500 text-red-500" }
 ];
 
@@ -114,7 +118,7 @@ export default function BookingsKanban({ initialRequests }: BookingsKanbanProps)
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <input
           type="text"
-          placeholder="Filter bookings by client name, event type, or location..."
+          placeholder="Filter event cases by client name, event type, or location..."
           value={filterQuery}
           onChange={(e) => setFilterQuery(e.target.value)}
           className="w-full sm:max-w-md px-3.5 py-2.5 bg-surface border border-border rounded-xl text-xs focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground"
