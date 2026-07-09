@@ -53,14 +53,16 @@ export default function Gallery() {
           ))}
         </div>
 
-        {/* Gallery Grid — use a regular CSS grid, not CSS columns, to avoid masonry layout bugs */}
-        <motion.div
-          initial={false}
-          whileInView={!hasEntered ? "visible" : false}
-          onViewportEnter={() => setHasEntered(true)}
-          viewport={{ once: true, margin: "-80px" }}
-          variants={{
-            visible: { transition: { staggerChildren: 0.06 } },
+        {/* Gallery Grid */}
+        {/* Parent div only tracks viewport entry — children self-animate with idx delays */}
+        <div
+          ref={(el) => {
+            if (!el || hasEntered) return;
+            const obs = new IntersectionObserver(
+              ([entry]) => { if (entry.isIntersecting) { setHasEntered(true); obs.disconnect(); } },
+              { rootMargin: "-80px" }
+            );
+            obs.observe(el);
           }}
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 w-full"
         >
@@ -74,8 +76,8 @@ export default function Gallery() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{
                   opacity: { duration: 0.4, delay: hasEntered ? 0 : idx * 0.05 },
-                  y: { duration: 0.4, delay: hasEntered ? 0 : idx * 0.05, ease: [0.16, 1, 0.3, 1] },
-                  layout: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+                  y: { duration: 0.4, delay: hasEntered ? 0 : idx * 0.05, ease: [0.16, 1, 0.3, 1] as const },
+                  layout: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const },
                 }}
                 whileHover={shouldReduceMotion ? {} : { y: -4, transition: { duration: 0.3 } }}
                 className="relative overflow-hidden rounded-2xl group border border-white/5 hover:border-[#D4AF37]/30 shadow-lg bg-[#121212] cursor-pointer aspect-[4/3]"
@@ -110,7 +112,7 @@ export default function Gallery() {
               </motion.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

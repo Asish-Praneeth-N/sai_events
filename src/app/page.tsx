@@ -37,26 +37,26 @@ const SECTIONS = [
 
 const SectionFallback = () => <div className="w-full py-16 bg-[#090909]" />;
 
-// ─── Intro visibility logic ────────────────────────────────────────────────────
-// Show intro on:
-//   1. First ever visit   (sessionStorage key absent)
-//   2. Browser reload/F5  (PerformanceNavigation type === 'reload')
-// Do NOT show on:
-//   - Client-side SPA navigation (key present + not a reload)
+// ─── Intro visibility logic ──────────────────────────────────────────────────
+// Show the cinematic doors ONLY on:
+//   1. First ever visit this session  (no sessionStorage key)
+//   2. An explicit browser reload     (F5 / Ctrl+R / Cmd+R)
+// Never show on:
+//   - Client-side Next.js navigation  (back from /login, /register, etc.)
+//   - back_forward browser navigation
 function shouldShowIntro(): boolean {
   if (typeof window === "undefined") return false;
 
-  // Detect browser reload vs client-side navigation
   const entries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
   const navType = entries[0]?.type ?? "navigate";
-  const isReload = navType === "reload";
 
-  // Check if user has ever seen the intro in this browser session
+  // Only an explicit reload should re-trigger the animation
+  const isExplicitReload = navType === "reload";
+
   const seenKey = "sai_intro_seen";
   const hasSeen = sessionStorage.getItem(seenKey) === "1";
 
-  if (!hasSeen || isReload) {
-    // Mark as seen for subsequent SPA navigations (won't survive a real reload)
+  if (!hasSeen || isExplicitReload) {
     sessionStorage.setItem(seenKey, "1");
     return true;
   }
@@ -64,17 +64,22 @@ function shouldShowIntro(): boolean {
 }
 
 export default function Home() {
-  const [showIntro, setShowIntro]   = useState(true); // start with doors showing (prevents flash)
+  // IMPORTANT: Start as false — CinematicDoors must NEVER mount unless the
+  // client-side check explicitly confirms it should (prevents it flashing on
+  // every SPA back-navigation before the useEffect runs).
+  const [showIntro, setShowIntro]   = useState(false);
   const [doorsOpen, setDoorsOpen]   = useState(false);
   const [contentReady, setContentReady] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
 
-  // Determine on client whether to show intro
+  // Runs once on mount — determines whether to show doors or skip straight to content
   useEffect(() => {
     const show = shouldShowIntro();
-    setShowIntro(show);
-    if (!show) {
-      // No intro — reveal content immediately
+    if (show) {
+      // First visit or explicit reload → show the cinematic intro
+      setShowIntro(true);
+    } else {
+      // SPA navigation (back from login etc.) → reveal content immediately, no doors
       setDoorsOpen(true);
       setContentReady(true);
     }
@@ -130,24 +135,25 @@ export default function Home() {
       )}
 
       {/*
-        Main content wrapper.
-        - Starts invisible and very slightly zoomed in (scale 1.05)
-        - When doorsOpen fires (doors start swinging), animates to full opacity + scale 1
-        - The 1.8s ease creates the sensation of a camera pulling back into the venue
+        Main content wrapper — cinematic zoom reveal.
+        - Starts zoomed IN (scale 1.18 = viewer is "inside" the venue)
+        - When doors open, animates scale → 1 over 3.2s (camera pulls back)
+        - Opacity fades in over 1.6s in parallel
+        - Together this creates the sensation of the venue rushing toward the user
       */}
       <motion.div
-        initial={{ opacity: 0, scale: 1.05 }}
+        initial={{ opacity: 0, scale: 1.18 }}
         animate={
           doorsOpen
             ? { opacity: 1, scale: 1 }
-            : { opacity: 0, scale: 1.05 }
+            : { opacity: 0, scale: 1.18 }
         }
         transition={{
-          opacity: { duration: 1.8, ease: "easeOut" },
-          scale:   { duration: 2.2, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 1.6, ease: "easeOut" },
+          scale:   { duration: 3.2, ease: [0.22, 1, 0.36, 1] },
         }}
         className="relative bg-[#090909] text-[#F7F3EC] overflow-x-hidden film-grain font-sans min-h-screen"
-        style={{ transformOrigin: "center center" }}
+        style={{ transformOrigin: "center center", willChange: "transform, opacity" }}
       >
         <Navbar activeSection={activeSection} sections={SECTIONS} />
 

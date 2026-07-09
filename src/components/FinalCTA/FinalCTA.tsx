@@ -13,7 +13,7 @@ export default function FinalCTA() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
     },
   };
 
@@ -64,6 +64,10 @@ export default function FinalCTA() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.15 } },
+          }}
           className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl text-left"
         >
           {/* Card 1: Client Invitation (Book Your Event) */}
@@ -72,7 +76,7 @@ export default function FinalCTA() {
             whileHover={
               shouldReduceMotion
                 ? {}
-                : { y: -8, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }
+                : { y: -8, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
             }
             className="group relative rounded-3xl border border-[#D4AF37]/25 p-8 sm:p-10 flex flex-col justify-between h-[340px] sm:h-[380px] bg-gradient-to-b from-[#110e0a] to-[#070604] shadow-2xl overflow-hidden"
           >
@@ -121,7 +125,7 @@ export default function FinalCTA() {
             whileHover={
               shouldReduceMotion
                 ? {}
-                : { y: -8, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }
+                : { y: -8, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
             }
             className="group relative rounded-3xl border border-white/5 p-8 sm:p-10 flex flex-col justify-between h-[340px] sm:h-[380px] bg-gradient-to-b from-[#0f0f0f] to-[#080808] shadow-2xl overflow-hidden hover:border-[#D4AF37]/20 transition-colors duration-500"
           >

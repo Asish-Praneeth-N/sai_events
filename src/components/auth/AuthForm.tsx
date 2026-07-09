@@ -10,6 +10,12 @@ interface AuthFormProps {
   mode: "login" | "register";
 }
 
+const inputClass =
+  "w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37]/60 text-[#F7F3EC] placeholder-white/25 transition duration-200 text-sm font-light";
+
+const labelClass =
+  "text-[10px] font-bold text-[#F7F3EC]/45 uppercase tracking-[0.18em]";
+
 export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const supabase = createClient();
@@ -42,9 +48,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
         });
 
         if (signInError) {
-          // Catch unconfirmed email errors and customize output
           if (
-            signInError.message.toLowerCase().includes("confirm") || 
+            signInError.message.toLowerCase().includes("confirm") ||
             signInError.message.toLowerCase().includes("verified")
           ) {
             throw new Error(
@@ -55,9 +60,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         }
 
         router.refresh();
-        // Redirect will be handled by middleware or page reload
       } else {
-        // Enforce validations
         if (password !== confirmPassword) {
           throw new Error("Passwords do not match.");
         }
@@ -86,12 +89,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
         if (signUpError) throw signUpError;
 
-        // Display check-inbox notification for email verification
         setMessage(
           "Registration successful! A verification email has been sent. Please confirm your email in your inbox before logging in."
         );
-        
-        // Reset inputs
+
         setEmail("");
         setPassword("");
         setConfirmPassword("");
@@ -110,12 +111,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-5">
       {error && (
-        <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-semibold rounded-xl animate-fade-in">
+        <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-xl">
           {error}
         </div>
       )}
       {message && (
-        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-semibold rounded-xl animate-fade-in">
+        <div className="p-3.5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#f5db91] text-xs font-semibold rounded-xl leading-relaxed">
           {message}
         </div>
       )}
@@ -123,12 +124,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
       {mode === "register" && (
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Account Type</label>
+            <label className={labelClass}>Account Type</label>
             <RoleSwitcher value={role} onChange={setRole} />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="fullName" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+            <label htmlFor="fullName" className={labelClass}>
               Full Name
             </label>
             <input
@@ -138,12 +139,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="John Doe"
-              className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 transition duration-200 text-sm"
+              className={inputClass}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="phoneNumber" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+            <label htmlFor="phoneNumber" className={labelClass}>
               Phone Number
             </label>
             <input
@@ -153,14 +154,14 @@ export default function AuthForm({ mode }: AuthFormProps) {
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="9876543210"
-              className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 transition duration-200 text-sm"
+              className={inputClass}
             />
           </div>
 
           {role === "vendor" && (
             <>
               <div className="space-y-1.5">
-                <label htmlFor="businessName" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                <label htmlFor="businessName" className={labelClass}>
                   Business Name
                 </label>
                 <input
@@ -170,12 +171,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder="Creative Studio Photography"
-                  className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 transition duration-200 text-sm"
+                  className={inputClass}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="address" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                <label htmlFor="address" className={labelClass}>
                   Business Address
                 </label>
                 <textarea
@@ -185,7 +186,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="123 Creative Street, Studio Zone"
-                  className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 transition duration-200 text-sm resize-none"
+                  className={`${inputClass} resize-none`}
                 />
               </div>
             </>
@@ -194,7 +195,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       )}
 
       <div className="space-y-1.5">
-        <label htmlFor="email" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+        <label htmlFor="email" className={labelClass}>
           Email Address
         </label>
         <input
@@ -204,12 +205,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="yourname@example.com"
-          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 transition duration-200 text-sm"
+          className={inputClass}
         />
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="password" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+        <label htmlFor="password" className={labelClass}>
           Password
         </label>
         <input
@@ -219,13 +220,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 transition duration-200 text-sm"
+          className={inputClass}
         />
       </div>
 
       {mode === "register" && (
         <div className="space-y-1.5">
-          <label htmlFor="confirmPassword" className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+          <label htmlFor="confirmPassword" className={labelClass}>
             Confirm Password
           </label>
           <input
@@ -235,7 +236,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-foreground placeholder-zinc-400 dark:placeholder-zinc-600 transition duration-200 text-sm"
+            className={inputClass}
           />
         </div>
       )}
@@ -243,9 +244,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition duration-200 shadow-md shadow-purple-500/20 hover:shadow-purple-500/30 hover:scale-[1.01] cursor-pointer text-sm"
+        className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] hover:from-[#c9a42e] hover:to-[#d9b43e] disabled:opacity-50 text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#D4AF37]/15 hover:shadow-[#D4AF37]/30 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs uppercase tracking-[0.18em]"
       >
-        {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+        {loading
+          ? "Please wait..."
+          : mode === "login"
+          ? "Sign In"
+          : "Create Account"}
       </button>
     </form>
   );
