@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { UserRole } from "@/lib/types";
 import RoleSwitcher from "./RoleSwitcher";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AuthFormProps {
   mode: "login" | "register";
@@ -107,173 +108,239 @@ export default function AuthForm({ mode }: AuthFormProps) {
       }
     } catch (err: any) {
       setError(err.message || "An authentication error occurred.");
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full space-y-5">
-      {error && (
-        <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-xl">
-          {error}
-        </div>
-      )}
-      {message && (
-        <div className="p-3.5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#f5db91] text-xs font-semibold rounded-xl leading-relaxed">
-          {message}
-        </div>
-      )}
-
-      {mode === "register" && (
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <label className={labelClass}>Account Type</label>
-            <RoleSwitcher value={role} onChange={setRole} />
+    <>
+      <form onSubmit={handleSubmit} className="w-full space-y-5">
+        {error && (
+          <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-xl">
+            {error}
           </div>
+        )}
 
-          <div className="space-y-1.5">
-            <label htmlFor="fullName" className={labelClass}>
-              Full Name
-            </label>
-            <input
-              id="fullName"
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="John Doe"
-              className={inputClass}
-            />
+        {mode === "register" && (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className={labelClass}>Account Type</label>
+              <RoleSwitcher value={role} onChange={setRole} />
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="fullName" className={labelClass}>
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="John Doe"
+                className={inputClass}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="phoneNumber" className={labelClass}>
+                Phone Number
+              </label>
+              <input
+                id="phoneNumber"
+                type="tel"
+                required
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="9876543210"
+                className={inputClass}
+              />
+            </div>
+
+            {role === "vendor" && (
+              <>
+                <div className="space-y-1.5">
+                  <label htmlFor="businessName" className={labelClass}>
+                    Business Name
+                  </label>
+                  <input
+                    id="businessName"
+                    type="text"
+                    required
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="Creative Studio Photography"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="address" className={labelClass}>
+                    Business Address
+                  </label>
+                  <textarea
+                    id="address"
+                    required
+                    rows={2}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="123 Creative Street, Studio Zone"
+                    className={`${inputClass} resize-none`}
+                  />
+                </div>
+              </>
+            )}
           </div>
+        )}
 
-          <div className="space-y-1.5">
-            <label htmlFor="phoneNumber" className={labelClass}>
-              Phone Number
-            </label>
-            <input
-              id="phoneNumber"
-              type="tel"
-              required
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="9876543210"
-              className={inputClass}
-            />
-          </div>
-
-          {role === "vendor" && (
-            <>
-              <div className="space-y-1.5">
-                <label htmlFor="businessName" className={labelClass}>
-                  Business Name
-                </label>
-                <input
-                  id="businessName"
-                  type="text"
-                  required
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="Creative Studio Photography"
-                  className={inputClass}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label htmlFor="address" className={labelClass}>
-                  Business Address
-                </label>
-                <textarea
-                  id="address"
-                  required
-                  rows={2}
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="123 Creative Street, Studio Zone"
-                  className={`${inputClass} resize-none`}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      <div className="space-y-1.5">
-        <label htmlFor="email" className={labelClass}>
-          Email Address
-        </label>
-        <input
-          id="email"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="yourname@example.com"
-          className={inputClass}
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <label htmlFor="password" className={labelClass}>
-          Password
-        </label>
-        <div className="relative">
-          <input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            className={`${inputClass} pr-12`}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
-          >
-            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-        </div>
-      </div>
-
-      {mode === "register" && (
         <div className="space-y-1.5">
-          <label htmlFor="confirmPassword" className={labelClass}>
-            Confirm Password
+          <label htmlFor="email" className={labelClass}>
+            Email Address
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="yourname@example.com"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="password" className={labelClass}>
+            Password
           </label>
           <div className="relative">
             <input
-              id="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
+              id="password"
+              type={showPassword ? "text" : "password"}
               required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className={`${inputClass} pr-12`}
             />
             <button
               type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
             >
-              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>
-      )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] hover:from-[#c9a42e] hover:to-[#d9b43e] disabled:opacity-50 text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#D4AF37]/15 hover:shadow-[#D4AF37]/30 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs uppercase tracking-[0.18em]"
-      >
-        {loading
-          ? "Please wait..."
-          : mode === "login"
-          ? "Sign In"
-          : "Create Account"}
-      </button>
-    </form>
+        {mode === "register" && (
+          <div className="space-y-1.5">
+            <label htmlFor="confirmPassword" className={labelClass}>
+              Confirm Password
+            </label>
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className={`${inputClass} pr-12`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] hover:from-[#c9a42e] hover:to-[#d9b43e] disabled:opacity-50 text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#D4AF37]/15 hover:shadow-[#D4AF37]/30 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs uppercase tracking-[0.18em]"
+        >
+          {loading
+            ? "Please wait..."
+            : mode === "login"
+            ? "Sign In"
+            : "Create Account"}
+        </button>
+      </form>
+
+      {/* ── Success Modal (Confetti SVG) ── */}
+      <AnimatePresence>
+        {message && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="relative w-full max-w-md bg-[#0d0b08] border border-white/10 rounded-3xl p-8 text-center shadow-2xl overflow-hidden"
+            >
+              {/* Confetti Animation Background overlay */}
+              <div className="absolute inset-0 pointer-events-none opacity-40 z-0 select-none">
+                <img src="/Confetti.svg" alt="" className="w-full h-full object-cover" />
+              </div>
+
+              {/* Icon / Brand */}
+              <div className="relative z-10 mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#f5db91] flex items-center justify-center shadow-lg shadow-[#D4AF37]/20 mb-6">
+                <Sparkles className="w-7 h-7 text-black" />
+              </div>
+
+              <h3 className="relative z-10 text-xl font-light text-white mb-3" style={{ fontFamily: "Playfair Display, serif" }}>
+                Celebration Begins!
+              </h3>
+
+              <p className="relative z-10 text-xs text-[#F7F3EC]/70 leading-relaxed mb-8 px-2">
+                {message}
+              </p>
+
+              {/* Action Button: Back to Sign In */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMessage(null);
+                  router.push("/login");
+                }}
+                className="relative z-10 w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] hover:from-[#c9a42e] hover:to-[#d9b43e] text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#D4AF37]/15 hover:scale-[1.02] text-xs uppercase tracking-[0.18em] cursor-pointer"
+              >
+                Back to Sign In
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Sign In Loading Overlay (Flowers SVG) ── */}
+      <AnimatePresence>
+        {loading && mode === "login" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#060504]/90 backdrop-blur-md"
+          >
+            <div className="relative w-44 h-44 mb-6">
+              <img src="/Flowers.svg" alt="Loading" className="w-full h-full object-contain" />
+            </div>
+
+            <p className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-[0.25em] animate-pulse">
+              Entering Experience...
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
