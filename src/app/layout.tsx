@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
-import Navbar from "@/components/Navbar";
+import { Playfair_Display, Poppins } from "next/font/google";
+import Script from "next/script";
+import CustomCursor from "@/components/Common/CustomCursor";
 import "./globals.css";
 
-const inter = Inter({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-playfair",
 });
 
-const outfit = Outfit({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -24,9 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} scroll-smooth`} suppressHydrationWarning>
+    <html lang="en" className={`${playfair.variable} ${poppins.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
-        <script
+        <Script
+          id="theme-initializer"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               try {
@@ -40,8 +44,8 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased bg-background text-foreground selection:bg-purple-500 selection:text-white transition-colors duration-200">
-        <Navbar />
+      <body className="antialiased bg-[#090909] text-foreground selection:bg-[#D4AF37] selection:text-black transition-colors duration-200">
+        <CustomCursor />
         {children}
       </body>
     </html>

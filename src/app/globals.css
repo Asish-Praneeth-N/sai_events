@@ -20,8 +20,8 @@
   --color-brand-500: #8b5cf6;
   --color-brand-600: #7c3aed;
   --color-brand-700: #6d28d9;
-  --font-sans: var(--font-inter), sans-serif;
-  --font-heading: var(--font-outfit), sans-serif;
+  --font-sans: var(--font-poppins), sans-serif;
+  --font-heading: var(--font-playfair), serif;
 }
 
 @layer base {
@@ -91,6 +91,15 @@ body {
   to   { width: var(--progress-width, 0%); }
 }
 
+@keyframes loadProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.animate-load-progress {
+  animation: loadProgress 1.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
 @keyframes pulseGlow {
   0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
   50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 8px 3px rgba(139, 92, 246, 0.6); }
@@ -140,3 +149,193 @@ body {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Premium 3D Flipping Event Album Loader ─── */
+.events-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.spinner-3d {
+  position: relative;
+  width: 36vw;
+  height: 36vw;
+  max-width: 320px;
+  max-height: 320px;
+  min-width: 180px;
+  min-height: 180px;
+  perspective: 1500px;
+}
+
+.spinner-page {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 50%;
+  transform-origin: left;
+  transform-style: preserve-3d;
+  animation-fill-mode: both;
+}
+
+.spinner-page:nth-child(1) {
+  animation: flip-page-1 2.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+  animation-delay: 0.15s;
+}
+
+.spinner-page:nth-child(2) {
+  animation: flip-page-2 2.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+  animation-delay: 0.45s;
+}
+
+.spinner-page:nth-child(3) {
+  animation: flip-page-3 2.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+  animation-delay: 0.75s;
+}
+
+.spinner-page:nth-child(4) {
+  animation: flip-page-4 2.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+  animation-delay: 1.05s;
+}
+
+.spinner-page:nth-child(5) {
+  animation: flip-page-5 2.8s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+  animation-delay: 1.35s;
+}
+
+.page-side {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.page-front {
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+.page-back {
+  transform: rotateY(180deg);
+}
+
+.page-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(6, 2, 17, 0.9) 0%, rgba(6, 2, 17, 0.25) 55%, rgba(6, 2, 17, 0) 100%);
+  z-index: 1;
+}
+
+.page-label {
+  position: relative;
+  z-index: 2;
+  color: #f5f3ff;
+  font-size: clamp(10px, 2.5vw, 15px);
+  font-weight: 800;
+  text-align: center;
+  padding-bottom: clamp(8px, 2vw, 16px);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  font-family: var(--font-heading);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@keyframes flip-page-1 {
+  0% { transform: rotateY(0deg); z-index: 5; opacity: 1; }
+  50%, 80% { transform: rotateY(-180deg); z-index: 1; opacity: 1; }
+  90%, 100% { transform: rotateY(-180deg); z-index: 1; opacity: 0; }
+}
+
+@keyframes flip-page-2 {
+  0% { transform: rotateY(0deg); z-index: 4; opacity: 1; }
+  50%, 80% { transform: rotateY(-180deg); z-index: 2; opacity: 1; }
+  90%, 100% { transform: rotateY(-180deg); z-index: 2; opacity: 0; }
+}
+
+@keyframes flip-page-3 {
+  0% { transform: rotateY(0deg); z-index: 3; opacity: 1; }
+  50%, 80% { transform: rotateY(-180deg); z-index: 3; opacity: 1; }
+  90%, 100% { transform: rotateY(-180deg); z-index: 3; opacity: 0; }
+}
+
+@keyframes flip-page-4 {
+  0% { transform: rotateY(0deg); z-index: 2; opacity: 1; }
+  50%, 80% { transform: rotateY(-180deg); z-index: 4; opacity: 1; }
+  90%, 100% { transform: rotateY(-180deg); z-index: 4; opacity: 0; }
+}
+
+@keyframes flip-page-5 {
+  0% { transform: rotateY(0deg); z-index: 1; opacity: 1; }
+  50%, 80% { transform: rotateY(-180deg); z-index: 5; opacity: 1; }
+  90%, 100% { transform: rotateY(-180deg); z-index: 5; opacity: 0; }
+}
+
+/* ─── Gold Intro CSS Spinner (Ahmed-MIT inspired) ─── */
+.intro-spinner {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  perspective: 56px;
+}
+
+.intro-spinner div {
+  width: 100%;
+  height: 100%;
+  background: #D4AF37;
+  position: absolute;
+  left: 50%;
+  transform-origin: left;
+  animation: spinner-16s03x 2s infinite;
+}
+
+.intro-spinner div:nth-child(1) {
+  animation-delay: 0.15s;
+}
+
+.intro-spinner div:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.intro-spinner div:nth-child(3) {
+  animation-delay: 0.45s;
+}
+
+.intro-spinner div:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.intro-spinner div:nth-child(5) {
+  animation-delay: 0.75s;
+}
+
+@keyframes spinner-16s03x {
+  0% {
+    transform: rotateY(0deg);
+  }
+
+  50%, 80% {
+    transform: rotateY(-180deg);
+  }
+
+  90%, 100% {
+    opacity: 0;
+    transform: rotateY(-180deg);
+  }
+}
+
+
