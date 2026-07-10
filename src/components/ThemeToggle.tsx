@@ -36,7 +36,7 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       type="button"
-      className="p-2 bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white transition-all duration-200 cursor-pointer flex items-center justify-center w-9 h-9"
+      className="p-2 bg-card-bg dark:bg-zinc-900/60 border border-card-border dark:border-zinc-800 rounded-lg hover:bg-surface-raised dark:hover:bg-zinc-800/80 text-muted-foreground dark:text-zinc-400 hover:text-foreground dark:hover:text-white transition-all duration-200 cursor-pointer flex items-center justify-center w-9 h-9 shadow-sm"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
       {theme === "dark" ? (
@@ -63,7 +63,7 @@ export default function ThemeToggle() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-5 h-5 text-indigo-500"
+          className="w-5 h-5 text-accent-gold"
         >
           <path
             strokeLinecap="round"

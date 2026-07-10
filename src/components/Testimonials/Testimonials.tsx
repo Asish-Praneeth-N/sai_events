@@ -51,10 +51,10 @@ export default function Testimonials() {
 
   return (
     <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#F0E6D0]/3 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-[#D4AF37]/5 rounded-full blur-[80px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
+      {/* Light-mode: clean neutrals. Dark-mode: cinematic warm glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-foreground/[0.015] dark:bg-[#F0E6D0]/3 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-accent-gold/3 dark:bg-[#D4AF37]/5 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-accent-gold/2 dark:bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-6 w-full relative z-10">
         

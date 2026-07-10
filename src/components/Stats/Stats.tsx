@@ -71,10 +71,10 @@ export default function Stats() {
   };
 
   return (
-    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Background gradients */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#4060C0]/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/4 right-1/4 w-[250px] h-[250px] bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
+    <section className="w-full py-24 sm:py-32 relative overflow-hidden select-none border-t border-border section-warm">
+      {/* Light-mode: warm subtle ambient. Dark-mode: cinematic blue depth */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-foreground/[0.015] dark:bg-[#4060C0]/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/4 right-1/4 w-[250px] h-[250px] bg-accent-gold/3 dark:bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
         

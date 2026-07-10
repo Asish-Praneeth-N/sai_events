@@ -15,9 +15,9 @@ export default function WhyChooseUs() {
   };
 
   return (
-    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Ambient background blur */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-[#0a1a0f]/15 rounded-full blur-[130px] pointer-events-none" />
+    <section className="w-full py-24 sm:py-32 relative overflow-hidden select-none border-t border-border section-warm">
+      {/* Ambient background glow — warm gold, not dark */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-gold/3 dark:bg-[#0a1a0f]/15 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
         {/* Header */}

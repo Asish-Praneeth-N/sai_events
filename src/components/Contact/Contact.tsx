@@ -53,10 +53,10 @@ export default function Contact() {
 
   return (
     <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Background gradients */}
-      <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-[#287878]/5 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[150px] bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
+      {/* Light-mode: warm neutrals. Dark-mode: cinematic depth */}
+      <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-foreground/[0.015] dark:bg-[#287878]/5 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-accent-gold/3 dark:bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[150px] bg-accent-gold/2 dark:bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
         

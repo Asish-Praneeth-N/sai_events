@@ -29,10 +29,10 @@ export default function EventCategories() {
   };
 
   return (
-    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Background gradients */}
-      <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-[#C47A35]/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />
+    <section className="w-full py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
+      {/* Light-mode: neutral warm ambient. Dark-mode: cinematic depth */}
+      <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-foreground/[0.02] dark:bg-[#C47A35]/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-accent-gold/3 dark:bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
         {/* Header */}
@@ -93,7 +93,7 @@ export default function EventCategories() {
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 w-full p-5 z-10">
                   {/* Icon */}
-                  <div className="w-9 h-9 rounded-lg bg-background/60 border border-border group-hover:border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37] mb-3.5 transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_12px_rgba(212,175,55,0.25)]">
+                  <div className="w-9 h-9 rounded-lg bg-card-bg border border-border group-hover:border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37] mb-3.5 transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_12px_rgba(212,175,55,0.25)]">
                     <IconComponent className="w-4.5 h-4.5" />
                   </div>
 

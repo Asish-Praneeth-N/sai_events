@@ -136,8 +136,8 @@ export default function Navbar({
               scrolled ? "scale-90" : "scale-100"
             }`}
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#f5db91] flex items-center justify-center shadow-md shadow-[#D4AF37]/20 group-hover:scale-105 transition-transform duration-300">
-              <Sparkles className="w-4 h-4 text-black" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-md shadow-accent-gold/20 group-hover:scale-105 transition-transform duration-300">
+              <Sparkles className="w-4 h-4 text-white dark:text-black" />
             </div>
             <span className="text-base font-black text-foreground tracking-[0.18em] uppercase" style={{ fontFamily: "Playfair Display, serif" }}>
               Sai Events
@@ -153,7 +153,7 @@ export default function Navbar({
                 animate={{ opacity: 0.4, y: 0 }}
                 exit={{ opacity: 0, y: 5 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute left-1/2 -translate-x-1/2 text-[9px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] hidden md:block pointer-events-none"
+                className="absolute left-1/2 -translate-x-1/2 text-[9px] uppercase font-bold tracking-[0.3em] text-accent-gold hidden md:block pointer-events-none"
               >
                 {currentSectionLabel}
               </motion.span>
@@ -166,7 +166,7 @@ export default function Navbar({
               <a
                 key={item.label}
                 href={item.href}
-                className="text-[10px] uppercase font-light tracking-[0.16em] text-foreground/65 hover:text-[#D4AF37] transition-colors duration-300"
+                className="text-[10px] uppercase font-light tracking-[0.16em] text-foreground/65 hover:text-accent-gold transition-colors duration-300"
               >
                 {item.label}
               </a>
@@ -183,9 +183,9 @@ export default function Navbar({
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-foreground/5 border border-border hover:border-[#D4AF37]/40 transition-all duration-300 cursor-pointer"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-foreground/5 border border-border hover:border-accent-gold/40 transition-all duration-300 cursor-pointer"
                 >
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#e4bf47] flex items-center justify-center text-black font-black text-[10px] flex-shrink-0">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-primary flex items-center justify-center text-white dark:text-black font-black text-[10px] flex-shrink-0">
                     {profile.full_name?.[0]?.toUpperCase() ?? "U"}
                   </div>
                   <span className="text-[10px] font-bold text-foreground/85 hidden xl:block">{profile.full_name}</span>
@@ -209,7 +209,7 @@ export default function Navbar({
                     >
                       <div className="px-4 py-2.5 border-b border-border mb-1">
                         <p className="text-[11px] font-bold text-foreground truncate">{profile.full_name}</p>
-                        <p className="text-[9px] text-[#D4AF37] uppercase tracking-wider font-bold mt-0.5">{profile.role}</p>
+                        <p className="text-[9px] text-accent-gold uppercase tracking-wider font-bold mt-0.5">{profile.role}</p>
                       </div>
 
                       <div className="px-1.5 space-y-0.5">
@@ -217,19 +217,19 @@ export default function Navbar({
                         {profile.role === "customer" && (
                           <Link href="/customer/dashboard" onClick={() => setDropdownOpen(false)}
                             className="flex items-center gap-2 px-3 py-2 text-[11px] font-medium text-foreground/75 hover:text-foreground hover:bg-foreground/5 rounded-xl transition-all duration-200">
-                            <LayoutDashboard className="w-3.5 h-3.5 text-[#D4AF37]" /> Customer Portal
+                            <LayoutDashboard className="w-3.5 h-3.5 text-accent-gold" /> Customer Portal
                           </Link>
                         )}
                         {profile.role === "vendor" && (
                           <Link href="/vendor/inbox" onClick={() => setDropdownOpen(false)}
                             className="flex items-center gap-2 px-3 py-2 text-[11px] font-medium text-foreground/75 hover:text-foreground hover:bg-foreground/5 rounded-xl transition-all duration-200">
-                            <Inbox className="w-3.5 h-3.5 text-[#D4AF37]" /> Vendor Portal
+                            <Inbox className="w-3.5 h-3.5 text-accent-gold" /> Vendor Portal
                           </Link>
                         )}
                         {profile.role === "admin" && (
                           <Link href="/admin" onClick={() => setDropdownOpen(false)}
                             className="flex items-center gap-2 px-3 py-2 text-[11px] font-medium text-foreground/75 hover:text-foreground hover:bg-foreground/5 rounded-xl transition-all duration-200">
-                            <LayoutDashboard className="w-3.5 h-3.5 text-[#D4AF37]" /> Admin Console
+                            <LayoutDashboard className="w-3.5 h-3.5 text-accent-gold" /> Admin Console
                           </Link>
                         )}
 
@@ -256,7 +256,7 @@ export default function Navbar({
                 </Link>
                 <Link
                   href="/register"
-                  className="px-5 py-2 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black font-bold text-[10px] uppercase tracking-[0.16em] rounded-xl hover:scale-[1.03] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] transition-all duration-300"
+                  className="px-5 py-2 bg-gradient-primary text-white dark:text-black font-bold text-[10px] uppercase tracking-[0.16em] rounded-xl hover:scale-[1.03] hover:shadow-lg hover:shadow-accent-gold/15 dark:hover:shadow-[#D4AF37]/30 transition-all duration-300"
                 >
                   Book Event
                 </Link>
@@ -293,8 +293,8 @@ export default function Navbar({
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-2.5 no-underline"
               >
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#f5db91] flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-black" />
+                <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white dark:text-black" />
                 </div>
                 <span className="font-heading font-black text-sm text-foreground tracking-[0.2em] uppercase">
                   Sai Events
@@ -318,7 +318,7 @@ export default function Navbar({
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="w-full text-center py-2 text-lg uppercase font-light tracking-[0.25em] text-foreground/80 hover:text-[#D4AF37] active:text-[#D4AF37] transition-colors duration-200 no-underline"
+                  className="w-full text-center py-2 text-lg uppercase font-light tracking-[0.25em] text-foreground/80 hover:text-accent-gold active:text-accent-gold transition-colors duration-200 no-underline"
                 >
                   {item.label}
                 </a>
@@ -332,7 +332,7 @@ export default function Navbar({
                   <Link
                     href="/register"
                     onClick={() => setMobileOpen(false)}
-                    className="w-full flex items-center justify-center py-4 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black text-[11px] font-black uppercase tracking-[0.22em] rounded-2xl shadow-lg shadow-[#D4AF37]/15 no-underline"
+                    className="w-full flex items-center justify-center py-4 bg-gradient-primary text-white dark:text-black text-[11px] font-black uppercase tracking-[0.22em] rounded-2xl shadow-lg shadow-accent-gold/15 dark:shadow-[#D4AF37]/15 no-underline"
                   >
                     Book Your Event
                   </Link>
@@ -350,7 +350,7 @@ export default function Navbar({
                 <>
                   <div className="text-center mb-3">
                     <p className="text-sm font-bold text-foreground">{profile.full_name}</p>
-                    <p className="text-[9px] text-[#D4AF37] uppercase tracking-[0.22em] mt-0.5">{profile.role}</p>
+                    <p className="text-[9px] text-accent-gold uppercase tracking-[0.22em] mt-0.5">{profile.role}</p>
                   </div>
                   <button
                     onClick={() => { setMobileOpen(false); handleLogout(); }}

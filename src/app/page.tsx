@@ -178,7 +178,7 @@ export default function Home() {
           opacity: { duration: 1.6, ease: "easeOut" },
           scale:   { duration: 3.2, ease: [0.22, 1, 0.36, 1] },
         }}
-        className="relative bg-transparent text-foreground overflow-x-hidden film-grain font-sans min-h-screen"
+        className="relative bg-background text-foreground overflow-x-hidden film-grain font-sans min-h-screen transition-colors duration-300"
         style={{ transformOrigin: "center center", willChange: "transform, opacity" }}
       >
         <Navbar activeSection={activeSection} sections={SECTIONS} />
@@ -205,7 +205,7 @@ export default function Home() {
                   title={sec.label}
                 >
                   <span
-                    className={`absolute right-5 text-[7px] uppercase font-bold tracking-[0.28em] text-[#D4AF37] whitespace-nowrap transition-all duration-300 ${
+                    className={`absolute right-5 text-[7px] uppercase font-bold tracking-[0.28em] text-accent-gold whitespace-nowrap transition-all duration-300 ${
                       isActive
                         ? "opacity-60 translate-x-0"
                         : "opacity-0 translate-x-1.5 group-hover:opacity-45 group-hover:translate-x-0"
@@ -216,7 +216,7 @@ export default function Home() {
                   <div
                     className={`rounded-full transition-all duration-400 ${
                       isActive
-                        ? "w-2.5 h-2.5 bg-[#D4AF37] shadow-[0_0_8px_rgba(212,175,55,0.5)]"
+                        ? "w-2.5 h-2.5 bg-accent-gold shadow-md shadow-accent-gold/40"
                         : "w-1.5 h-1.5 bg-foreground/15 dark:bg-white/15 group-hover:bg-foreground/30 dark:group-hover:bg-white/30"
                     }`}
                   />

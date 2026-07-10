@@ -89,6 +89,7 @@ export async function createOperationalManager(data: CreateOMInput) {
       availability_status: "Inactive",
       employment_status: "Onboarding",
       created_by_admin: user.id,
+      requires_password_change: true,
     });
 
   if (metadataErr) {
@@ -234,7 +235,7 @@ export async function resetOMPassword(omId: string, email: string) {
 
   // Trigger Supabase Auth Password Reset Email
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/reset-password`,
+    redirectTo: `${origin}/auth/callback?next=/update-password`,
   });
 
   if (error) throw new Error(error.message);

@@ -24,6 +24,10 @@
   --color-btn-secondary-bg: var(--btn-secondary-bg);
   --color-btn-secondary-hover: var(--btn-secondary-hover);
   --color-navbar-bg: var(--navbar-bg);
+  --background-image-gradient-primary: var(--gradient-primary);
+  --background-image-gradient-primary-hover: var(--gradient-primary-hover);
+  --background-image-gradient-gold: var(--gradient-gold);
+  --background-image-gradient-hero: var(--gradient-hero);
   --color-brand-50: #f5f3ff;
   --color-brand-100: #ede9fe;
   --color-brand-500: #8b5cf6;
@@ -35,28 +39,83 @@
 
 @layer base {
   :root {
-    --background: #FAF6F0; /* Soft peachy off-white */
-    --foreground: #3A2F28; /* Deep warm charcoal/espresso brown */
-    --border: #F0E2D6; /* Soft peach-beige border */
-    --surface: #F5EAE0; /* Peachy-cream surface */
-    --surface-raised: #FCF9F6; /* Cream-white surface */
-    --muted: #F5EAE0;
-    --muted-foreground: #827265; /* Warm dusty brown/taupe */
-    --accent-gold: #D87A5E; /* Dusky orange/terracotta instead of gold */
-    --muted-gold: #F4CBBF; /* Light dusky peach instead of light gold */
-    --overlay: rgba(250, 246, 240, 0.92);
-    --hero-overlay: rgba(250, 246, 240, 0.25);
-    --navbar-bg: rgba(250, 246, 240, 0.88);
+    /* ── EDITORIAL LUXURY LIGHT THEME ──────────────────────────────────
+       Art direction: "Luxury Morning" — a premium hotel lobby at 10 AM.
+       Natural light. Clean architecture. Premium materials.
+       5-level surface hierarchy so cards float naturally without gradients.
+    ──────────────────────────────────────────────────────────────────── */
 
-    /* Card/Inputs UI Details */
-    --card-bg: #FCF9F6;
-    --card-border: #F0E2D6;
-    --card-shadow: 0 10px 30px rgba(130, 114, 101, 0.05);
-    --input-bg: #FCF9F6;
-    --btn-secondary-bg: #FCF9F6;
-    --btn-secondary-hover: #F5EAE0;
+    /* Level 1 — Application Background: warm architectural off-white
+       Not pure white. Not beige. Like gallery walls or linen paper. */
+    --background: #F8F7F4;
+    /* Level 2 — Section Alternate: slightly warmer for visual rhythm */
+    --background-secondary: #F1EFE9;
+    /* Typography: rich warm charcoal — premium ink, not harsh black */
+    --foreground: #1A1917;
+    /* Borders: warm, structural, never decorative */
+    --border: #E2DDD6;
+    --border-light: #EAE7E1;
+    /* Level 3 — Content Surface */
+    --surface: #FAFAF7;
+    /* Level 5 — Interactive / Muted zones */
+    --surface-raised: #EFEDE7;
+    --muted: #ECEAE4;
+    /* Body text: warm neutral, excellent readability, never low-opacity grey */
+    --muted-foreground: #5C5853;
 
-    /* Cinematic Doors - Brand Element: ALWAYS luxurious dark walnut wood */
+    /* ── Champagne Gold Accent ──────────────────────────────────────────
+       Restraint is luxury. Gold appears only at key moments.
+       Never as a background fill. Always as an accent signal.
+    ──────────────────────────────────────────────────────────────────── */
+    --accent-gold: #C8A435;
+    --accent-gold-hover: #B8942A;
+    --accent-gold-surface: #F5EDD0;
+    --muted-gold: #D9C07A;
+
+    /* ── Overlays ───────────────────────────────────────────────────── */
+    --overlay: rgba(248, 247, 244, 0.94);
+    /* Hero overlay: near-zero — photography is the hero, not the UI.
+       Only a breath of warm tone to integrate text against the image. */
+    --hero-overlay: rgba(26, 25, 23, 0.04);
+    /* Navbar: warm white with excellent transparency */
+    --navbar-bg: rgba(248, 247, 244, 0.92);
+
+    /* ── Level 4 — Cards: Pure White ────────────────────────────────────
+       Pure white cards against the warm background create natural depth.
+       No glass. No frost. No gradients. Pure elevation through shadow.
+    ──────────────────────────────────────────────────────────────────── */
+    --card-bg: #FFFFFF;
+    --card-border: #E2DDD6;
+    /* Warm ink shadows — richer and more natural than cold black shadows */
+    --card-shadow: 0 1px 2px rgba(26, 25, 23, 0.05), 0 4px 12px rgba(26, 25, 23, 0.04);
+    --card-shadow-md: 0 8px 28px rgba(26, 25, 23, 0.08);
+    --card-shadow-lg: 0 20px 56px rgba(26, 25, 23, 0.10);
+    --input-bg: #FFFFFF;
+    --btn-secondary-bg: #FFFFFF;
+    --btn-secondary-hover: #F5F4F1;
+
+    /* ── Hero Gradient ──────────────────────────────────────────────────
+       EDITORIAL DIRECTION: Photography is the hero.
+       NO white fog. NO heavy overlay.
+       Only a subtle bottom vignette to anchor text to the photograph.
+       The venue must be IMMEDIATELY visible. The gradient starts at 70%.
+    ──────────────────────────────────────────────────────────────────── */
+    --gradient-hero:
+      linear-gradient(
+        180deg,
+        rgba(248, 247, 244, 0.00) 0%,
+        rgba(248, 247, 244, 0.00) 55%,
+        rgba(248, 247, 244, 0.55) 82%,
+        rgba(248, 247, 244, 0.90) 100%
+      );
+
+    /* Primary CTA: solid gold. No heavy gradients on buttons. */
+    --gradient-primary: linear-gradient(135deg, #C8A435 0%, #D9B84A 100%);
+    --gradient-primary-hover: linear-gradient(135deg, #B8942A 0%, #C8A840 100%);
+    --gradient-gold: linear-gradient(135deg, #C8A435 0%, #D4B45A 100%);
+    --gradient-background: none;
+
+    /* ── Cinematic Doors — Brand Element: ALWAYS luxurious dark walnut wood ── */
     --door-bg-left: linear-gradient(to right, #0b0705 0%, #191009 40%, #201209 70%, #160d07 100%);
     --door-bg-right: linear-gradient(to left, #0b0705 0%, #191009 40%, #201209 70%, #160d07 100%);
     --door-border: #251508;
@@ -89,6 +148,13 @@
     --btn-secondary-bg: rgba(255, 255, 255, 0.05);
     --btn-secondary-hover: rgba(255, 255, 255, 0.08);
 
+    /* Gradients */
+    --gradient-hero: linear-gradient(180deg, rgba(9, 9, 9, 0.15) 0%, rgba(9, 9, 9, 0.45) 45%, rgba(9, 9, 9, 0.90) 100%);
+    --gradient-primary: linear-gradient(135deg, #D4AF37 0%, #e4bf47 100%);
+    --gradient-primary-hover: linear-gradient(135deg, #c9a42e 0%, #d9b43e 100%);
+    --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #e4bf47 100%);
+    --gradient-background: none;
+
     /* Cinematic Doors - Brand Element: ALWAYS luxurious dark walnut wood */
     --door-bg-left: linear-gradient(to right, #0b0705 0%, #191009 40%, #201209 70%, #160d07 100%);
     --door-bg-right: linear-gradient(to left, #0b0705 0%, #191009 40%, #201209 70%, #160d07 100%);
@@ -103,14 +169,23 @@
 
 body {
   background-color: var(--background);
-  background-image: radial-gradient(circle at 15% 15%, rgba(216, 122, 94, 0.22) 0%, transparent 55%),
-                    radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.98) 0%, transparent 65%),
-                    linear-gradient(135deg, rgba(252, 248, 244, 0.95) 0%, rgba(255, 255, 255, 1) 100%);
-  background-attachment: fixed;
+  /* No decorative background gradient — structure creates hierarchy */
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
+}
+
+/* Editorial Card — pure white surface floating above the warm background */
+.glass-card {
+  background: #FFFFFF;
+  border: 1px solid #E2DDD6;
+  box-shadow: 0 1px 2px rgba(26, 25, 23, 0.05), 0 4px 12px rgba(26, 25, 23, 0.04);
+}
+.dark .glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Smooth theme transition for core elements, excluding custom transform animations */
@@ -134,9 +209,33 @@ span {
 }
 
 .dark body {
+  /* Dark mode retains its cinematic ambient depth */
   background-image: radial-gradient(circle at 10% 15%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
                     radial-gradient(circle at 90% 85%, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
   background-attachment: fixed;
+}
+
+/* ── LIGHT MODE: Image Enhancement ─────────────────────────────────
+   In light mode, hero photography should feel richer, not washed out.
+   Slightly deeper contrast and saturation preserves the luxury mood.
+   Dark mode uses its own image handling — this class is light-only.
+──────────────────────────────────────────────────────────────────── */
+:root .hero-image-light {
+  filter: brightness(0.92) contrast(1.08) saturate(1.06);
+}
+.dark .hero-image-light {
+  filter: none;
+}
+
+/* ── LIGHT MODE: Section Alternating Background ─────────────────────
+   Creates visual rhythm without decorative gradients.
+   Warm neutral sections alternate between --background and --background-secondary.
+──────────────────────────────────────────────────────────────────── */
+.section-warm {
+  background-color: var(--background-secondary);
+}
+.dark .section-warm {
+  background-color: transparent;
 }
 
 /* ─── CINEMATIC: Hide scrollbar completely (we use snap anchors) ─── */
@@ -298,10 +397,11 @@ html::-webkit-scrollbar {
 /* ─── Scrollbar (for admin/other pages — hidden on main cinema page) ─── */
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: #d4d4d8; border-radius: 99px; }
-.dark ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); }
-::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
-.dark ::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.55); }
+/* Light: warm stone — refined, premium */
+::-webkit-scrollbar-thumb  { background: #C8C3BA; border-radius: 99px; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(199, 166, 74, 0.30); }
+::-webkit-scrollbar-thumb:hover { background: #A8A39A; }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(199, 166, 74, 0.55); }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

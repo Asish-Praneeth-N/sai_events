@@ -63,9 +63,14 @@ export async function updateSession(request: NextRequest) {
   const isProtectedPath =
     path.startsWith("/admin") ||
     path.startsWith("/customer") ||
-    path.startsWith("/vendor");
+    path.startsWith("/vendor") ||
+    path.startsWith("/operations") ||
+    path.startsWith("/update-password");
   
-  const isAuthPath = path.startsWith("/login") || path.startsWith("/register");
+  const isAuthPath = 
+    path.startsWith("/login") || 
+    path.startsWith("/register") || 
+    path.startsWith("/forgot-password");
 
   if (isProtectedPath) {
     if (!user) {
@@ -85,6 +90,40 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/unauthorized";
       return NextResponse.redirect(url);
     }
+    if (path.startsWith("/operations") && role !== "operational_manager") {
+      url.pathname = "/unauthorized";
+      return NextResponse.redirect(url);
+    }
+
+    // Check operational manager constraints (lock & password change)
+    if (role === "operational_manager") {
+      const { data: om, error: omError } = await supabase
+        .from("operational_managers")
+        .select("employment_status, requires_password_change")
+        .eq("id", user.id)
+        .single();
+      
+      const requiresPasswordChange = (!omError && om) ? (om.requires_password_change ?? false) : false;
+      const employmentStatus = (!omError && om) ? (om.employment_status ?? "Onboarding") : "Active";
+
+      // 1. Force password change first if required
+      if (requiresPasswordChange && path !== "/update-password") {
+        url.pathname = "/update-password";
+        return NextResponse.redirect(url);
+      }
+
+      // 2. Lock check: if status is not Active, redirect to locked page
+      if (!requiresPasswordChange && employmentStatus !== "Active" && path !== "/operations/locked") {
+        url.pathname = "/operations/locked";
+        return NextResponse.redirect(url);
+      }
+
+      // 3. Prevent accessing /operations/locked if account IS Active
+      if (employmentStatus === "Active" && path === "/operations/locked") {
+        url.pathname = "/operations/dashboard";
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
   // Redirect authenticated users trying to hit auth forms
@@ -93,6 +132,8 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/admin/dashboard";
     } else if (role === "vendor") {
       url.pathname = "/vendor/profile";
+    } else if (role === "operational_manager") {
+      url.pathname = "/operations";
     } else {
       url.pathname = "/customer/profile";
     }

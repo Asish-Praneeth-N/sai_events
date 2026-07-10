@@ -32,10 +32,10 @@ export default function HowItWorks() {
   });
 
   return (
-    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1a1308]/50 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />
+    <section className="w-full py-24 sm:py-32 relative overflow-hidden select-none border-t border-border section-warm">
+      {/* Light-mode: warm subtle ambient. Dark-mode: preserved cinematic depth */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-foreground/[0.02] dark:bg-[#1a1308]/50 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-accent-gold/3 dark:bg-[#D4AF37]/3 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-5xl mx-auto px-6 w-full relative z-10">
         
@@ -96,7 +96,7 @@ export default function HowItWorks() {
 
                         {/* Icon */}
                         <div
-                          className={`w-10 h-10 rounded-xl bg-background/60 border border-border group-hover:border-[#D4AF37]/45 flex items-center justify-center text-[#D4AF37] transition-all duration-300 ${
+                          className={`w-10 h-10 rounded-xl bg-card-bg border border-border group-hover:border-[#D4AF37]/45 flex items-center justify-center text-[#D4AF37] transition-all duration-300 ${
                             isRight ? "sm:ml-auto" : ""
                           }`}
                         >

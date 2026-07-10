@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -13,10 +14,10 @@ interface AuthFormProps {
 }
 
 const inputClass =
-  "w-full px-4 py-3 bg-[#130f0c]/60 border border-white/8 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/45 focus:border-[#D4AF37]/70 text-[#F7F3EC] placeholder-white/20 transition-all duration-300 text-sm font-light";
+  "w-full px-4 py-3 bg-surface/65 dark:bg-[#130f0c]/60 border border-border dark:border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37] text-foreground dark:text-[#F7F3EC] placeholder-foreground/25 dark:placeholder-white/20 transition-all duration-300 text-sm font-light";
 
 const labelClass =
-  "text-[9px] font-bold text-[#D4AF37]/80 uppercase tracking-[0.2em]";
+  "text-[9px] font-bold text-[#D87A5E] dark:text-[#D4AF37]/80 uppercase tracking-[0.2em] transition-colors duration-300";
 
 export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
@@ -229,9 +230,19 @@ export default function AuthForm({ mode }: AuthFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="password" className={labelClass}>
-            Password
-          </label>
+          <div className="flex justify-between items-center">
+            <label htmlFor="password" className={labelClass}>
+              Password
+            </label>
+            {mode === "login" && (
+              <Link
+                href="/forgot-password"
+                className="text-[10px] text-[#D87A5E] hover:text-[#F4A28A] dark:text-[#D4AF37] dark:hover:text-[#f5db91] transition-colors font-semibold"
+              >
+                Forgot Password?
+              </Link>
+            )}
+          </div>
           <div className="relative">
             <input
               id="password"
@@ -281,7 +292,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] hover:from-[#c9a42e] hover:to-[#d9b43e] disabled:opacity-50 text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#D4AF37]/15 hover:shadow-[#D4AF37]/30 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs uppercase tracking-[0.18em]"
+          className="w-full py-3.5 bg-gradient-primary hover:bg-gradient-primary-hover disabled:opacity-50 text-white dark:text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-accent-gold/15 dark:shadow-[#D4AF37]/15 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs uppercase tracking-[0.18em]"
         >
           {loading
             ? "Please wait..."
@@ -305,7 +316,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-md bg-[#0d0b08] border border-white/10 rounded-3xl p-8 text-center shadow-2xl overflow-hidden"
+              className="relative w-full max-w-md bg-surface/90 dark:bg-[#0d0b08] border border-border dark:border-white/10 rounded-3xl p-8 text-center shadow-2xl overflow-hidden backdrop-blur-md transition-colors duration-300"
             >
               {/* Confetti Animation Background overlay */}
               <div className="absolute inset-0 pointer-events-none opacity-40 z-0 select-none">
@@ -313,15 +324,15 @@ export default function AuthForm({ mode }: AuthFormProps) {
               </div>
 
               {/* Icon / Brand */}
-              <div className="relative z-10 mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#f5db91] flex items-center justify-center shadow-lg shadow-[#D4AF37]/20 mb-6">
-                <Sparkles className="w-7 h-7 text-black" />
+              <div className="relative z-10 mx-auto w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-lg shadow-accent-gold/15 dark:shadow-[#D4AF37]/20 mb-6">
+                <Sparkles className="w-7 h-7 text-white dark:text-black" />
               </div>
 
-              <h3 className="relative z-10 text-xl font-light text-white mb-3" style={{ fontFamily: "Playfair Display, serif" }}>
+              <h3 className="relative z-10 text-xl font-light text-foreground dark:text-white mb-3" style={{ fontFamily: "Playfair Display, serif" }}>
                 Celebration Begins!
               </h3>
 
-              <p className="relative z-10 text-xs text-[#F7F3EC]/70 leading-relaxed mb-8 px-2">
+              <p className="relative z-10 text-xs text-muted-foreground dark:text-[#F7F3EC]/70 leading-relaxed mb-8 px-2">
                 {message}
               </p>
 
@@ -332,7 +343,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                   setMessage(null);
                   router.push("/login");
                 }}
-                className="relative z-10 w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] hover:from-[#c9a42e] hover:to-[#d9b43e] text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#D4AF37]/15 hover:scale-[1.02] text-xs uppercase tracking-[0.18em] cursor-pointer"
+                className="relative z-10 w-full py-3.5 bg-gradient-primary hover:bg-gradient-primary-hover text-white dark:text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-accent-gold/15 dark:shadow-[#D4AF37]/15 hover:scale-[1.02] text-xs uppercase tracking-[0.18em] cursor-pointer"
               >
                 Back to Sign In
               </button>

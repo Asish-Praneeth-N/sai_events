@@ -19,14 +19,15 @@ export default function FinalCTA() {
 
   return (
     <section className="w-full bg-transparent py-24 sm:py-36 relative overflow-hidden select-none border-t border-border">
-      {/* Background image & lighting overlay */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+      {/* Background image — let the venue breathe */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <img
           src="/images/reception.png"
           alt="Grand Finale"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover hero-image-light opacity-30 dark:opacity-40"
         />
-        <div className="absolute inset-0 bg-background/45 backdrop-blur-md" />
+        {/* Light: very subtle warm overlay. Dark: cinematic tint. No blur — blur kills mood. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/30 to-background/80 dark:from-[#090909]/60 dark:via-[#090909]/25 dark:to-[#090909]/75" />
       </div>
 
       {/* Ambient spotlights */}

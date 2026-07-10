@@ -34,7 +34,27 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                var localTheme = localStorage.getItem('theme');
+                var isDark = false;
+                if (localTheme) {
+                  isDark = localTheme === 'dark';
+                } else {
+                  // Automatic theme based on IST timing (UTC + 5.30)
+                  var utc = new Date().getTime();
+                  var ist = new Date(utc + (5.5 * 60 * 60 * 1000));
+                  var istHour = ist.getUTCHours();
+                  var istMin = ist.getUTCMinutes();
+                  var istTotalMin = (istHour * 60) + istMin;
+                  
+                  // 6:00 AM (360 min) to 6:00 PM (1080 min) is light
+                  if (istTotalMin >= 360 && istTotalMin <= 1080) {
+                    isDark = false;
+                  } else {
+                    isDark = true;
+                  }
+                }
+                
+                if (isDark) {
                   document.documentElement.classList.add('dark');
                 } else {
                   document.documentElement.classList.remove('dark');

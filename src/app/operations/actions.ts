@@ -443,3 +443,13 @@ export async function saveOMProfile(data: {
   revalidatePath("/operations/profile");
 }
 
+export async function completeOMPasswordChange() {
+  const { supabase, user } = await requireOM();
+  const { error } = await supabase
+    .from("operational_managers")
+    .update({ requires_password_change: false })
+    .eq("id", user.id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/operations");
+}
+

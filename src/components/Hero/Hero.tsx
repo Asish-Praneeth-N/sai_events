@@ -77,7 +77,7 @@ export default function Hero() {
             <img
               src={LANDING_PAGE_CONFIG.hero.backgroundImages[currentBg]}
               alt="Sai Events Background"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover hero-image-light"
             />
             {/* Theme-adaptive wash for high text readability */}
             <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
@@ -98,7 +98,7 @@ export default function Hero() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-card-bg border border-card-border shadow-sm mb-6"
         >
-          <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" />
+          <Sparkles className="w-3.5 h-3.5 text-accent-gold animate-pulse" />
           <span className="text-[10px] uppercase font-bold text-foreground tracking-[0.25em]">
             Luxury Events Ecosystem
           </span>
@@ -118,7 +118,7 @@ export default function Hero() {
                   variants={wordReveal}
                   className={`inline-block ${
                     idx >= titleWords.length - 2
-                      ? "text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-[#f5db91] font-black"
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-accent-gold to-muted-gold font-black"
                       : "font-light"
                   }`}
                   style={{ fontFamily: "Playfair Display, serif" }}
@@ -150,7 +150,7 @@ export default function Hero() {
         >
           <a
             href="#finale"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black font-bold text-xs uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-[#D4AF37]/15 text-center flex items-center justify-center gap-2 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 group cursor-pointer"
+            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-accent-gold to-muted-gold text-white dark:text-black font-bold text-xs uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-accent-gold/15 text-center flex items-center justify-center gap-2 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 group cursor-pointer"
           >
             <Calendar className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
             Book Your Event
@@ -166,8 +166,8 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Decorative divider */}
-      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      {/* Decorative divider — very subtle, so photography bleeds naturally into content */}
+      <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
     </div>
   );
 }

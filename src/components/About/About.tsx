@@ -36,9 +36,9 @@ export default function About() {
 
   return (
     <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Background gradients */}
-      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-[#6428B0]/5 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-1/3 left-1/4 w-[320px] h-[320px] bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />
+      {/* Light-mode: warm neutral ambient. Dark-mode: cinematic purple depth */}
+      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-foreground/[0.02] dark:bg-[#6428B0]/5 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-1/3 left-1/4 w-[320px] h-[320px] bg-accent-gold/3 dark:bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
         

@@ -19,9 +19,9 @@ export default function Gallery() {
 
   return (
     <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-[#D4AF37]/4 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/3 w-[300px] h-[300px] bg-[#FF9040]/3 rounded-full blur-[110px] pointer-events-none" />
+      {/* Light-mode: clean neutrals. Dark-mode: warm cinematic depth */}
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-accent-gold/3 dark:bg-[#D4AF37]/4 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-[300px] h-[300px] bg-foreground/[0.015] dark:bg-[#FF9040]/3 rounded-full blur-[110px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
         {/* Header */}
