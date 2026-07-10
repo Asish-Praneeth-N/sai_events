@@ -231,7 +231,30 @@ export async function resetOMPassword(omId: string, email: string) {
   if (profile?.role !== "admin") throw new Error("Unauthorized");
 
   const hostHeaders = await headers();
-  const origin = hostHeaders.get("origin") || "http://localhost:3000";
+  
+  // Robust origin resolution for Server Actions
+  let origin = "";
+  const referer = hostHeaders.get("referer");
+  if (referer) {
+    try {
+      const url = new URL(referer);
+      origin = url.origin;
+    } catch {
+      // ignore parsing error
+    }
+  }
+  
+  if (!origin) {
+    const host = hostHeaders.get("x-forwarded-host") || hostHeaders.get("host");
+    if (host) {
+      const proto = hostHeaders.get("x-forwarded-proto") || "http";
+      origin = `${proto}://${host}`;
+    }
+  }
+  
+  if (!origin) {
+    origin = hostHeaders.get("origin") || "http://localhost:3000";
+  }
 
   // Trigger Supabase Auth Password Reset Email
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
