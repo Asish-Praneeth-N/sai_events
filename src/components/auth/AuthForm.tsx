@@ -79,6 +79,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
             router.push("/admin/dashboard");
           } else if (role === "vendor") {
             router.push("/vendor");
+          } else if (role === "operational_manager") {
+            router.push("/operations");
           } else {
             router.push("/customer");
           }

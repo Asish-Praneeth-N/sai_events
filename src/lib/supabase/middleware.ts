@@ -40,12 +40,17 @@ export async function updateSession(request: NextRequest) {
 
   let role: string | null = null;
   if (user) {
-    const { data: profile } = await supabase
+    const { data: profile, error: profileErr } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
     role = profile?.role || null;
+    if (profileErr) {
+      console.error(`[Middleware Profile Fetch Error] uid: ${user.id}, path: ${path}, error:`, profileErr.message);
+    } else {
+      console.log(`[Middleware Profile Fetch Success] uid: ${user.id}, path: ${path}, role: ${role}`);
+    }
   }
 
   // Admin routing isolation: once authenticated as admin, must stay inside /admin/*

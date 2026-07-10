@@ -12,13 +12,18 @@ export default async function OperationsLayout({
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileErr } = await supabase
     .from("profiles")
     .select("role, full_name, email")
     .eq("id", user.id)
     .single();
 
+  if (profileErr) {
+    console.error(`[Layout Profile Fetch Error] uid: ${user.id}, error:`, profileErr.message);
+  }
+
   if (!profile || profile.role !== "operational_manager") {
+    console.log(`[Layout Access Denied] uid: ${user.id}, role: ${profile?.role || "null"}`);
     redirect("/unauthorized");
   }
 

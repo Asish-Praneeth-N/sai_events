@@ -73,7 +73,7 @@ export async function createOperationalManager(data: CreateOMInput) {
   }
 
   // 2. Register user in Supabase Auth (with specific temporary password)
-  const password = data.temporaryPassword || "WelcomeOM123!";
+  const password = data.temporaryPassword || "Test@123";
   const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
     email: data.email,
     password,

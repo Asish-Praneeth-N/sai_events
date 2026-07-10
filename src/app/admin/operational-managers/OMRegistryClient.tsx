@@ -65,7 +65,7 @@ export default function OMRegistryClient({ initialManagers, databasePending = fa
   const [cities, setCities] = useState<string[]>([]);
   const [address, setAddress] = useState("");
   const [joiningDate, setJoiningDate] = useState(new Date().toISOString().split("T")[0]);
-  const [tempPassword, setTempPassword] = useState("");
+  const [tempPassword, setTempPassword] = useState("Test@123");
   
   // Edit Form state
   const [editOM, setEditOM] = useState<OMProfile | null>(null);
@@ -80,7 +80,7 @@ export default function OMRegistryClient({ initialManagers, databasePending = fa
     setCities([]);
     setAddress("");
     setJoiningDate(new Date().toISOString().split("T")[0]);
-    setTempPassword("");
+    setTempPassword("Test@123");
   };
 
   const handleCreate = async (e: React.FormEvent) => {
