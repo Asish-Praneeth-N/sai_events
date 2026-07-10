@@ -46,12 +46,39 @@ export async function createOperationalManager(data: CreateOMInput) {
 
   if (profile?.role !== "admin") throw new Error("Unauthorized");
 
+  const hostHeaders = await headers();
+  
+  // Resolve origin dynamically
+  let origin = "";
+  const referer = hostHeaders.get("referer");
+  if (referer) {
+    try {
+      const url = new URL(referer);
+      origin = url.origin;
+    } catch {
+      // ignore
+    }
+  }
+  
+  if (!origin) {
+    const host = hostHeaders.get("x-forwarded-host") || hostHeaders.get("host");
+    if (host) {
+      const proto = hostHeaders.get("x-forwarded-proto") || "http";
+      origin = `${proto}://${host}`;
+    }
+  }
+  
+  if (!origin) {
+    origin = hostHeaders.get("origin") || "http://localhost:3000";
+  }
+
   // 2. Register user in Supabase Auth (with specific temporary password)
   const password = data.temporaryPassword || "WelcomeOM123!";
   const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
     email: data.email,
     password,
     options: {
+      emailRedirectTo: `${origin}/auth/callback`,
       data: {
         role: "operational_manager",
         full_name: data.fullName,

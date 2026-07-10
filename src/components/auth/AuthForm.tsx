@@ -108,6 +108,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           email,
           password,
           options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: signupData,
           },
         });
