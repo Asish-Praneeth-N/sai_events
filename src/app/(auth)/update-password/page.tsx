@@ -63,7 +63,11 @@ export default function UpdatePasswordPage() {
 
         // 3. Clear OM password change flag if needed
         if (profile?.role === "operational_manager") {
-          await completeOMPasswordChange();
+          try {
+            await completeOMPasswordChange();
+          } catch (omErr) {
+            console.error("Failed to clear OM password change flag:", omErr);
+          }
         }
 
         setMessage("Your password has been updated successfully.");

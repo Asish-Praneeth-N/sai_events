@@ -6,6 +6,7 @@ import { Calendar, MapPin, Users, AlertTriangle, ArrowRight, Clock, CheckSquare,
 
 function getStatusConfig(status: string) {
   switch (status) {
+    case "Pending":           return { color: "text-orange-600 dark:text-orange-400",  bg: "bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/25",  label: "New — Pending Acceptance" };
     case "Assigned":          return { color: "text-amber-600 dark:text-amber-400",   bg: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/25",   label: "Awaiting Acceptance" };
     case "Accepted":          return { color: "text-blue-600 dark:text-blue-400",     bg: "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/25",       label: "Accepted" };
     case "Execution Started": return { color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/25", label: "In Execution" };
@@ -73,7 +74,7 @@ export default async function AssignmentsPage() {
     );
   }
 
-  const active  = (assignments || []).filter(a => ["Assigned", "Accepted", "Execution Started"].includes(a.status));
+  const active  = (assignments || []).filter(a => ["Pending", "Assigned", "Accepted", "Execution Started"].includes(a.status));
   const closed  = (assignments || []).filter(a => ["Execution Complete", "Closed"].includes(a.status));
   const all     = assignments || [];
 

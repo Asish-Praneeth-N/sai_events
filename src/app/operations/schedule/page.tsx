@@ -18,7 +18,7 @@ export default async function SchedulePage() {
       )
     `)
     .eq("assigned_operational_manager_id", user.id)
-    .in("status", ["Assigned", "Accepted", "Execution Started"]);
+    .in("status", ["Pending", "Assigned", "Accepted", "Execution Started"]);
 
   const assignments = assignmentsData as any[] | null;
 
@@ -49,6 +49,7 @@ export default async function SchedulePage() {
     const req = a.event_requests;
     if (!req) return null;
     const statusColors: Record<string, string> = {
+      "Pending":           "text-orange-400 bg-orange-500/10 border-orange-500/20",
       "Assigned":         "text-amber-400 bg-amber-500/10 border-amber-500/20",
       "Accepted":         "text-blue-400 bg-blue-500/10 border-blue-500/20",
       "Execution Started":"text-violet-400 bg-violet-500/10 border-violet-500/20",

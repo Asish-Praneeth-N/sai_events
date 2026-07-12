@@ -115,7 +115,7 @@ export default async function OperationsLayout({
     .from("event_assignments")
     .select("*", { count: "exact", head: true })
     .eq("assigned_operational_manager_id", user.id)
-    .eq("status", "Assigned");
+    .in("status", ["Pending", "Assigned"]);
 
   const { count: unreadCount } = await supabase
     .from("notifications")

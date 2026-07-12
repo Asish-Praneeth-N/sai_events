@@ -63,7 +63,7 @@ export default async function OperationsDashboardPage() {
 
   // Checklist pending count (across all my active assignments)
   const activeAssignmentIds = (assignments || [])
-    .filter((a) => ["Accepted", "Execution Started"].includes(a.status))
+    .filter((a) => ["Pending", "Assigned", "Accepted", "Execution Started"].includes(a.status))
     .map((a) => a.id);
 
   let pendingChecklistCount = 0;

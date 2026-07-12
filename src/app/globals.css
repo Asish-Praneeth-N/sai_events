@@ -37,6 +37,19 @@
   --font-heading: var(--font-playfair), serif;
 }
 
+@utility bg-gradient-primary {
+  background-image: var(--gradient-primary);
+}
+@utility bg-gradient-primary-hover {
+  background-image: var(--gradient-primary-hover);
+}
+@utility bg-gradient-gold {
+  background-image: var(--gradient-gold);
+}
+@utility bg-gradient-hero {
+  background-image: var(--gradient-hero);
+}
+
 @layer base {
   :root {
     /* ── EDITORIAL LUXURY LIGHT THEME ──────────────────────────────────
