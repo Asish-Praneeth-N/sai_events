@@ -25,6 +25,9 @@ export default function ServiceItemForm({
   const [description, setDescription] = useState(item?.description || "");
   const [price, setPrice] = useState(item?.price || 0);
   const [pricingType, setPricingType] = useState<"flat" | "per_plate">(item?.pricing_type || "flat");
+  const [pricingUnit, setPricingUnit] = useState<"per_plate" | "per_piece" | "fixed">(item?.pricing_unit || "per_plate");
+  const [foodCategory, setFoodCategory] = useState<"veg" | "non_veg" | "beverage" | "dessert" | "general">(item?.food_category || "general");
+  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "high_tea" | "general">(item?.meal_type || "general");
   const [isAvailable, setIsAvailable] = useState(item?.is_available ?? true);
   const [sortOrder, setSortOrder] = useState(item?.sort_order || 0);
   const [mediaUrls, setMediaUrls] = useState<string[]>(item?.media || []);
@@ -51,7 +54,10 @@ export default function ServiceItemForm({
           name,
           description,
           price,
-          pricing_type: pricingType,
+          pricing_type: pricingUnit === "per_plate" ? "per_plate" : "flat",
+          pricing_unit: pricingUnit,
+          food_category: foodCategory,
+          meal_type: mealType,
           is_available: isAvailable,
           sort_order: sortOrder,
           media_urls: mediaUrls,
@@ -128,15 +134,16 @@ export default function ServiceItemForm({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pricing Model</label>
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pricing Unit</label>
               <select
-                value={pricingType}
-                onChange={(e) => setPricingType(e.target.value as any)}
+                value={pricingUnit}
+                onChange={(e) => setPricingUnit(e.target.value as any)}
                 required
                 className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
               >
-                <option value="flat">Flat Package Price</option>
-                <option value="per_plate">Per Plate / Guest Price</option>
+                <option value="per_plate">Per Plate (x Guest Count)</option>
+                <option value="per_piece">Per Piece / Unit</option>
+                <option value="fixed">Fixed Price Package</option>
               </select>
             </div>
 
@@ -148,9 +155,41 @@ export default function ServiceItemForm({
                 required
                 value={price}
                 onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                placeholder="e.g. 50000"
+                placeholder="e.g. 500"
                 className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200 animate-none"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Food Category (If Food Item)</label>
+              <select
+                value={foodCategory}
+                onChange={(e) => setFoodCategory(e.target.value as any)}
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+              >
+                <option value="general">General / Non-Food</option>
+                <option value="veg">Vegetarian</option>
+                <option value="non_veg">Non-Vegetarian</option>
+                <option value="beverage">Beverage & Drinks</option>
+                <option value="dessert">Sweets & Desserts</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">Meal Type (If Food Item)</label>
+              <select
+                value={mealType}
+                onChange={(e) => setMealType(e.target.value as any)}
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+              >
+                <option value="general">General / Any Meal</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="high_tea">High Tea / Snacks</option>
+              </select>
             </div>
           </div>
 

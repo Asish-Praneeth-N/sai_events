@@ -10,17 +10,13 @@ export default async function VendorCalendarPage() {
     redirect("/login");
   }
 
-  // Ensure profile details are completed (onboarded vendor check)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("business_name, phone_number")
+    .select("*")
     .eq("id", user.id)
     .single();
 
-  if (!profile?.business_name || !profile?.phone_number || profile.phone_number === "0000000000") {
-    redirect("/vendor/profile");
-  }
-
+  // Fetch confirmed vendor assignments
   const { data: bookingsData, error } = await supabase
     .from("vendor_assignments")
     .select(`
@@ -33,25 +29,16 @@ export default async function VendorCalendarPage() {
         id,
         event_type,
         event_date,
+        event_time,
         location,
         guest_count,
         status,
-        event_assignments (
-          id,
-          profiles:assigned_operational_manager_id (
-            full_name,
-            phone_number,
-            email
-          )
-        ),
         request_items (
           quantity,
           unit_price,
           pricing_type,
           service_items (
-            name,
-            subcategory_id,
-            subcategories ( category_id )
+            name
           )
         )
       )
@@ -59,30 +46,39 @@ export default async function VendorCalendarPage() {
     .eq("vendor_id", user.id)
     .in("status", ["Accepted", "Approved"]);
 
+  // Fetch personal schedule entries
+  const { data: personalSchedulesData } = await supabase
+    .from("vendor_personal_schedules")
+    .select("*")
+    .eq("vendor_id", user.id)
+    .order("start_date", { ascending: true });
+
   if (error) {
     return (
-      <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-sm rounded-xl">
-        <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.25a.75.75 0 011.5 0v4.5a.75.75 0 01-1.5 0v-4.5zm.75 7.5a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
-        </svg>
-        Failed to fetch calendar bookings: {error.message}
+      <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl">
+        Failed to fetch calendar data: {error.message}
       </div>
     );
   }
 
   const bookings = (bookingsData || []) as any[];
+  const personalSchedules = (personalSchedulesData || []) as any[];
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <p className="text-[9.5px] uppercase tracking-widest font-bold text-muted-foreground">Scheduling</p>
-        <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Calendar</h1>
+        <p className="text-[9.5px] uppercase tracking-widest font-bold text-accent-gold">Scheduling Studio</p>
+        <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Interactive Calendar & Schedule</h1>
         <p className="text-xs text-muted-foreground font-light mt-1">
-          Your confirmed schedule, upcoming events, and availability.
+          Monitor daily event capacity, track confirmed bookings, block personal leave, and manage availability.
         </p>
       </div>
 
-      <CalendarClient bookings={bookings} />
+      <CalendarClient
+        bookings={bookings}
+        personalSchedules={personalSchedules}
+        profile={profile}
+      />
     </div>
   );
 }

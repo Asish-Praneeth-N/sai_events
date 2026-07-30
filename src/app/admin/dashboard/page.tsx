@@ -15,7 +15,8 @@ function AttentionCard({
   icon: Icon, 
   description,
   colorClass = "text-foreground",
-  bgClass = "bg-surface"
+  bgClass = "bg-surface",
+  href,
 }: { 
   label: string; 
   value: string | number; 
@@ -23,25 +24,33 @@ function AttentionCard({
   description?: string;
   colorClass?: string;
   bgClass?: string;
+  href?: string;
 }) {
-  return (
-    <div className={`${bgClass} border border-border rounded-2xl p-5 hover:border-accent-gold/25 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36`}>
+  const cardContent = (
+    <div className={`${bgClass} border border-border rounded-2xl p-5 hover:border-accent-gold/45 hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-36 cursor-pointer group`}>
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-accent-gold transition-colors">{label}</p>
           <h3 className={`text-3xl font-light font-heading mt-1 ${colorClass}`}>{value}</h3>
         </div>
-        <div className="w-9 h-9 rounded-xl bg-background border border-border flex items-center justify-center text-accent-gold">
+        <div className="w-9 h-9 rounded-xl bg-background border border-border flex items-center justify-center text-accent-gold group-hover:scale-110 transition-transform">
           <Icon className="w-4 h-4" />
         </div>
       </div>
       {description && (
-        <div className="text-[10px] text-muted-foreground font-medium pt-2 border-t border-border/30 truncate">
-          {description}
+        <div className="text-[10px] text-muted-foreground font-medium pt-2 border-t border-border/30 truncate flex items-center justify-between">
+          <span>{description}</span>
+          <span className="text-accent-gold opacity-0 group-hover:opacity-100 transition-opacity">→</span>
         </div>
       )}
     </div>
   );
+
+  if (href) {
+    return <Link href={href} className="block no-underline">{cardContent}</Link>;
+  }
+
+  return cardContent;
 }
 
 export default async function AdminDashboardPage() {
@@ -219,6 +228,7 @@ export default async function AdminDashboardPage() {
             description={todaysEvents ? "Events executing today!" : "No events scheduled for today"}
             colorClass="text-accent-gold"
             bgClass={todaysEvents ? "bg-accent-gold/5 border-accent-gold/35" : "bg-surface"}
+            href="/admin/bookings?filter=today"
           />
           <AttentionCard 
             label="Pending Event Cases" 
@@ -226,6 +236,7 @@ export default async function AdminDashboardPage() {
             icon={Clock} 
             description="Awaiting customer requests review"
             colorClass={pendingEventCases ? "text-amber-500" : "text-foreground"}
+            href="/admin/bookings?filter=pending"
           />
           <AttentionCard 
             label="Pending Vendor Reg." 
@@ -233,6 +244,7 @@ export default async function AdminDashboardPage() {
             icon={Users} 
             description="Awaiting supplier onboarding approval"
             colorClass={pendingVendors ? "text-amber-500" : "text-foreground"}
+            href="/admin/vendors?tab=pending"
           />
           <AttentionCard 
             label="Pending Vendor Invites" 
@@ -240,6 +252,7 @@ export default async function AdminDashboardPage() {
             icon={Send} 
             description="Active category leads pending response"
             colorClass={pendingVendorInvitations ? "text-pink-500" : "text-foreground"}
+            href="/admin/vendor-invitations"
           />
           <AttentionCard 
             label="OMs Available" 
@@ -247,6 +260,7 @@ export default async function AdminDashboardPage() {
             icon={Briefcase} 
             description="Operational Managers ready for assignment"
             colorClass="text-emerald-500"
+            href="/admin/operational-managers?status=available"
           />
           <AttentionCard 
             label="Waiting OM Assignment" 
@@ -255,6 +269,7 @@ export default async function AdminDashboardPage() {
             description="Locked event cases waiting OM dispatch"
             colorClass={waitingOMAssignment ? "text-rose-500" : "text-foreground"}
             bgClass={waitingOMAssignment ? "bg-rose-500/5 border-rose-500/35" : "bg-surface"}
+            href="/admin/assignments?filter=unassigned"
           />
           <AttentionCard 
             label="Events In Progress" 
@@ -262,6 +277,7 @@ export default async function AdminDashboardPage() {
             icon={Activity} 
             description="Active events in preparation or execution"
             colorClass="text-blue-500"
+            href="/admin/bookings?filter=active"
           />
           <AttentionCard 
             label="Delayed Event Tasks" 
@@ -269,6 +285,7 @@ export default async function AdminDashboardPage() {
             icon={AlertTriangle} 
             description="OM assignments past expected completion"
             colorClass={delayedEvents ? "text-red-500 animate-pulse" : "text-foreground"}
+            href="/admin/assignments?filter=delayed"
           />
           <AttentionCard 
             label="Escalated Events" 
@@ -277,6 +294,7 @@ export default async function AdminDashboardPage() {
             description="Events flagged with active escalations"
             colorClass={escalatedEvents ? "text-red-500" : "text-foreground"}
             bgClass={escalatedEvents ? "bg-red-500/10 border-red-500/30 animate-pulse" : "bg-surface"}
+            href="/admin/assignments?filter=escalated"
           />
         </div>
       </div>

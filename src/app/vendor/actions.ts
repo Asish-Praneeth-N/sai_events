@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { VendorAvailabilityStatus } from "@/lib/types";
 
 export async function saveVendorProfile(formData: {
   fullName: string;
@@ -29,13 +30,69 @@ export async function saveVendorProfile(formData: {
   revalidatePath("/vendor/profile");
 }
 
+export async function saveExtendedVendorProfile(data: {
+  fullName: string;
+  phoneNumber: string;
+  businessName: string;
+  address: string;
+  primaryCity?: string;
+  serviceRadiusKm?: number;
+  maxDailyCapacity?: number;
+  yearsOfExperience?: number;
+  instagramUrl?: string;
+  websiteUrl?: string;
+  facebookUrl?: string;
+  bankName?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  accountName?: string;
+  vendorDocuments?: any;
+  godownPhotos?: string[];
+  vehicleAssets?: Array<{ type: string; url: string; name: string }>;
+  additionalNotes?: string;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: data.fullName,
+      phone_number: data.phoneNumber,
+      business_name: data.businessName,
+      address: data.address,
+      primary_city: data.primaryCity,
+      service_radius_km: data.serviceRadiusKm || 100,
+      max_daily_capacity: data.maxDailyCapacity || 5,
+      years_of_experience: data.yearsOfExperience || 0,
+      instagram_url: data.instagramUrl,
+      website_url: data.websiteUrl,
+      facebook_url: data.facebookUrl,
+      bank_name: data.bankName,
+      account_number: data.accountNumber,
+      ifsc_code: data.ifscCode,
+      account_name: data.accountName,
+      vendor_documents: data.vendorDocuments || {},
+      godown_photos: data.godownPhotos || [],
+      vehicle_assets: data.vehicleAssets || [],
+      additional_notes: data.additionalNotes,
+    })
+    .eq("id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/vendor/profile");
+  revalidatePath("/vendor");
+}
+
 export async function updateVendorCategoryMappings(categoryIds: string[]) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error("Unauthorized");
 
-  // Delete current mappings
   await supabase
     .from("vendor_category_mappings")
     .delete()
@@ -87,9 +144,9 @@ export async function removePortfolioImage(portfolioItemId: string) {
   revalidatePath("/vendor/profile");
 }
 
-// ─── Availability Status ─────────────────────────────────────────────────────
+// ─── Availability & Capacity Actions ─────────────────────────────────────────
 
-export async function updateVendorAvailability(status: "Available" | "Busy" | "Leave") {
+export async function updateVendorAvailability(status: VendorAvailabilityStatus) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
@@ -101,6 +158,136 @@ export async function updateVendorAvailability(status: "Available" | "Busy" | "L
 
   if (error) throw new Error(error.message);
   revalidatePath("/vendor");
+  revalidatePath("/vendor/calendar");
+}
+
+// ─── Personal Schedules Actions ────────────────────────────────────────────────
+
+export async function savePersonalSchedule(entry: {
+  id?: string;
+  title: string;
+  entryType: "Leave" | "Personal Function" | "Equipment Maintenance" | "Office Work" | "Family Function";
+  startDate: string;
+  endDate: string;
+  startTime?: string;
+  endTime?: string;
+  notes?: string;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const payload = {
+    vendor_id: user.id,
+    title: entry.title,
+    entry_type: entry.entryType,
+    start_date: entry.startDate,
+    end_date: entry.endDate,
+    start_time: entry.startTime || null,
+    end_time: entry.endTime || null,
+    notes: entry.notes || null,
+  };
+
+  if (entry.id) {
+    const { error } = await supabase
+      .from("vendor_personal_schedules")
+      .update(payload)
+      .eq("id", entry.id)
+      .eq("vendor_id", user.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase
+      .from("vendor_personal_schedules")
+      .insert(payload);
+    if (error) throw new Error(error.message);
+  }
+
+  revalidatePath("/vendor/calendar");
+  revalidatePath("/vendor/inbox");
+}
+
+export async function deletePersonalSchedule(id: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { error } = await supabase
+    .from("vendor_personal_schedules")
+    .delete()
+    .eq("id", id)
+    .eq("vendor_id", user.id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/vendor/calendar");
+  revalidatePath("/vendor/inbox");
+}
+
+// ─── Grouped Quotations Actions ───────────────────────────────────────────────
+
+export async function submitGroupedVendorQuotation(data: {
+  requestId: string;
+  items: Array<{ serviceItemId: string; itemPrice: number; quantity: number }>;
+  notes?: string;
+  isConfirmed: boolean;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  if (!data.isConfirmed) {
+    throw new Error("You must explicitly confirm that you can provide this service before submitting.");
+  }
+
+  let grandTotal = 0;
+  const itemPayloads = data.items.map((i) => {
+    const sub = i.itemPrice * i.quantity;
+    grandTotal += sub;
+    return {
+      service_item_id: i.serviceItemId,
+      item_price: i.itemPrice,
+      quantity: i.quantity,
+      subtotal: sub,
+    };
+  });
+
+  // 1. Insert or Update Quotation Header
+  const { data: qData, error: qErr } = await supabase
+    .from("vendor_quotations")
+    .insert({
+      request_id: data.requestId,
+      vendor_id: user.id,
+      grand_total: grandTotal,
+      is_confirmed: true,
+      confirmed_at: new Date().toISOString(),
+      notes: data.notes || null,
+      status: "Submitted",
+    })
+    .select("id")
+    .single();
+
+  if (qErr) throw new Error(qErr.message);
+
+  // 2. Insert Quotation Items
+  const itemsWithQId = itemPayloads.map((ip) => ({
+    ...ip,
+    quotation_id: qData.id,
+  }));
+
+  const { error: itemsErr } = await supabase
+    .from("vendor_quotation_items")
+    .insert(itemsWithQId);
+
+  if (itemsErr) throw new Error(itemsErr.message);
+
+  // 3. Update vendor assignment status to 'Quotation Submitted'
+  await supabase
+    .from("vendor_assignments")
+    .update({ status: "Quotation Submitted" })
+    .eq("request_id", data.requestId)
+    .eq("vendor_id", user.id);
+
+  revalidatePath("/vendor/inbox");
+  revalidatePath("/vendor/bookings");
 }
 
 // ─── Vendor Services ─────────────────────────────────────────────────────────
@@ -117,7 +304,6 @@ export async function saveVendorServices(services: ServiceInput[]) {
 
   if (!user) throw new Error("Unauthorized");
 
-  // 1. Fetch existing vendor services
   const { data: existingServices, error: fetchErr } = await supabase
     .from("vendor_services")
     .select("id, service_item_id")
@@ -127,7 +313,6 @@ export async function saveVendorServices(services: ServiceInput[]) {
 
   const existingMap = new Map(existingServices?.map((s) => [s.service_item_id, s.id]) || []);
 
-  // 2. Delete vendor services that are no longer selected
   const newServiceItemIds = new Set(services.map((s) => s.serviceItemId));
   const toDeleteIds: string[] = [];
   existingMap.forEach((id, serviceItemId) => {
@@ -144,7 +329,6 @@ export async function saveVendorServices(services: ServiceInput[]) {
     if (delErr) throw new Error(delErr.message);
   }
 
-  // 3. Upsert selected services
   for (const s of services) {
     let vendorServiceId = existingMap.get(s.serviceItemId);
 
@@ -168,7 +352,6 @@ export async function saveVendorServices(services: ServiceInput[]) {
       vendorServiceId = insData.id;
     }
 
-    // 4. Replace media for this vendor_service
     const { error: mediaDelErr } = await supabase
       .from("vendor_service_media")
       .delete()
@@ -203,7 +386,6 @@ export async function uploadVendorDocument(
 
   if (!user) throw new Error("Unauthorized");
 
-  // Validate that the vendor is confirmed (Approved) for this event
   const { data: assignment, error: getError } = await supabase
     .from("vendor_assignments")
     .select("id")
@@ -216,7 +398,6 @@ export async function uploadVendorDocument(
     throw new Error("Unauthorized event case access. Booking must be confirmed.");
   }
 
-  // Upload to Supabase Storage (vendor-uploads bucket)
   const storagePath = `vendor-documents/${user.id}/${eventId}/${Date.now()}_${file.name}`;
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from("vendor-uploads")
@@ -224,12 +405,10 @@ export async function uploadVendorDocument(
 
   if (uploadError) throw new Error(uploadError.message);
 
-  // Get public URL
   const { data: { publicUrl } } = supabase.storage
     .from("vendor-uploads")
     .getPublicUrl(storagePath);
 
-  // Insert document record
   const { data, error } = await supabase
     .from("documents")
     .insert({
@@ -254,7 +433,6 @@ export async function deleteVendorDocument(documentId: string, eventId: string) 
 
   if (!user) throw new Error("Unauthorized");
 
-  // Validate assignment
   const { data: assignment, error: getError } = await supabase
     .from("vendor_assignments")
     .select("id")
@@ -267,7 +445,6 @@ export async function deleteVendorDocument(documentId: string, eventId: string) 
     throw new Error("Unauthorized event case access.");
   }
 
-  // Fetch the document to get the storage path for deletion
   const { data: doc } = await supabase
     .from("documents")
     .select("file_url")
@@ -275,7 +452,6 @@ export async function deleteVendorDocument(documentId: string, eventId: string) 
     .eq("uploaded_by", user.id)
     .single();
 
-  // If the file is hosted on Supabase Storage (vendor-uploads), delete from storage too
   if (doc?.file_url) {
     try {
       const url = new URL(doc.file_url);
@@ -283,9 +459,7 @@ export async function deleteVendorDocument(documentId: string, eventId: string) 
       if (pathMatch?.[1]) {
         await supabase.storage.from("vendor-uploads").remove([pathMatch[1]]);
       }
-    } catch (_) {
-      // Non-storage URLs: skip storage deletion
-    }
+    } catch (_) {}
   }
 
   const { error } = await supabase
@@ -312,7 +486,6 @@ export async function submitCompletionReport(
 
   if (!user) throw new Error("Unauthorized");
 
-  // 1. Verify vendor is assigned and approved
   const { data: assignment, error: getError } = await supabase
     .from("vendor_assignments")
     .select("id")
@@ -325,7 +498,6 @@ export async function submitCompletionReport(
     throw new Error("Unauthorized event case access. Booking must be confirmed.");
   }
 
-  // 2. Save completion notes to the vendor_assignments record
   const { error: notesError } = await supabase
     .from("vendor_assignments")
     .update({
@@ -336,7 +508,6 @@ export async function submitCompletionReport(
 
   if (notesError) throw new Error(notesError.message);
 
-  // 3. Insert any photo URL links as documents
   if (photoUrls.length > 0) {
     const docRecords = photoUrls.map((url, idx) => ({
       event_id: eventId,
@@ -353,7 +524,6 @@ export async function submitCompletionReport(
     if (mediaErr) throw new Error(mediaErr.message);
   }
 
-  // 4. Dispatch system notification for Admins
   await supabase
     .from("notifications")
     .insert({

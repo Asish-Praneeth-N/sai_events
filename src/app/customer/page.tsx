@@ -9,15 +9,6 @@ export default async function CustomerPage() {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("phone_number, address")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.phone_number || profile.phone_number === "0000000000" || !profile?.address) {
-    redirect("/customer/profile");
-  }
-
+  // Direct navigation to dashboard for high availability
   redirect("/customer/dashboard");
 }

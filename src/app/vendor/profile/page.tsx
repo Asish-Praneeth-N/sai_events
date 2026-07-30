@@ -8,10 +8,10 @@ export default async function VendorProfilePage() {
 
   if (!user) redirect("/login");
 
-  // Fetch profile
+  // Fetch full profile record with extended vendor fields
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, phone_number, business_name, address, availability_status")
+    .select("*")
     .eq("id", user.id)
     .single();
 
@@ -36,27 +36,19 @@ export default async function VendorProfilePage() {
     .eq("vendor_id", user.id)
     .order("display_order", { ascending: true });
 
-  const initialProfile = {
-    fullName: profile?.full_name || "",
-    phoneNumber: profile?.phone_number === "0000000000" ? "" : profile?.phone_number || "",
-    businessName: profile?.business_name || "",
-    address: profile?.address || "",
-    email: user.email || "",
-    availabilityStatus: (profile?.availability_status as "Available" | "Busy" | "Leave") || "Available",
-  };
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <p className="text-[9.5px] uppercase tracking-widest font-bold text-muted-foreground">Account</p>
-        <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Business Profile</h1>
+        <p className="text-[9.5px] uppercase tracking-widest font-bold text-accent-gold">Business Management</p>
+        <h1 className="text-2xl font-light font-heading text-foreground mt-0.5">Extended Business Profile & Assets</h1>
         <p className="text-xs text-muted-foreground font-light mt-1">
-          Manage your business details, service categories, and showcase gallery.
+          Manage company credentials, location & service radius, bank verification, compliance certificates, godown, and vehicle assets.
         </p>
       </div>
 
       <VendorProfileForm
-        initialProfile={initialProfile}
+        profile={profile}
+        userEmail={user.email || ""}
         categories={categories || []}
         initialMappings={mappings?.map((m) => m.category_id) || []}
         portfolioItems={portfolioItems || []}

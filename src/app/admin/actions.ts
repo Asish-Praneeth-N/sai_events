@@ -13,7 +13,6 @@ export async function updateVendorStatus(
 
   if (!user) throw new Error("Unauthorized");
 
-  // Verify caller is admin
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -37,10 +36,8 @@ export async function updateVendorStatus(
   };
   const auditAction = actionMap[status] || "Vendor Status Updated";
 
-  // Log audit record
   await logAuditRecord(auditAction, "vendor", vendorId, { status });
 
-  // Send a system notification log
   try {
     const { data: vendorProfile } = await supabase
       .from("profiles")
@@ -97,7 +94,6 @@ export async function logNotification(data: {
 }) {
   const supabase = await createClient();
   
-  // Attempt logging if notifications table exists
   const { error } = await supabase
     .from("notifications")
     .insert({
@@ -109,18 +105,98 @@ export async function logNotification(data: {
     });
 
   if (error) {
-    console.warn("Notifications table might not be migrated yet, error:", error.message);
+    console.warn("Notifications error:", error.message);
   }
 }
 
-// 4. Media Object Deletion Action
+// 4. Admin Cancel Dispatched Vendor Request
+export async function cancelDispatchedVendorRequest(assignmentId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { data: assignment, error: getErr } = await supabase
+    .from("vendor_assignments")
+    .select("id, request_id, vendor_id")
+    .eq("id", assignmentId)
+    .single();
+
+  if (getErr || !assignment) throw new Error("Assignment not found.");
+
+  const { error } = await supabase
+    .from("vendor_assignments")
+    .update({ status: "Cancelled" })
+    .eq("id", assignmentId);
+
+  if (error) throw new Error(error.message);
+
+  // Send notification to vendor that request was cancelled
+  await logNotification({
+    userId: assignment.vendor_id,
+    userType: "vendor",
+    userName: "System",
+    message: `Admin cancelled dispatched lead request for event file #${assignment.request_id.substring(0, 8)}.`,
+  });
+
+  revalidatePath(`/admin/bookings/${assignment.request_id}`);
+}
+
+// 5. Approve Vendor & Notify Other Candidate Vendors ("Opportunity Closed")
+export async function approveVendorAndNotifyOthers(requestId: string, approvedAssignmentId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  // Fetch target assignment details
+  const { data: targetAssignment } = await supabase
+    .from("vendor_assignments")
+    .select("id, vendor_id, category_id")
+    .eq("id", approvedAssignmentId)
+    .single();
+
+  if (!targetAssignment) throw new Error("Assignment record missing.");
+
+  // Mark winning assignment Approved
+  await supabase
+    .from("vendor_assignments")
+    .update({ status: "Approved" })
+    .eq("id", approvedAssignmentId);
+
+  // Fetch all other candidate assignments for this category
+  const { data: otherAssignments } = await supabase
+    .from("vendor_assignments")
+    .select("id, vendor_id")
+    .eq("request_id", requestId)
+    .eq("category_id", targetAssignment.category_id)
+    .neq("id", approvedAssignmentId);
+
+  // Reject other assignments and send Opportunity Closed notification
+  if (otherAssignments && otherAssignments.length > 0) {
+    for (const other of otherAssignments) {
+      await supabase
+        .from("vendor_assignments")
+        .update({ status: "Rejected" })
+        .eq("id", other.id);
+
+      await logNotification({
+        userId: other.vendor_id,
+        userType: "vendor",
+        userName: "System",
+        message: "This opportunity has been assigned to another vendor.",
+      });
+    }
+  }
+
+  revalidatePath(`/admin/bookings/${requestId}`);
+}
+
+// 6. Media Object Deletion Action
 export async function deleteMediaObject(mediaId: string, storagePath: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error("Unauthorized");
 
-  // Verify admin
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -129,7 +205,6 @@ export async function deleteMediaObject(mediaId: string, storagePath: string) {
 
   if (profile?.role !== "admin") throw new Error("Unauthorized");
 
-  // Delete from storage bucket
   const filename = storagePath.split("/").pop();
   if (filename) {
     await supabase.storage
@@ -137,7 +212,6 @@ export async function deleteMediaObject(mediaId: string, storagePath: string) {
       .remove([`service-items/${filename}`]);
   }
 
-  // Delete from service_item_media table
   const { error } = await supabase
     .from("service_item_media")
     .delete()

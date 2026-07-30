@@ -3,8 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-// 1. Categories CRUD Server Actions
-export async function saveCategory(formData: {
+// 1. Main Categories (Level 1) CRUD Server Actions
+export async function saveMainCategory(formData: {
   id?: string;
   name: string;
   description?: string;
@@ -15,6 +15,60 @@ export async function saveCategory(formData: {
   const supabase = await createClient();
 
   const payload: any = {
+    name: formData.name,
+    description: formData.description,
+    image_url: formData.image_url,
+    is_active: formData.is_active ?? true,
+    sort_order: formData.sort_order ?? 0,
+  };
+
+  let error;
+
+  if (formData.id) {
+    const { error: err } = await supabase
+      .from("main_categories")
+      .update(payload)
+      .eq("id", formData.id);
+    error = err;
+  } else {
+    const { error: err } = await supabase
+      .from("main_categories")
+      .insert([payload]);
+    error = err;
+  }
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/catalog");
+}
+
+export async function deleteMainCategory(id: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("main_categories")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/catalog");
+}
+
+// 2. Categories (Level 2) CRUD Server Actions
+export async function saveCategory(formData: {
+  id?: string;
+  main_category_id?: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  is_active?: boolean;
+  sort_order?: number;
+}) {
+  const supabase = await createClient();
+
+  const payload: any = {
+    main_category_id: formData.main_category_id || null,
     name: formData.name,
     description: formData.description,
     image_url: formData.image_url,
@@ -55,7 +109,7 @@ export async function deleteCategory(id: string) {
   revalidatePath("/admin/catalog");
 }
 
-// 2. Subcategories CRUD Server Actions
+// 3. Subcategories (Level 3) CRUD Server Actions
 export async function saveSubcategory(formData: {
   id?: string;
   category_id: string;
@@ -107,7 +161,7 @@ export async function deleteSubcategory(id: string) {
   revalidatePath("/admin/catalog");
 }
 
-// 3. Service Items CRUD Server Actions
+// 4. Service Items (Level 4) CRUD Server Actions
 export async function saveServiceItem(formData: {
   id?: string;
   subcategory_id: string;
@@ -115,9 +169,12 @@ export async function saveServiceItem(formData: {
   description: string;
   price: number;
   pricing_type: "flat" | "per_plate";
+  pricing_unit?: "per_plate" | "per_piece" | "fixed";
+  food_category?: "veg" | "non_veg" | "beverage" | "dessert" | "general";
+  meal_type?: "breakfast" | "lunch" | "dinner" | "high_tea" | "general";
   is_available?: boolean;
   sort_order?: number;
-  media_urls?: string[]; // Array of media urls uploaded to Supabase Storage
+  media_urls?: string[];
 }) {
   const supabase = await createClient();
 
@@ -127,6 +184,9 @@ export async function saveServiceItem(formData: {
     description: formData.description,
     price: formData.price,
     pricing_type: formData.pricing_type,
+    pricing_unit: formData.pricing_unit || (formData.pricing_type === "per_plate" ? "per_plate" : "fixed"),
+    food_category: formData.food_category || "general",
+    meal_type: formData.meal_type || "general",
     is_available: formData.is_available ?? true,
     sort_order: formData.sort_order ?? 0,
   };
@@ -153,9 +213,7 @@ export async function saveServiceItem(formData: {
   if (error) throw new Error(error.message);
   if (!itemId) throw new Error("Failed to resolve service item ID.");
 
-  // Save multiple media files if passed in
   if (formData.media_urls && formData.media_urls.length > 0) {
-    // Delete existing media records for this item (to overwrite)
     if (formData.id) {
       await supabase
         .from("service_item_media")

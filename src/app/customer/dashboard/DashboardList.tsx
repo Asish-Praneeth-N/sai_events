@@ -97,6 +97,9 @@ export default function DashboardList({ requests, notifications }: DashboardList
     requests.length > 0 ? requests[0].id : null
   );
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
+  const [cancellationReason, setCancellationReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -119,15 +122,26 @@ export default function DashboardList({ requests, notifications }: DashboardList
 
   const activeRequest = requests.find((r) => r.id === activeEventId) || null;
 
-  const handleCancel = async (id: string) => {
-    if (!confirm("Are you sure you want to cancel this event request? This cannot be undone.")) {
+  const openCancelModal = (id: string) => {
+    setCancelTargetId(id);
+    setCancellationReason("");
+    setShowCancelModal(true);
+  };
+
+  const handleCancelSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cancelTargetId) return;
+    if (!cancellationReason.trim()) {
+      setError("Cancellation reason is mandatory.");
       return;
     }
-    setCancellingId(id);
+
+    setCancellingId(cancelTargetId);
     setError(null);
     try {
-      await cancelEventRequest(id);
+      await cancelEventRequest(cancelTargetId, cancellationReason.trim());
       setSuccess("Your event request has been cancelled.");
+      setShowCancelModal(false);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Failed to cancel event request.");
@@ -404,11 +418,23 @@ export default function DashboardList({ requests, notifications }: DashboardList
                       )}
                     </div>
 
-                    <div className="border-t border-border/40 pt-4 flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="font-light">Estimated Budget:</span>
-                      <span className="font-bold text-foreground font-mono">
-                        ₹{Number(activeRequest.total_budget).toLocaleString("en-IN")}
-                      </span>
+                    <div className="border-t border-border/40 pt-4 flex flex-col gap-2">
+                      <div className="flex justify-between items-center text-xs text-muted-foreground">
+                        <span className="font-light">Estimated Budget:</span>
+                        <span className="font-bold text-foreground font-mono">
+                          ₹{Number(activeRequest.total_budget).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+
+                      {activeRequest.status !== "Cancelled" && (
+                        <button
+                          type="button"
+                          onClick={() => openCancelModal(activeRequest.id)}
+                          className="w-full text-center px-4 py-2 border border-red-500/30 hover:bg-red-500/10 text-red-400 text-xs font-semibold rounded-xl transition cursor-pointer"
+                        >
+                          Cancel Event Request
+                        </button>
+                      )}
                     </div>
 
                     <a
@@ -1424,6 +1450,60 @@ export default function DashboardList({ requests, notifications }: DashboardList
                   className="px-4.5 py-2.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold text-black text-[10px] font-bold uppercase tracking-wider rounded-xl transition cursor-pointer shadow-md shadow-[#D4AF37]/10"
                 >
                   {requestingMeeting ? "Logging request..." : "Confirm Request"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── CANCEL EVENT REQUEST MODAL ─── */}
+      {showCancelModal && cancelTargetId && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="bg-surface border border-border/80 rounded-3xl max-w-md w-full overflow-hidden p-6.5 space-y-6 shadow-2xl animate-scale-in">
+            <div className="flex justify-between items-center border-b border-border/50 pb-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-red-400">
+                Cancel Event Request
+              </h3>
+              <button 
+                onClick={() => setShowCancelModal(false)}
+                className="text-muted-foreground hover:text-foreground transition cursor-pointer p-1 rounded-lg hover:bg-surface-raised"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCancelSubmit} className="space-y-4 text-xs">
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                Are you sure you want to cancel this event request? Please provide a mandatory reason for cancellation.
+              </p>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Cancellation Reason *</label>
+                <textarea
+                  rows={3}
+                  required
+                  placeholder="Specify why you are cancelling (e.g., date changed, venue relocated, budget update)..."
+                  value={cancellationReason}
+                  onChange={(e) => setCancellationReason(e.target.value)}
+                  className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-red-500/50 text-foreground placeholder-muted-foreground font-light text-xs resize-none"
+                />
+              </div>
+
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-border/50">
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(false)}
+                  className="px-4 py-2.5 border border-border hover:bg-surface-raised rounded-xl text-xs font-semibold text-foreground transition cursor-pointer"
+                >
+                  Keep Event
+                </button>
+                <button
+                  type="submit"
+                  disabled={cancellingId !== null}
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer shadow-md"
+                >
+                  {cancellingId !== null ? "Cancelling..." : "Confirm Cancellation"}
                 </button>
               </div>
             </form>

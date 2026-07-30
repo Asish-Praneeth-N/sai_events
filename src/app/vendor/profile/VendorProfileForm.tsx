@@ -1,18 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  saveVendorProfile,
+  saveExtendedVendorProfile,
   updateVendorCategoryMappings,
   addPortfolioImage,
   removePortfolioImage,
   updateVendorAvailability,
 } from "../actions";
+import { Profile, VendorAvailabilityStatus } from "@/lib/types";
 import {
-  Store, CheckCircle2, AlertCircle, Plus,
-  Trash2, LogOut, ShieldCheck, User, Phone, MapPin, Tag, Image, Clock, Info
+  Store, CheckCircle2, AlertCircle, Plus, Trash2, LogOut, X,
+  ShieldCheck, User, Phone, MapPin, Tag, Image, Clock, Info,
+  Building2, Globe, Landmark, FileCheck,
+  Truck, Warehouse, Sliders, MessageSquare
 } from "lucide-react";
 
 interface Category {
@@ -28,63 +31,92 @@ interface PortfolioItem {
   display_order: number;
 }
 
-interface VendorProfileFormProps {
-  initialProfile: {
-    fullName: string;
-    phoneNumber: string;
-    businessName: string;
-    address: string;
-    email: string;
-    availabilityStatus: "Available" | "Busy" | "Leave";
-  };
+interface Props {
+  profile: Profile | null;
+  userEmail: string;
   categories: Category[];
   initialMappings: string[];
   portfolioItems: PortfolioItem[];
 }
 
 export default function VendorProfileForm({
-  initialProfile,
+  profile,
+  userEmail,
   categories,
   initialMappings,
   portfolioItems,
-}: VendorProfileFormProps) {
+}: Props) {
   const router = useRouter();
   const supabase = createClient();
-  const [isPending, startTransition] = useTransition();
 
-  const [fullName, setFullName] = useState(initialProfile.fullName);
-  const [phoneNumber, setPhoneNumber] = useState(initialProfile.phoneNumber);
-  const [businessName, setBusinessName] = useState(initialProfile.businessName);
-  const [address, setAddress] = useState(initialProfile.address);
+  // Basic Info
+  const [fullName, setFullName] = useState(profile?.full_name || "");
+  const [phoneNumber, setPhoneNumber] = useState(
+    profile?.phone_number === "0000000000" ? "" : profile?.phone_number || ""
+  );
+  const [businessName, setBusinessName] = useState(profile?.business_name || "");
+  const [address, setAddress] = useState(profile?.address || "");
+  const [primaryCity, setPrimaryCity] = useState(profile?.primary_city || "");
+  const [serviceRadiusKm, setServiceRadiusKm] = useState<number>(profile?.service_radius_km || 100);
+  const [maxDailyCapacity, setMaxDailyCapacity] = useState<number>(profile?.max_daily_capacity || 5);
+  const [yearsOfExperience, setYearsOfExperience] = useState<number>(profile?.years_of_experience || 0);
+
+  // Social Links
+  const [instagramUrl, setInstagramUrl] = useState(profile?.instagram_url || "");
+  const [websiteUrl, setWebsiteUrl] = useState(profile?.website_url || "");
+  const [facebookUrl, setFacebookUrl] = useState(profile?.facebook_url || "");
+
+  // Bank Details
+  const [bankName, setBankName] = useState(profile?.bank_name || "");
+  const [accountNumber, setAccountNumber] = useState(profile?.account_number || "");
+  const [ifscCode, setIfscCode] = useState(profile?.ifsc_code || "");
+  const [accountName, setAccountName] = useState(profile?.account_name || "");
+
+  // Category Mappings
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialMappings);
 
-  const [availability, setAvailability] = useState<"Available" | "Busy" | "Leave">(
-    initialProfile.availabilityStatus
+  // Certificates & Asset Inputs
+  const [gstUrl, setGstUrl] = useState(profile?.vendor_documents?.gst?.url || "");
+  const [panUrl, setPanUrl] = useState(profile?.vendor_documents?.pan?.url || "");
+  const [msmeUrl, setMsmeUrl] = useState(profile?.vendor_documents?.msme?.url || "");
+
+  const [godownPhoto, setGodownPhoto] = useState("");
+  const [godownPhotos, setGodownPhotos] = useState<string[]>(profile?.godown_photos || []);
+
+  const [vehicleType, setVehicleType] = useState("Truck");
+  const [vehicleName, setVehicleName] = useState("");
+  const [vehicleUrl, setVehicleUrl] = useState("");
+  const [vehicleAssets, setVehicleAssets] = useState<Array<{ type: string; url: string; name: string }>>(
+    profile?.vehicle_assets || []
   );
-  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>(portfolioItems);
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [newImageCaption, setNewImageCaption] = useState("");
-  const [showAddImage, setShowAddImage] = useState(false);
-  const [addingImage, setAddingImage] = useState(false);
+  const [additionalNotes, setAdditionalNotes] = useState(profile?.additional_notes || "");
 
+  // Status & Feedback State
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
-
-  const fields = [fullName, phoneNumber, businessName, address];
-  const filledCount =
-    fields.filter((f) => f.trim().length > 0).length +
-    (selectedCategories.length > 0 ? 1 : 0);
-  const completeness = Math.round((filledCount / 5) * 100);
 
   const handleCategoryToggle = (id: string) => {
     setSelectedCategories((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
     );
+  };
+
+  const handleAddGodownPhoto = () => {
+    if (!godownPhoto.trim()) return;
+    setGodownPhotos((prev) => [...prev, godownPhoto.trim()]);
+    setGodownPhoto("");
+  };
+
+  const handleAddVehicleAsset = () => {
+    if (!vehicleName.trim() || !vehicleUrl.trim()) return;
+    setVehicleAssets((prev) => [
+      ...prev,
+      { type: vehicleType, name: vehicleName.trim(), url: vehicleUrl.trim() },
+    ]);
+    setVehicleName("");
+    setVehicleUrl("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,429 +126,506 @@ export default function VendorProfileForm({
     setSuccess(null);
 
     try {
-      if (phoneNumber.trim().length < 10) {
-        throw new Error("Phone number must contain at least 10 digits.");
-      }
-      await saveVendorProfile({ fullName, phoneNumber, businessName, address });
+      if (!fullName.trim()) throw new Error("Owner Name is required.");
+      if (phoneNumber.trim().length < 10) throw new Error("Phone number must contain at least 10 digits.");
+      if (!businessName.trim()) throw new Error("Company Name is required.");
+
+      const vendorDocumentsPayload = {
+        gst: { url: gstUrl, status: profile?.vendor_documents?.gst?.status || "Pending" },
+        pan: { url: panUrl, status: profile?.vendor_documents?.pan?.status || "Pending" },
+        msme: { url: msmeUrl, status: profile?.vendor_documents?.msme?.status || "Pending" },
+      };
+
+      await saveExtendedVendorProfile({
+        fullName,
+        phoneNumber,
+        businessName,
+        address,
+        primaryCity,
+        serviceRadiusKm,
+        maxDailyCapacity,
+        yearsOfExperience,
+        instagramUrl,
+        websiteUrl,
+        facebookUrl,
+        bankName,
+        accountNumber,
+        ifscCode,
+        accountName,
+        vendorDocuments: vendorDocumentsPayload,
+        godownPhotos,
+        vehicleAssets,
+        additionalNotes,
+      });
+
       await updateVendorCategoryMappings(selectedCategories);
 
-      setSuccess("Business credentials saved successfully.");
+      setSuccess("Vendor profile & registration parameters updated successfully.");
       setTimeout(() => setSuccess(null), 3500);
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "Failed to update profile details.");
+      setError(err.message || "Failed to update profile.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAvailabilityChange = async (state: "Available" | "Busy" | "Leave") => {
-    setAvailabilityLoading(true);
-    setAvailability(state);
-    try {
-      await updateVendorAvailability(state);
-      setSuccess(`Status changed to ${state}.`);
-      setTimeout(() => setSuccess(null), 2500);
-    } catch (err: any) {
-      setError(err.message || "Failed to update availability.");
-    } finally {
-      setAvailabilityLoading(false);
-    }
-  };
-
-  const handleAddPortfolioImage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newImageUrl.trim()) return;
-    setAddingImage(true);
-    setError(null);
-    try {
-      await addPortfolioImage(newImageUrl.trim(), newImageCaption.trim() || undefined);
-      setNewImageUrl("");
-      setNewImageCaption("");
-      setShowAddImage(false);
-      setSuccess("New showcase file appended successfully.");
-      setTimeout(() => setSuccess(null), 3000);
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Failed to add showcase image.");
-    } finally {
-      setAddingImage(false);
-    }
-  };
-
-  const handleRemovePortfolioImage = async (itemId: string) => {
-    try {
-      await removePortfolioImage(itemId);
-      setPortfolio((prev) => prev.filter((p) => p.id !== itemId));
-      setSuccess("Showcase file deleted.");
-      setTimeout(() => setSuccess(null), 2500);
-    } catch (err: any) {
-      setError(err.message || "Failed to delete showcase image.");
-    }
-  };
-
-  const handleSignOut = async () => {
-    setSigningOut(true);
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
-  };
-
-  const initials = (businessName || fullName || "?")
-    .split(" ").slice(0, 2).map((w) => w[0]?.toUpperCase() || "").join("");
-
   return (
-    <div className="space-y-8 select-none max-w-7xl mx-auto pb-12">
-
-      {/* Toast Alert logs */}
+    <div className="space-y-8 select-none max-w-5xl mx-auto pb-12">
       {error && (
-        <div className="p-4 bg-red-950/20 border border-red-500/30 text-red-400 text-xs rounded-2xl flex items-center gap-3 animate-scale-in">
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
-          <span>{error}</span>
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+            <span>{error}</span>
+          </div>
+          <button onClick={() => setError(null)} className="cursor-pointer text-red-400">
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 text-xs rounded-2xl flex items-center gap-3 animate-scale-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
-          <span>{success}</span>
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+            <span>{success}</span>
+          </div>
+          <button onClick={() => setSuccess(null)} className="cursor-pointer text-emerald-400">
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 
-      {/* ── Covered Banner Header Profile ── */}
-      <div className="relative rounded-[32px] overflow-hidden border border-border/80 shadow-md">
-        <div className="h-44 bg-gradient-to-br from-[#1c1815] via-[#2d261f] to-[#120e0c] dark:from-[#0d0b0a] dark:to-[#050404] flex items-center justify-end px-8 relative">
-          <div className="absolute top-0 right-0 w-[50%] h-full bg-gradient-to-l from-accent-gold/5 to-transparent blur-2xl pointer-events-none" />
-          
-          <div className="flex gap-2 relative z-10">
-            <span className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/25 select-none">
-              <ShieldCheck className="w-3.5 h-3.5" /> Vetted Partner
-            </span>
-          </div>
-        </div>
-
-        {/* Info layout */}
-        <div className="p-6 sm:p-8 pt-0 bg-surface flex flex-col sm:flex-row sm:items-end justify-between gap-6 relative">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-5 -mt-12 sm:-mt-14 relative z-10">
-            <div className="w-24 h-24 rounded-[28px] bg-zinc-900 border-2 border-accent-gold flex items-center justify-center text-accent-gold text-3xl font-heading shadow-xl select-none font-bold">
-              {initials}
-            </div>
-            <div className="space-y-1 pb-1">
-              <h2 className="text-2xl font-light text-foreground font-heading leading-tight">
-                {businessName || "Your Enterprise"}
-              </h2>
-              <p className="text-xs text-muted-foreground font-mono font-light">
-                {initialProfile.email}
-              </p>
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* 1. Company & Owner Information */}
+        <div className="p-6 rounded-3xl bg-surface border border-border space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <Building2 className="w-4 h-4 text-accent-gold" />
+            <h3 className="text-sm font-bold text-foreground">1. Company & Owner Information</h3>
           </div>
 
-          {/* Progress Calibration bar */}
-          <div className="w-full sm:w-64 space-y-2 self-end pb-1">
-            <div className="flex items-center justify-between text-[9px] uppercase tracking-widest font-extrabold text-muted-foreground">
-              <span>Calibration Strength</span>
-              <span className={completeness === 100 ? "text-emerald-400 font-bold" : "text-accent-gold font-bold"}>
-                {completeness}%
-              </span>
-            </div>
-            <div className="w-full h-1.5 bg-background border border-border/40 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-700 ${
-                  completeness === 100 ? "bg-emerald-500" : "bg-accent-gold"
-                }`}
-                style={{ width: `${completeness}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Two-Column Layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-        {/* Left Column: Form detail segments */}
-        <form onSubmit={handleSubmit} className="lg:col-span-7 space-y-6">
-
-          {/* Business profile logs card */}
-          <div className="p-6 sm:p-8 bg-surface border border-border/80 rounded-[32px] space-y-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Store className="w-4 h-4 text-accent-gold" />
-              <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 font-mono">Business Credentials</h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Owner Name</label>
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Mohan Kumar"
-                  className="w-full px-4 py-3 bg-background border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-accent-gold/45 transition font-light"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Phone Line</label>
-                <input
-                  type="tel"
-                  required
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="e.g. 9876543210"
-                  className="w-full px-4 py-3 bg-background border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-accent-gold/45 transition font-mono"
-                />
-              </div>
-            </div>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div className="space-y-1.5">
-              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Company Name</label>
+              <label className="block font-semibold text-muted-foreground uppercase">Company Name *</label>
               <input
                 type="text"
                 required
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                placeholder="e.g. Grand Event Photography"
-                className="w-full px-4 py-3 bg-background border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-accent-gold/45 transition font-light"
+                placeholder="e.g. Royal Decor & Sound Studio"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Operating Address / Service Coverage</label>
-              <textarea
+              <label className="block font-semibold text-muted-foreground uppercase">Owner Name *</label>
+              <input
+                type="text"
                 required
-                rows={3}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="e.g. Asish Praneeth"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Mobile Number *</label>
+              <input
+                type="tel"
+                required
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="e.g. 9876543210"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Email Address (Read-Only)</label>
+              <input
+                type="email"
+                disabled
+                value={userEmail}
+                className="w-full px-3.5 py-2.5 bg-background/50 border border-border/50 rounded-xl text-muted-foreground font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Years of Industry Experience</label>
+              <input
+                type="number"
+                min={0}
+                value={yearsOfExperience}
+                onChange={(e) => setYearsOfExperience(Number(e.target.value))}
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Maximum Daily Event Capacity</label>
+              <input
+                type="number"
+                min={1}
+                value={maxDailyCapacity}
+                onChange={(e) => setMaxDailyCapacity(Number(e.target.value))}
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Location & Service Area Radius */}
+        <div className="p-6 rounded-3xl bg-surface border border-border space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <MapPin className="w-4 h-4 text-accent-gold" />
+            <h3 className="text-sm font-bold text-foreground">2. Location & Service Radius</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Primary Operating City</label>
+              <input
+                type="text"
+                value={primaryCity}
+                onChange={(e) => setPrimaryCity(e.target.value)}
+                placeholder="e.g. Hyderabad"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">
+                Service Radius: <span className="text-accent-gold font-mono font-bold">{serviceRadiusKm} KM</span>
+              </label>
+              <select
+                value={serviceRadiusKm}
+                onChange={(e) => setServiceRadiusKm(Number(e.target.value))}
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              >
+                <option value={50}>50 KM (Local City Only)</option>
+                <option value={100}>100 KM (Metropolitan Region)</option>
+                <option value={150}>150 KM (Extended Travel Area)</option>
+                <option value={250}>250+ KM (Statewide Travel)</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="block font-semibold text-muted-foreground uppercase">Godown / Office Address *</label>
+              <textarea
+                rows={2}
+                required
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="e.g. Hyderabad TS. Cover all southern sectors."
-                className="w-full px-4 py-3 bg-background border border-border rounded-xl text-xs text-foreground focus:outline-none focus:border-accent-gold/45 transition resize-none font-light leading-relaxed"
+                placeholder="Complete address for equipment dispatch..."
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground resize-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Category & Services Multi-Selection */}
+        <div className="p-6 rounded-3xl bg-surface border border-border space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <Tag className="w-4 h-4 text-accent-gold" />
+            <h3 className="text-sm font-bold text-foreground">3. Service Categories Selection</h3>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-xs">
+            {categories.map((cat) => {
+              const isSelected = selectedCategories.includes(cat.id);
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => handleCategoryToggle(cat.id)}
+                  className={`px-4 py-2 rounded-xl border font-bold transition cursor-pointer ${
+                    isSelected
+                      ? "bg-accent-gold text-black border-accent-gold shadow-md"
+                      : "bg-background border-border text-muted-foreground hover:bg-surface-raised"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4. Social Links */}
+        <div className="p-6 rounded-3xl bg-surface border border-border space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <Globe className="w-4 h-4 text-accent-gold" />
+            <h3 className="text-sm font-bold text-foreground">4. Social Links & Portfolio Web</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Instagram Handle / URL</label>
+              <input
+                type="text"
+                value={instagramUrl}
+                onChange={(e) => setInstagramUrl(e.target.value)}
+                placeholder="https://instagram.com/your_handle"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Official Website</label>
+              <input
+                type="url"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                placeholder="https://yourevents.com"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Facebook Page</label>
+              <input
+                type="text"
+                value={facebookUrl}
+                onChange={(e) => setFacebookUrl(e.target.value)}
+                placeholder="https://facebook.com/your_page"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Bank Account Details */}
+        <div className="p-6 rounded-3xl bg-surface border border-border space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <Landmark className="w-4 h-4 text-accent-gold" />
+            <h3 className="text-sm font-bold text-foreground">5. Bank Account & Payout Verification</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Bank Name</label>
+              <input
+                type="text"
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value)}
+                placeholder="e.g. HDFC Bank"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Account Holder Name</label>
+              <input
+                type="text"
+                value={accountName}
+                onChange={(e) => setAccountName(e.target.value)}
+                placeholder="e.g. Royal Decor Enterprises"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">Account Number</label>
+              <input
+                type="text"
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                placeholder="e.g. 5010029384918"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">IFSC Code</label>
+              <input
+                type="text"
+                value={ifscCode}
+                onChange={(e) => setIfscCode(e.target.value)}
+                placeholder="e.g. HDFC0001234"
+                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 6. Assets & Compliance Documents */}
+        <div className="p-6 rounded-3xl bg-surface border border-border space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <FileCheck className="w-4 h-4 text-accent-gold" />
+            <h3 className="text-sm font-bold text-foreground">6. Compliance Certificates & Asset Photos</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">GST Certificate URL</label>
+              <input
+                type="url"
+                value={gstUrl}
+                onChange={(e) => setGstUrl(e.target.value)}
+                placeholder="https://...gst.pdf"
+                className="w-full px-3 py-2 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">PAN Card URL</label>
+              <input
+                type="url"
+                value={panUrl}
+                onChange={(e) => setPanUrl(e.target.value)}
+                placeholder="https://...pan.pdf"
+                className="w-full px-3 py-2 bg-background border border-border rounded-xl text-foreground"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-muted-foreground uppercase">MSME / UDYAM Certificate URL</label>
+              <input
+                type="url"
+                value={msmeUrl}
+                onChange={(e) => setMsmeUrl(e.target.value)}
+                placeholder="https://...msme.pdf"
+                className="w-full px-3 py-2 bg-background border border-border rounded-xl text-foreground"
               />
             </div>
           </div>
 
-          {/* Categories mappings panel */}
-          <div className="p-6 sm:p-8 bg-surface border border-border/80 rounded-[32px] space-y-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Tag className="w-4 h-4 text-accent-gold" />
-              <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 font-mono">Channels Alignment</h3>
+          {/* Godown Photos section */}
+          <div className="pt-4 border-t border-border/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <Warehouse className="w-4 h-4 text-accent-gold" /> Godown / Warehouse Photos
+              </span>
             </div>
-            <p className="text-[10px] text-muted-foreground font-light leading-normal">
-              Select standard event channels corresponding to your business services to catalog proposals.
-            </p>
 
-            {categories.length === 0 ? (
-              <p className="text-xs text-muted-foreground font-light py-2">No category logs available.</p>
-            ) : (
-              <div className="flex flex-wrap gap-2 pt-1.5">
-                {categories.map((cat) => {
-                  const isSelected = selectedCategories.includes(cat.id);
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => handleCategoryToggle(cat.id)}
-                      className={`px-3 py-2 border rounded-xl text-[10px] font-bold uppercase tracking-widest transition cursor-pointer ${
-                        isSelected
-                          ? "bg-accent-gold border-accent-gold text-black shadow"
-                          : "bg-background border-border text-muted-foreground hover:border-accent-gold/15"
-                      }`}
-                      title={cat.description || cat.name}
-                    >
-                      {cat.name}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Availability schedule */}
-          <div className="p-6 sm:p-8 bg-surface border border-border/80 rounded-[32px] space-y-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-accent-gold" />
-              <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 font-mono">Workspace Availability</h3>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {(["Available", "Busy", "Leave"] as const).map((state) => (
-                <button
-                  key={state}
-                  type="button"
-                  disabled={availabilityLoading}
-                  onClick={() => handleAvailabilityChange(state)}
-                  className={`py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest text-center cursor-pointer transition ${
-                    availability === state
-                      ? "bg-accent-gold/10 border-accent-gold/30 text-accent-gold font-black"
-                      : "bg-background border-border text-muted-foreground hover:bg-surface-raised"
-                  }`}
-                >
-                  {state}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Submit details button */}
-          <div className="flex justify-between items-center gap-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-3.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold text-black text-[11px] font-bold uppercase tracking-wider rounded-xl transition cursor-pointer shadow-md shadow-[#D4AF37]/10"
-            >
-              {loading ? "Saving Parameters..." : "Save Credentials"}
-            </button>
-          </div>
-
-        </form>
-
-        {/* Right Column: DB Showcase Gallery & Signout */}
-        <div className="lg:col-span-5 space-y-6 w-full">
-
-          {/* Gallery block */}
-          <div className="p-6 sm:p-8 bg-surface border border-border/80 rounded-[32px] space-y-5 shadow-sm">
-            <div className="flex justify-between items-center">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Image className="w-4 h-4 text-accent-gold" />
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 font-mono">Showcase Gallery</h3>
-                </div>
-                <p className="text-[10px] text-muted-foreground font-light font-mono">
-                  {portfolio.length} portfolio item{portfolio.length !== 1 ? "s" : ""} cataloged.
-                </p>
-              </div>
-
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={godownPhoto}
+                onChange={(e) => setGodownPhoto(e.target.value)}
+                placeholder="Append Warehouse Photo URL (https://...)"
+                className="flex-1 px-3 py-2 bg-background border border-border rounded-xl text-xs text-foreground"
+              />
               <button
                 type="button"
-                onClick={() => setShowAddImage(!showAddImage)}
-                className="p-2 bg-background border border-border rounded-xl text-accent-gold hover:bg-surface-raised cursor-pointer transition"
-                title="Append File URL"
+                onClick={handleAddGodownPhoto}
+                className="px-4 py-2 bg-background hover:bg-surface-raised border border-border text-foreground font-bold rounded-xl text-xs cursor-pointer"
               >
-                <Plus className="w-4 h-4" />
+                + Add Photo
               </button>
             </div>
 
-            {/* URL input drawer */}
-            {showAddImage && (
-              <form onSubmit={handleAddPortfolioImage} className="p-4 bg-background border border-border/80 rounded-2xl space-y-4 animate-scale-in text-xs">
-                <div className="space-y-1.5">
-                  <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Image Asset URL</label>
-                  <input
-                    type="url"
-                    required
-                    placeholder="https://images.unsplash.com/...jpg"
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-xs focus:outline-none focus:border-accent-gold/45"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Caption Descriptor</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Royal Wedding Main Stage Setup"
-                    value={newImageCaption}
-                    onChange={(e) => setNewImageCaption(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-xs focus:outline-none focus:border-accent-gold/45"
-                  />
-                </div>
-                <div className="flex justify-end gap-2 text-[9px]">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddImage(false)}
-                    className="px-3.5 py-1.5 border border-border rounded-xl text-muted-foreground cursor-pointer"
-                  >Cancel</button>
-                  <button
-                    type="submit"
-                    disabled={addingImage}
-                    className="px-4 py-1.5 bg-accent-gold text-black font-bold rounded-xl uppercase tracking-wider cursor-pointer"
-                  >Append</button>
-                </div>
-              </form>
-            )}
-
-            {/* Pinterest-quality Masonry grid from Supabase */}
-            {portfolio.length > 0 ? (
-              <div className="columns-2 gap-3 space-y-3 max-h-[420px] overflow-y-auto pr-1 scrollbar-none pt-1">
-                {portfolio.map((item) => (
-                  <div key={item.id} className="relative rounded-2xl overflow-hidden border border-border group break-inside-avoid shadow-sm hover:shadow-md transition">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.image_url}
-                      alt={item.caption || "Showcase asset"}
-                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {item.caption && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm text-white text-[8px] uppercase tracking-wider font-mono px-3 py-2 truncate opacity-0 group-hover:opacity-100 transition duration-250 select-none">
-                        {item.caption}
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition duration-250 flex items-center justify-center">
-                      <button
-                        type="button"
-                        onClick={() => handleRemovePortfolioImage(item.id)}
-                        className="p-3 bg-red-600 hover:bg-red-500 text-white rounded-xl hover:scale-105 cursor-pointer shadow-md"
-                        title="Delete asset"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+            {godownPhotos.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {godownPhotos.map((url, idx) => (
+                  <div key={idx} className="p-2 rounded-xl bg-background border border-border flex items-center gap-2 text-xs">
+                    <span className="truncate max-w-[150px] font-mono text-[10px] text-muted-foreground">{url}</span>
+                    <button
+                      type="button"
+                      onClick={() => setGodownPhotos((prev) => prev.filter((_, i) => i !== idx))}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="py-12 text-center text-xs text-muted-foreground font-light border border-dashed border-border/80 rounded-2xl bg-background/30">
-                No portfolio images cataloged yet. Append assets above to build your showcase gallery.
-              </div>
             )}
-
-            <div className="p-3 bg-background border border-border/60 rounded-2xl flex items-start gap-2.5 text-[9.5px] text-muted-foreground leading-normal font-light">
-              <Info className="w-4 h-4 text-accent-gold shrink-0 mt-0.5" />
-              <p>
-                Reference photos are cataloged in your vetted profile files. Dispatchers review these showcase assets when matching category availability.
-              </p>
-            </div>
           </div>
 
-          {/* Account control */}
-          <div className="p-6 bg-surface border border-border/80 rounded-3xl space-y-4 shadow-sm">
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 font-mono">Account Credentials</h3>
-              <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{initialProfile.email}</p>
+          {/* Vehicles section */}
+          <div className="pt-4 border-t border-border/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <Truck className="w-4 h-4 text-accent-gold" /> Logistics & Vehicle Assets (Truck / Mini Truck / Van)
+              </span>
             </div>
 
-            {!showSignOutConfirm ? (
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+              <select
+                value={vehicleType}
+                onChange={(e) => setVehicleType(e.target.value)}
+                className="px-3 py-2 bg-background border border-border rounded-xl text-foreground"
+              >
+                <option value="Truck">Heavy Truck</option>
+                <option value="Mini Truck">Mini Truck / DCM</option>
+                <option value="Van">Delivery Van</option>
+                <option value="Tempo">Tempo / Loader</option>
+              </select>
+              <input
+                type="text"
+                value={vehicleName}
+                onChange={(e) => setVehicleName(e.target.value)}
+                placeholder="Vehicle Name / Registration Number"
+                className="px-3 py-2 bg-background border border-border rounded-xl text-foreground"
+              />
+              <input
+                type="url"
+                value={vehicleUrl}
+                onChange={(e) => setVehicleUrl(e.target.value)}
+                placeholder="Vehicle Photo / Document URL"
+                className="px-3 py-2 bg-background border border-border rounded-xl text-foreground"
+              />
               <button
                 type="button"
-                onClick={() => setShowSignOutConfirm(true)}
-                className="w-full py-2.5 border border-border hover:border-red-950/20 text-xs font-bold uppercase tracking-wider rounded-xl text-red-400 hover:bg-red-950/10 transition cursor-pointer flex items-center justify-center gap-2"
+                onClick={handleAddVehicleAsset}
+                className="px-4 py-2 bg-background hover:bg-surface-raised border border-border text-foreground font-bold rounded-xl text-xs cursor-pointer"
               >
-                <LogOut className="w-4 h-4" /> Sign Out
+                + Add Asset
               </button>
-            ) : (
-              <div className="flex items-center justify-between p-3.5 bg-background border border-border/60 rounded-2xl animate-scale-in text-xs font-bold">
-                <span className="text-muted-foreground">Are you sure?</span>
-                <div className="flex items-center gap-2 font-bold">
-                  <button
-                    onClick={() => setShowSignOutConfirm(false)}
-                    type="button"
-                    className="px-3.5 py-1.5 border border-border rounded-xl text-muted-foreground cursor-pointer text-[10px]"
-                  >Cancel</button>
-                  <button
-                    onClick={handleSignOut}
-                    disabled={signingOut}
-                    type="button"
-                    className="px-3.5 py-1.5 bg-red-600 text-white rounded-xl uppercase tracking-wider cursor-pointer text-[10px]"
-                  >
-                    {signingOut ? "Leaving..." : "Yes, Exit"}
-                  </button>
-                </div>
+            </div>
+
+            {vehicleAssets.length > 0 && (
+              <div className="space-y-1.5 pt-1">
+                {vehicleAssets.map((v, idx) => (
+                  <div key={idx} className="p-2.5 rounded-xl bg-background border border-border flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-bold text-foreground">{v.name}</span>
+                      <span className="text-[10px] text-muted-foreground ml-2">({v.type})</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setVehicleAssets((prev) => prev.filter((_, i) => i !== idx))}
+                      className="text-red-400 hover:text-red-300 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
-
         </div>
 
-      </div>
+        {/* 7. Additional Requirements & Notes */}
+        <div className="p-6 rounded-3xl bg-surface border border-border space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <MessageSquare className="w-4 h-4 text-accent-gold" />
+            <h3 className="text-sm font-bold text-foreground">7. Additional Requirements & Notes</h3>
+          </div>
 
+          <div className="space-y-1.5 text-xs">
+            <textarea
+              rows={3}
+              value={additionalNotes}
+              onChange={(e) => setAdditionalNotes(e.target.value)}
+              placeholder="Provide any special instructions, equipment details, or custom logistics setup parameters..."
+              className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-foreground resize-none"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-4 border-t border-border/40">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-8 py-3.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold text-black font-bold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer shadow-xl shadow-accent-gold/20"
+          >
+            {loading ? "Saving Credentials..." : "Save Extended Business Profile"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

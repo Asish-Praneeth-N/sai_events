@@ -51,7 +51,9 @@ export default function AdminSidebar({ adminName, adminEmail, onClose }: AdminSi
         { href: "/admin/vendors", label: "Vendors Registry", icon: Store },
         { href: "/admin/customers", label: "Clients Directory", icon: Users },
         { href: "/admin/users", label: "Users Management", icon: UserCheck },
-        { href: "/admin/catalog", label: "Service Catalog", icon: BookOpen }
+        { href: "/admin/catalog", label: "Service Catalog", icon: BookOpen },
+        { href: "/admin/event-parts", label: "Event Parts Master", icon: GitBranch },
+        { href: "/admin/recommendations", label: "Recommendations Master", icon: Sparkles }
       ]
     },
     {
