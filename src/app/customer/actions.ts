@@ -158,6 +158,31 @@ export async function discardEventDraft(draftId: string) {
   return { success: true };
 }
 
+export interface EventPartConfigInput {
+  eventPartId: string;
+  eventPartName: string;
+  eventDate?: string;
+  startTime?: string;
+  endTime?: string;
+  venueName?: string;
+  venueAddress?: string;
+  minGuests?: number;
+  maxGuests?: number;
+  planningMode?: "RECOMMENDED" | "CUSTOM";
+  selectedPackageId?: string;
+  customServices?: {
+    serviceItemId?: string;
+    servicePackageId?: string;
+    customRequirements?: string;
+  }[];
+  cateringConfig?: {
+    mealTypes: string[];
+    foodPreference: "veg" | "non_veg" | "both";
+    vegPlateCount: number;
+    nonVegPlateCount: number;
+  };
+}
+
 export interface CreateEventInput {
   requestId?: string;
   eventType: string;
@@ -177,6 +202,7 @@ export interface CreateEventInput {
   specialRequirements?: string;
   referenceVideoUrl?: string;
   eventPartIds?: string[];
+  eventPartsConfig?: EventPartConfigInput[];
   items: { serviceItemId: string; quantity: number }[];
 }
 
@@ -185,50 +211,50 @@ export async function createEventRequest(eventData: CreateEventInput) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error("Unauthorized");
-  if (eventData.items.length === 0) throw new Error("Please select at least one service item.");
   if (eventData.guestCount <= 0) throw new Error("Guest count must be greater than zero.");
 
-  const itemIds = eventData.items.map((i) => i.serviceItemId);
-
-  const { data: dbItems, error: itemsError } = await supabase
-    .from("service_items")
-    .select("id, price, pricing_type, pricing_unit, food_category, meal_type, is_available, name")
-    .in("id", itemIds)
-    .is("deleted_at", null);
-
-  if (itemsError) throw new Error(itemsError.message);
-  if (!dbItems || dbItems.length !== itemIds.length) {
-    throw new Error("One or more selected service items are no longer available.");
-  }
-
   let totalBudget = 0;
-  const requestItemsToInsert = eventData.items.map((clientItem) => {
-    const dbItem = dbItems.find((i) => i.id === clientItem.serviceItemId);
-    if (!dbItem) throw new Error("Item not found");
-    if (!dbItem.is_available) throw new Error(`Item ${dbItem.name} is not available.`);
+  let requestItemsToInsert: any[] = [];
 
-    const unitPrice = Number(dbItem.price);
-    const unit = dbItem.pricing_unit || (dbItem.pricing_type === "per_plate" ? "per_plate" : "fixed");
+  // Calculate items total if traditional service items passed
+  if (eventData.items && eventData.items.length > 0) {
+    const itemIds = eventData.items.map((i) => i.serviceItemId);
+    const { data: dbItems, error: itemsError } = await supabase
+      .from("service_items")
+      .select("id, price, pricing_type, pricing_unit, food_category, meal_type, is_available, name")
+      .in("id", itemIds)
+      .is("deleted_at", null);
 
-    let itemTotal = 0;
-    if (unit === "per_plate") {
-      itemTotal = unitPrice * eventData.guestCount * clientItem.quantity;
-    } else {
-      itemTotal = unitPrice * clientItem.quantity;
-    }
+    if (itemsError) throw new Error(itemsError.message);
 
-    totalBudget += itemTotal;
+    requestItemsToInsert = eventData.items.map((clientItem) => {
+      const dbItem = (dbItems || []).find((i) => i.id === clientItem.serviceItemId);
+      if (!dbItem) throw new Error("Item not found");
+      if (!dbItem.is_available) throw new Error(`Item ${dbItem.name} is not available.`);
 
-    return {
-      service_item_id: clientItem.serviceItemId,
-      quantity: clientItem.quantity,
-      unit_price: unitPrice,
-      pricing_type: dbItem.pricing_type,
-      pricing_unit: unit,
-      food_category: dbItem.food_category || "general",
-      meal_type: dbItem.meal_type || "general",
-    };
-  });
+      const unitPrice = Number(dbItem.price);
+      const unit = dbItem.pricing_unit || (dbItem.pricing_type === "per_plate" ? "per_plate" : "fixed");
+
+      let itemTotal = 0;
+      if (unit === "per_plate") {
+        itemTotal = unitPrice * eventData.guestCount * clientItem.quantity;
+      } else {
+        itemTotal = unitPrice * clientItem.quantity;
+      }
+
+      totalBudget += itemTotal;
+
+      return {
+        service_item_id: clientItem.serviceItemId,
+        quantity: clientItem.quantity,
+        unit_price: unitPrice,
+        pricing_type: dbItem.pricing_type,
+        pricing_unit: unit,
+        food_category: dbItem.food_category || "general",
+        meal_type: dbItem.meal_type || "general",
+      };
+    });
+  }
 
   const refNumber = `SAI-2026-${Math.floor(1000 + Math.random() * 9000)}`;
   let requestId = eventData.requestId;
@@ -246,7 +272,6 @@ export async function createEventRequest(eventData: CreateEventInput) {
     // Allow editing if status is Request Submitted OR if it is a Draft OR if edit permission granted
     const isSubmittedState = existing.status === "Request Submitted" || existing.is_draft;
     if (!isSubmittedState) {
-      // Check if there is an approved edit request
       const { data: approvedEdit } = await supabase
         .from("event_edit_requests")
         .select("id")
@@ -258,7 +283,6 @@ export async function createEventRequest(eventData: CreateEventInput) {
         throw new Error("Event request is locked and requires Admin edit permission to modify.");
       }
 
-      // Mark the edit request as used
       await supabase
         .from("event_edit_requests")
         .update({ status: "used", used_at: new Date().toISOString() })
@@ -295,6 +319,7 @@ export async function createEventRequest(eventData: CreateEventInput) {
 
     await supabase.from("request_items").delete().eq("request_id", requestId);
     await supabase.from("event_request_parts").delete().eq("request_id", requestId);
+    await supabase.from("customer_event_parts").delete().eq("request_id", requestId);
   } else {
     const { data: request, error: requestError } = await supabase
       .from("event_requests")
@@ -329,6 +354,110 @@ export async function createEventRequest(eventData: CreateEventInput) {
     if (!request) throw new Error("Failed to insert event request.");
 
     requestId = request.id;
+  }
+
+  // Insert standard request items if present
+  if (requestItemsToInsert.length > 0) {
+    const finalItems = requestItemsToInsert.map((item) => ({
+      request_id: requestId,
+      ...item,
+    }));
+    const { error: insertItemsErr } = await supabase.from("request_items").insert(finalItems);
+    if (insertItemsErr) throw new Error(insertItemsErr.message);
+  }
+
+  // Insert event_request_parts if eventPartIds provided
+  if (eventData.eventPartIds && eventData.eventPartIds.length > 0) {
+    const partRows = eventData.eventPartIds.map((partId) => ({
+      request_id: requestId,
+      event_part_id: partId,
+    }));
+    await supabase.from("event_request_parts").insert(partRows);
+  }
+
+  // Insert hierarchical customer_event_parts with price snapshots
+  if (eventData.eventPartsConfig && eventData.eventPartsConfig.length > 0) {
+    for (const pConfig of eventData.eventPartsConfig) {
+      let pkgSnapshot: number | null = null;
+
+      if (pConfig.planningMode === "RECOMMENDED" && pConfig.selectedPackageId) {
+        const { data: pkgData } = await supabase
+          .from("packages")
+          .select("price")
+          .eq("id", pConfig.selectedPackageId)
+          .single();
+        if (pkgData) {
+          pkgSnapshot = Number(pkgData.price);
+        }
+      }
+
+      const { data: insertedPart, error: partErr } = await supabase
+        .from("customer_event_parts")
+        .insert({
+          request_id: requestId,
+          event_part_id: pConfig.eventPartId,
+          event_part_name: pConfig.eventPartName,
+          event_date: pConfig.eventDate || null,
+          start_time: pConfig.startTime || null,
+          end_time: pConfig.endTime || null,
+          venue_name: pConfig.venueName || null,
+          venue_address: pConfig.venueAddress || null,
+          min_guests: pConfig.minGuests || null,
+          max_guests: pConfig.maxGuests || null,
+          planning_mode: pConfig.planningMode || "CUSTOM",
+          selected_package_id: pConfig.selectedPackageId || null,
+          package_price_snapshot: pkgSnapshot,
+        })
+        .select("id")
+        .single();
+
+      if (partErr) console.error("Error inserting customer_event_parts:", partErr.message);
+
+      if (insertedPart) {
+        // Insert custom services if present
+        if (pConfig.planningMode === "CUSTOM" && pConfig.customServices && pConfig.customServices.length > 0) {
+          const serviceRows: any[] = [];
+          for (const cs of pConfig.customServices) {
+            let priceSnap = 0;
+            if (cs.servicePackageId) {
+              const { data: sp } = await supabase.from("packages").select("price").eq("id", cs.servicePackageId).single();
+              if (sp) priceSnap = Number(sp.price);
+            } else if (cs.serviceItemId) {
+              const { data: si } = await supabase.from("service_items").select("price").eq("id", cs.serviceItemId).single();
+              if (si) priceSnap = Number(si.price);
+            }
+
+            serviceRows.push({
+              customer_event_part_id: insertedPart.id,
+              service_item_id: cs.serviceItemId || null,
+              service_package_id: cs.servicePackageId || null,
+              custom_requirements: cs.customRequirements || null,
+              price_snapshot: priceSnap,
+            });
+          }
+          if (serviceRows.length > 0) {
+            await supabase.from("customer_event_part_services").insert(serviceRows);
+          }
+        }
+
+        // Insert catering configuration if present
+        if (pConfig.cateringConfig) {
+          const cat = pConfig.cateringConfig;
+          const plateSnap = 600; // base plate estimation
+          const totalCateringSnap = (cat.vegPlateCount + cat.nonVegPlateCount) * plateSnap;
+
+          await supabase.from("catering_configurations").insert({
+            customer_event_part_id: insertedPart.id,
+            meal_types: cat.mealTypes || [],
+            food_preference: cat.foodPreference || "both",
+            veg_plate_count: cat.vegPlateCount || 0,
+            non_veg_plate_count: cat.nonVegPlateCount || 0,
+            plate_price_snapshot: plateSnap,
+            total_catering_price_snapshot: totalCateringSnap,
+          });
+        }
+      }
+    }
   }
 
   const itemsPayload = requestItemsToInsert.map((item) => ({

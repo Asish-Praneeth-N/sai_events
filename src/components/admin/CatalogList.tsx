@@ -323,6 +323,7 @@ export default function CatalogList({
       {activeCategoryModal && (
         <CategoryForm
           category={activeCategoryModal === "new" ? null : activeCategoryModal}
+          mainCategoryId={activeMainCategoryId}
           onClose={() => setActiveCategoryModal(null)}
         />
       )}

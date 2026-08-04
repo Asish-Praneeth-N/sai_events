@@ -108,15 +108,117 @@ export interface ServiceItemMedia {
   created_at: string;
 }
 
+export interface EventTypeMaster {
+  id: string;
+  name: string;
+  description?: string | null;
+  cover_image_url?: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface EventPart {
   id: string;
   event_type: string;
   name: string;
   description?: string | null;
+  cover_image_url?: string | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export type PackageType = "EVENT_PART_PACKAGE" | "SERVICE_PACKAGE";
+
+export interface PackageService {
+  id?: string;
+  package_id?: string;
+  service_name: string;
+  service_item_id?: string | null;
+  is_included: boolean;
+}
+
+export interface PackageMediaItem {
+  id?: string;
+  package_id?: string;
+  media_url: string;
+  media_type: "image" | "video";
+  display_order: number;
+}
+
+export interface PackageMaster {
+  id: string;
+  package_type: PackageType;
+  event_type: string;
+  event_part_id?: string | null;
+  service_item_id?: string | null;
+  name: string;
+  description: string;
+  price: number;
+  original_value?: number | null;
+  savings?: number | null;
+  is_recommended: boolean;
+  min_suitable_budget?: number | null;
+  max_suitable_budget?: number | null;
+  recommendation_priority: number;
+  cover_image_url?: string | null;
+  ref_video_url?: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  included_services?: PackageService[];
+  gallery_media?: PackageMediaItem[];
+  event_part?: EventPart | null;
+  service_item?: ServiceItem | null;
+}
+
+export interface CateringConfiguration {
+  id?: string;
+  customer_event_part_id?: string;
+  meal_types: string[];
+  food_preference: "veg" | "non_veg" | "both";
+  veg_plate_count: number;
+  non_veg_plate_count: number;
+  plate_price_snapshot: number;
+  total_catering_price_snapshot: number;
+}
+
+export interface CustomerEventPartService {
+  id?: string;
+  customer_event_part_id?: string;
+  service_item_id?: string | null;
+  service_package_id?: string | null;
+  custom_requirements?: string | null;
+  price_snapshot: number;
+  service_item?: ServiceItem | null;
+  service_package?: PackageMaster | null;
+}
+
+export interface CustomerEventPart {
+  id: string;
+  request_id: string;
+  event_part_id: string;
+  event_part_name: string;
+  event_date?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  venue_name?: string | null;
+  venue_address?: string | null;
+  min_guests?: number | null;
+  max_guests?: number | null;
+  planning_mode?: "RECOMMENDED" | "CUSTOM" | null;
+  selected_package_id?: string | null;
+  package_price_snapshot?: number | null;
+  created_at: string;
+  updated_at: string;
+  selected_package?: PackageMaster | null;
+  event_part?: EventPart | null;
+  custom_services?: CustomerEventPartService[];
+  catering_config?: CateringConfiguration | null;
 }
 
 export interface Recommendation {

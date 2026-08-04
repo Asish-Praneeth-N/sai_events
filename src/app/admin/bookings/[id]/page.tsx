@@ -208,6 +208,23 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
     .order("created_at", { ascending: false });
   const timelineLogs = timelineData || [];
 
+  // 9. Fetch Hierarchical Event Functions & Price Snapshots
+  const { data: eventPartsData } = await supabase
+    .from("customer_event_parts")
+    .select(`
+      *,
+      selected_package:packages(*),
+      custom_services:customer_event_part_services(
+        *,
+        service_item:service_items(*),
+        service_package:packages(*)
+      ),
+      catering_config:catering_configurations(*)
+    `)
+    .eq("request_id", id)
+    .order("created_at", { ascending: true });
+  const customerEventParts = eventPartsData || [];
+
   // 9. Structure the category groups for the Matchmaker component
   const groups = categoryIds.map((catId) => {
     const group = categoryGroupsMap[catId];
@@ -268,6 +285,7 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
         omAssignments={omAssignments as any[]}
         availableOMs={availableOMs}
         timelineLogs={timelineLogs as any[]}
+        customerEventParts={customerEventParts as any[]}
       />
     </div>
   );

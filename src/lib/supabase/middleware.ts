@@ -39,17 +39,19 @@ export async function updateSession(request: NextRequest) {
   const path = url.pathname;
 
   let role: string | null = null;
+  let profileCompleted: boolean = true;
   if (user) {
     const { data: profile, error: profileErr } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, profile_completed")
       .eq("id", user.id)
       .single();
     role = profile?.role || null;
+    profileCompleted = Boolean(profile?.profile_completed);
     if (profileErr) {
       console.error(`[Middleware Profile Fetch Error] uid: ${user.id}, path: ${path}, error:`, profileErr.message);
     } else {
-      console.log(`[Middleware Profile Fetch Success] uid: ${user.id}, path: ${path}, role: ${role}`);
+      console.log(`[Middleware Profile Fetch Success] uid: ${user.id}, path: ${path}, role: ${role}, completed: ${profileCompleted}`);
     }
   }
 
@@ -87,9 +89,17 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/unauthorized";
       return NextResponse.redirect(url);
     }
-    if (path.startsWith("/customer") && role !== "customer") {
-      url.pathname = "/unauthorized";
-      return NextResponse.redirect(url);
+    if (path.startsWith("/customer")) {
+      if (role !== "customer") {
+        url.pathname = "/unauthorized";
+        return NextResponse.redirect(url);
+      }
+      // Mandatory Profile Completion Gate: redirect customer to profile completion if incomplete
+      if (!profileCompleted && path !== "/customer/profile") {
+        url.pathname = "/customer/profile";
+        url.searchParams.set("completion", "required");
+        return NextResponse.redirect(url);
+      }
     }
     if (path.startsWith("/vendor") && role !== "vendor") {
       url.pathname = "/unauthorized";
@@ -140,7 +150,10 @@ export async function updateSession(request: NextRequest) {
     } else if (role === "operational_manager") {
       url.pathname = "/operations";
     } else {
-      url.pathname = "/customer/profile";
+      url.pathname = profileCompleted ? "/customer/dashboard" : "/customer/profile";
+      if (!profileCompleted) {
+        url.searchParams.set("completion", "required");
+      }
     }
     return NextResponse.redirect(url);
   }

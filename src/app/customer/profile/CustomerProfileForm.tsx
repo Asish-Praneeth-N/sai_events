@@ -202,7 +202,7 @@ export default function CustomerProfileForm({
       </div>
 
       {/* ── Right Column: Credentials Input Form ── */}
-      <form onSubmit={handleSubmit} className="lg:col-span-8 space-y-6">
+      <form onSubmit={handleSubmit} className="lg:col-span-8 space-y-6 w-full min-w-0">
         
         {isCompletionRequired && (
           <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs rounded-2xl flex items-center gap-3 animate-fade-in">
@@ -228,34 +228,34 @@ export default function CustomerProfileForm({
           </div>
         )}
 
-        <div className="p-6.5 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-6">
+        <div className="p-4 sm:p-6.5 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-6 w-full min-w-0">
           <div className="space-y-1 border-b border-border/40 pb-4">
-            <h2 className="text-lg font-light font-heading text-foreground">Contact & Coordination Profile</h2>
+            <h2 className="text-base sm:text-lg font-light font-heading text-foreground">Contact & Coordination Profile</h2>
             <p className="text-[10.5px] text-muted-foreground mt-1 leading-relaxed font-light">
               Your contact details are used to coordinate event planning schedules, layout syncs, and event manager communications.
             </p>
           </div>
 
-          <div className="space-y-5 text-xs">
+          <div className="space-y-5 text-xs w-full min-w-0">
             
             {/* Authenticated Email (Readonly) */}
             <div className="space-y-2">
               <label className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                <Mail className="w-3.5 h-3.5 text-accent-gold" />
+                <Mail className="w-3.5 h-3.5 text-accent-gold shrink-0" />
                 <span>Verified Account Email (Supabase Auth)</span>
               </label>
               <input
                 type="email"
                 disabled
                 value={initialProfile.email}
-                className="w-full px-4 py-3 bg-surface-raised border border-border/50 rounded-xl text-muted-foreground font-mono text-xs opacity-80 cursor-not-allowed"
+                className="w-full px-4 py-3 bg-surface-raised border border-border/50 rounded-xl text-muted-foreground font-mono text-xs opacity-80 cursor-not-allowed truncate"
               />
             </div>
 
             {/* Full Name field */}
             <div className="space-y-2">
               <label htmlFor="fullName" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                <User className="w-3.5 h-3.5 text-accent-gold" />
+                <User className="w-3.5 h-3.5 text-accent-gold shrink-0" />
                 <span>Full Name *</span>
               </label>
               <input
@@ -270,16 +270,16 @@ export default function CustomerProfileForm({
             </div>
 
             {/* Phone field with Country Code */}
-            <div className="space-y-2">
+            <div className="space-y-2 w-full">
               <label htmlFor="phoneNumber" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                <Phone className="w-3.5 h-3.5 text-accent-gold" />
+                <Phone className="w-3.5 h-3.5 text-accent-gold shrink-0" />
                 <span>Primary Phone Number *</span>
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-row gap-2 w-full min-w-0">
                 <select
                   value={phoneCountryCode}
                   onChange={(e) => setPhoneCountryCode(e.target.value)}
-                  className="px-3 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground text-xs font-mono shrink-0 cursor-pointer"
+                  className="w-28 sm:w-44 px-2.5 sm:px-3 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground text-xs font-mono shrink-0 cursor-pointer text-ellipsis overflow-hidden"
                 >
                   {ALL_COUNTRY_CODES.map((c, idx) => (
                     <option key={`${c.code}-${idx}`} value={c.code} className="bg-surface text-foreground">
@@ -294,7 +294,7 @@ export default function CustomerProfileForm({
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="e.g. 9876543210"
-                  className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-sm font-mono hover:border-border/60"
+                  className="flex-1 min-w-0 w-full px-3.5 sm:px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-xs sm:text-sm font-mono hover:border-border/60"
                 />
               </div>
             </div>
@@ -306,24 +306,24 @@ export default function CustomerProfileForm({
                   type="checkbox"
                   checked={whatsappSameAsPhone}
                   onChange={(e) => setWhatsappSameAsPhone(e.target.checked)}
-                  className="w-4 h-4 rounded border-border text-accent-gold focus:ring-accent-gold/30 accent-[#D4AF37] cursor-pointer"
+                  className="w-4 h-4 rounded border-border text-accent-gold focus:ring-accent-gold/30 accent-[#D4AF37] cursor-pointer shrink-0"
                 />
-                <span>WhatsApp number is same as primary phone number</span>
+                <span className="leading-snug">WhatsApp number is same as primary phone number</span>
               </label>
             </div>
 
             {/* Separate WhatsApp Field if disabled */}
             {!whatsappSameAsPhone && (
-              <div className="space-y-2 pt-2 animate-fade-in">
+              <div className="space-y-2 pt-2 animate-fade-in w-full">
                 <label htmlFor="whatsappNumber" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-accent-gold" />
+                  <MessageSquare className="w-3.5 h-3.5 text-accent-gold shrink-0" />
                   <span>WhatsApp Number *</span>
                 </label>
-                <div className="flex gap-2">
+                <div className="flex flex-row gap-2 w-full min-w-0">
                   <select
                     value={whatsappCountryCode}
                     onChange={(e) => setWhatsappCountryCode(e.target.value)}
-                    className="px-3 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground text-xs font-mono shrink-0 cursor-pointer"
+                    className="w-28 sm:w-44 px-2.5 sm:px-3 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground text-xs font-mono shrink-0 cursor-pointer text-ellipsis overflow-hidden"
                   >
                     {ALL_COUNTRY_CODES.map((c, idx) => (
                       <option key={`${c.code}-${idx}`} value={c.code} className="bg-surface text-foreground">
@@ -338,27 +338,27 @@ export default function CustomerProfileForm({
                     value={whatsappNumber}
                     onChange={(e) => setWhatsappNumber(e.target.value)}
                     placeholder="e.g. 9876543210"
-                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-sm font-mono hover:border-border/60"
+                    className="flex-1 min-w-0 w-full px-3.5 sm:px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-xs sm:text-sm font-mono hover:border-border/60"
                   />
                 </div>
               </div>
             )}
 
             {/* Address field & Geolocation */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
+            <div className="space-y-2 w-full">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <label htmlFor="address" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-accent-gold" />
+                  <MapPin className="w-3.5 h-3.5 text-accent-gold shrink-0" />
                   <span>Customer Address & Location *</span>
                 </label>
                 <button
                   type="button"
                   onClick={handleGetCurrentLocation}
                   disabled={locating}
-                  className="text-[10px] text-accent-gold hover:underline flex items-center gap-1 font-bold cursor-pointer disabled:opacity-50"
+                  className="text-[10px] text-accent-gold hover:underline flex items-center gap-1 font-bold cursor-pointer disabled:opacity-50 shrink-0 ml-auto"
                 >
-                  <Navigation className="w-3 h-3 text-accent-gold" />
-                  {locating ? "Locating..." : "Use Current Location"}
+                  <Navigation className="w-3 h-3 text-accent-gold shrink-0" />
+                  <span>{locating ? "Locating..." : "Use Current Location"}</span>
                 </button>
               </div>
               <textarea
@@ -372,7 +372,7 @@ export default function CustomerProfileForm({
               />
               {locationLat && locationLng && (
                 <div className="text-[10px] text-muted-foreground font-mono flex items-center gap-1.5 pt-0.5">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
                   Coordinates captured: {locationLat.toFixed(5)}, {locationLng.toFixed(5)}
                 </div>
               )}
@@ -385,7 +385,7 @@ export default function CustomerProfileForm({
           <button
             type="submit"
             disabled={loading}
-            className="px-7 py-3 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold disabled:opacity-50 text-black font-bold rounded-xl transition shadow text-xs uppercase tracking-[0.15em] cursor-pointer shadow-md shadow-[#D4AF37]/10"
+            className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold disabled:opacity-50 text-black font-bold rounded-xl transition text-xs uppercase tracking-[0.15em] cursor-pointer shadow-md shadow-[#D4AF37]/10"
           >
             {loading ? "Saving Profile..." : "Save Profile Details"}
           </button>

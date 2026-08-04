@@ -95,6 +95,17 @@ export default async function PlanEventPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
+  // 8. Fetch active Master Packages
+  const { data: packagesData } = await supabase
+    .from("packages")
+    .select(`
+      *,
+      included_services:package_services(*),
+      gallery_media:package_media(*)
+    `)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
   const categories = categoriesData || [];
   const subcategories = subcategoriesData || [];
   const items = (itemsData || []).map((item: any) => ({
@@ -105,11 +116,12 @@ export default async function PlanEventPage() {
 
   const eventParts = (eventPartsData || []) as EventPart[];
   const recommendations = (recommendationsData || []) as Recommendation[];
+  const packages = (packagesData || []) as any[];
 
   return (
     <div className="space-y-8 animate-fade-in-up">
       <div>
-        <h1 className="text-3xl font-light font-heading text-foreground">Event Planning Studio</h1>
+        <h1 className="text-2xl sm:text-3xl font-light font-heading text-foreground">Event Planning Studio</h1>
         <p className="text-xs text-muted-foreground mt-1 font-light">
           Specify your event parameters, select sub-events, review curated recommendations, and customize catering options.
         </p>
@@ -121,6 +133,7 @@ export default async function PlanEventPage() {
         items={items}
         eventParts={eventParts}
         recommendations={recommendations}
+        packages={packages}
         userProfile={userProfile}
         existingDraft={existingDraft}
       />

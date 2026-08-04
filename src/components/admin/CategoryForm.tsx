@@ -6,10 +6,11 @@ import { Category } from "@/lib/types";
 
 interface CategoryFormProps {
   category?: Category | null;
+  mainCategoryId?: string; // ← the currently selected main category
   onClose: () => void;
 }
 
-export default function CategoryForm({ category, onClose }: CategoryFormProps) {
+export default function CategoryForm({ category, mainCategoryId, onClose }: CategoryFormProps) {
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState(category?.name || "");
   const [description, setDescription] = useState(category?.description || "");
@@ -26,6 +27,8 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
       try {
         await saveCategory({
           id: category?.id,
+          // When editing keep existing link; when creating use the active main category
+          main_category_id: category?.main_category_id ?? mainCategoryId ?? undefined,
           name,
           description,
           image_url: imageUrl,

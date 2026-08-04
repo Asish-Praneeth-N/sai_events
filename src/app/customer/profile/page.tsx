@@ -53,7 +53,7 @@ export default async function CustomerProfilePage({
   return (
     <div className="space-y-8 animate-fade-in-up">
       <div>
-        <h1 className="text-3xl font-light font-heading text-foreground">Customer Profile Credentials</h1>
+        <h1 className="text-2xl sm:text-3xl font-light font-heading text-foreground">Customer Profile Credentials</h1>
         <p className="text-xs text-muted-foreground mt-1 font-light">
           Manage your contact credentials and standard shipping/billing event address.
         </p>
