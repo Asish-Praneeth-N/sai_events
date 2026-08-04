@@ -58,6 +58,13 @@ interface VendorCommandCenterProps {
   assignments: Assignment[];
   notifications: Notification[];
   portfolioCount: number;
+  previousEnquiries?: {
+    id: string;
+    event_type: string;
+    event_description: string;
+    status: string;
+    created_at: string;
+  }[];
 }
 
 function getDaysUntil(dateStr: string) {
@@ -160,6 +167,7 @@ export default function VendorCommandCenter({
   assignments,
   notifications,
   portfolioCount,
+  previousEnquiries = [],
 }: VendorCommandCenterProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -749,6 +757,35 @@ export default function VendorCommandCenter({
               })}
             </div>
           </div>
+
+          {/* Segment D: Previous Guest Consultation Requests (Historical context) */}
+          {previousEnquiries.length > 0 && (
+            <div className="bg-surface border border-border/80 rounded-3xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-[10px] uppercase tracking-widest font-extrabold text-muted-foreground">Previous Requests</h3>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-accent-gold px-2 py-0.5 bg-accent-gold/10 rounded-full border border-accent-gold/20">
+                  Pre-Account Context
+                </span>
+              </div>
+              <div className="space-y-3">
+                {previousEnquiries.map((pe) => (
+                  <div key={pe.id} className="p-3.5 bg-background border border-border/60 rounded-2xl space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-foreground">{pe.event_type}</span>
+                      <span className="text-[9px] text-muted-foreground font-mono">{formatDate(pe.created_at)}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground line-clamp-2 font-light font-sans">
+                      {pe.event_description}
+                    </p>
+                    <div className="pt-1 text-[9px] font-semibold text-emerald-400 flex items-center gap-1">
+                      <Check className="w-3 h-3 text-emerald-400" />
+                      Submitted prior to vendor onboarding
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
 

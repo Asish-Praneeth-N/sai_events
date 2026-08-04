@@ -130,7 +130,6 @@ export async function cancelDispatchedVendorRequest(assignmentId: string) {
 
   if (error) throw new Error(error.message);
 
-  // Send notification to vendor that request was cancelled
   await logNotification({
     userId: assignment.vendor_id,
     userType: "vendor",
@@ -141,13 +140,12 @@ export async function cancelDispatchedVendorRequest(assignmentId: string) {
   revalidatePath(`/admin/bookings/${assignment.request_id}`);
 }
 
-// 5. Approve Vendor & Notify Other Candidate Vendors ("Opportunity Closed")
+// 5. Approve Vendor & Notify Other Candidate Vendors
 export async function approveVendorAndNotifyOthers(requestId: string, approvedAssignmentId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
 
-  // Fetch target assignment details
   const { data: targetAssignment } = await supabase
     .from("vendor_assignments")
     .select("id, vendor_id, category_id")
@@ -156,13 +154,11 @@ export async function approveVendorAndNotifyOthers(requestId: string, approvedAs
 
   if (!targetAssignment) throw new Error("Assignment record missing.");
 
-  // Mark winning assignment Approved
   await supabase
     .from("vendor_assignments")
     .update({ status: "Approved" })
     .eq("id", approvedAssignmentId);
 
-  // Fetch all other candidate assignments for this category
   const { data: otherAssignments } = await supabase
     .from("vendor_assignments")
     .select("id, vendor_id")
@@ -170,7 +166,6 @@ export async function approveVendorAndNotifyOthers(requestId: string, approvedAs
     .eq("category_id", targetAssignment.category_id)
     .neq("id", approvedAssignmentId);
 
-  // Reject other assignments and send Opportunity Closed notification
   if (otherAssignments && otherAssignments.length > 0) {
     for (const other of otherAssignments) {
       await supabase
@@ -221,4 +216,153 @@ export async function deleteMediaObject(mediaId: string, storagePath: string) {
 
   revalidatePath("/admin/catalog");
   revalidatePath("/admin/media");
+}
+
+// 7. Admin Edit Access Management
+export async function approveEditRequest(editRequestId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { data: editReq, error: fetchErr } = await supabase
+    .from("event_edit_requests")
+    .select("id, event_id, customer_id")
+    .eq("id", editRequestId)
+    .single();
+
+  if (fetchErr || !editReq) throw new Error("Edit request not found.");
+
+  const { error } = await supabase
+    .from("event_edit_requests")
+    .update({
+      status: "approved",
+      approved_at: new Date().toISOString(),
+      approved_by: user.id,
+    })
+    .eq("id", editRequestId);
+
+  if (error) throw new Error(error.message);
+
+  await logNotification({
+    userId: editReq.customer_id,
+    userType: "customer",
+    userName: "SAI EVENTS Admin",
+    message: `Edit access approved! You can now modify parameters for event file #${editReq.event_id.substring(0, 8)}.`,
+  });
+
+  revalidatePath(`/customer/events/${editReq.event_id}`);
+  revalidatePath("/admin/edit-requests");
+  return { success: true };
+}
+
+export async function rejectEditRequest(editRequestId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { data: editReq, error: fetchErr } = await supabase
+    .from("event_edit_requests")
+    .select("id, event_id, customer_id")
+    .eq("id", editRequestId)
+    .single();
+
+  if (fetchErr || !editReq) throw new Error("Edit request not found.");
+
+  const { error } = await supabase
+    .from("event_edit_requests")
+    .update({ status: "rejected" })
+    .eq("id", editRequestId);
+
+  if (error) throw new Error(error.message);
+
+  await logNotification({
+    userId: editReq.customer_id,
+    userType: "customer",
+    userName: "SAI EVENTS Admin",
+    message: `Edit access request for event file #${editReq.event_id.substring(0, 8)} was rejected by admin.`,
+  });
+
+  revalidatePath(`/customer/events/${editReq.event_id}`);
+  revalidatePath("/admin/edit-requests");
+  return { success: true };
+}
+
+// 8. Admin Event Meeting Scheduling
+export async function scheduleEventMeeting(
+  meetingId: string,
+  confirmedDate: string,
+  confirmedTime: string,
+  meetingLink?: string,
+  adminNotes?: string
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { data: meeting, error: fetchErr } = await supabase
+    .from("event_meetings")
+    .select("id, event_id, customer_id")
+    .eq("id", meetingId)
+    .single();
+
+  if (fetchErr || !meeting) throw new Error("Meeting request not found.");
+
+  const { error } = await supabase
+    .from("event_meetings")
+    .update({
+      status: "Scheduled",
+      confirmed_date: confirmedDate,
+      confirmed_time: confirmedTime,
+      meeting_link: meetingLink || null,
+      admin_notes: adminNotes || null,
+    })
+    .eq("id", meetingId);
+
+  if (error) throw new Error(error.message);
+
+  await logNotification({
+    userId: meeting.customer_id,
+    userType: "customer",
+    userName: "SAI EVENTS Admin",
+    message: `Event Meeting Scheduled: Confirmed for ${confirmedDate} at ${confirmedTime}.`,
+  });
+
+  revalidatePath(`/customer/events/${meeting.event_id}`);
+  revalidatePath("/admin/meetings");
+  return { success: true };
+}
+
+export async function rejectEventMeeting(meetingId: string, adminNotes?: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { data: meeting, error: fetchErr } = await supabase
+    .from("event_meetings")
+    .select("id, event_id, customer_id")
+    .eq("id", meetingId)
+    .single();
+
+  if (fetchErr || !meeting) throw new Error("Meeting request not found.");
+
+  const { error } = await supabase
+    .from("event_meetings")
+    .update({
+      status: "Rejected",
+      admin_notes: adminNotes || null,
+    })
+    .eq("id", meetingId);
+
+  if (error) throw new Error(error.message);
+
+  await logNotification({
+    userId: meeting.customer_id,
+    userType: "customer",
+    userName: "SAI EVENTS Admin",
+    message: `Meeting request for event file #${meeting.event_id.substring(0, 8)} was rejected by admin.`,
+  });
+
+  revalidatePath(`/customer/events/${meeting.event_id}`);
+  revalidatePath("/admin/meetings");
+  return { success: true };
 }

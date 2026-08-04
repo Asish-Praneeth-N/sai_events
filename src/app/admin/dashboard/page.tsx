@@ -5,7 +5,7 @@ import {
   Users, Store, CalendarCheck, CheckCircle2, Clock, XCircle,
   Eye, Loader, ArrowRight, Activity, TrendingUp, AlertCircle,
   Shield, ShieldAlert, Send, Briefcase, History, AlertTriangle, Zap, Calendar,
-  BookOpen, GitBranch
+  BookOpen, GitBranch, HelpCircle
 } from "lucide-react";
 
 // Stat block component
@@ -61,6 +61,7 @@ export default async function AdminDashboardPage() {
   let pendingEventCases = 0;
   let pendingVendors = 0;
   let pendingVendorInvitations = 0;
+  let newGuestEnquiries = 0;
   let availableOMs = 0;
   let waitingOMAssignment = 0;
   let activeEvents = 0;
@@ -71,6 +72,15 @@ export default async function AdminDashboardPage() {
   let upcomingEvents: any[] = [];
 
   try {
+    // Fetch New Guest Enquiries count
+    try {
+      const { count: newEnquiriesCount } = await supabase
+        .from("guest_enquiries")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "new");
+      newGuestEnquiries = newEnquiriesCount || 0;
+    } catch (_) {}
+
     // 1. Fetch Today's Events
     const { count: todaysEventsCount, error: err1 } = await supabase
       .from("event_requests")
@@ -229,6 +239,15 @@ export default async function AdminDashboardPage() {
             colorClass="text-accent-gold"
             bgClass={todaysEvents ? "bg-accent-gold/5 border-accent-gold/35" : "bg-surface"}
             href="/admin/bookings?filter=today"
+          />
+          <AttentionCard 
+            label="New Enquiries" 
+            value={newGuestEnquiries || 0} 
+            icon={HelpCircle} 
+            description="Guest consultations awaiting contact"
+            colorClass={newGuestEnquiries ? "text-amber-400 font-bold" : "text-foreground"}
+            bgClass={newGuestEnquiries ? "bg-amber-500/5 border-amber-500/30" : "bg-surface"}
+            href="/admin/enquiries"
           />
           <AttentionCard 
             label="Pending Event Cases" 

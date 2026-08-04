@@ -102,7 +102,7 @@ export default function OMProfile({ initialProfile, omData }: OMProfileProps) {
     .join("");
 
   return (
-    <div className="space-y-8 select-none max-w-7xl mx-auto pb-12">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Toast feedback */}
       {error && (
         <div className="p-4 bg-red-950/20 border border-red-500/30 text-red-400 text-xs rounded-2xl flex items-center gap-3 animate-scale-in">

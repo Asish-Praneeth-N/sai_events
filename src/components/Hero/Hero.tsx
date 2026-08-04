@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
 import { LANDING_PAGE_CONFIG } from "@/constants/introConfig";
+import Link from "next/link";
 import { Sparkles, Calendar, ArrowRight } from "lucide-react";
 import { CINEMATIC_EASE } from "@/lib/motionVariants";
 
@@ -156,13 +157,13 @@ export default function Hero() {
             Book Your Event
           </a>
 
-          <a
-            href="#finale"
+          <Link
+            href="/register?role=vendor"
             className="w-full sm:w-auto px-8 py-4 bg-btn-secondary-bg hover:bg-btn-secondary-hover text-foreground font-bold text-xs uppercase tracking-[0.2em] rounded-xl border border-card-border hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 text-center flex items-center justify-center gap-2 group cursor-pointer"
           >
             Become a Vendor
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-          </a>
+          </Link>
         </motion.div>
       </div>
 

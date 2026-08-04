@@ -64,13 +64,41 @@ export default async function CustomerDashboardPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  // Fetch linked guest enquiries
+  let enquiries: any[] = [];
+  try {
+    const { data: enquiriesData } = await supabase
+      .from("guest_enquiries")
+      .select("id, event_type, event_description, status, created_at")
+      .eq("linked_user_id", user.id)
+      .order("created_at", { ascending: false });
+    enquiries = enquiriesData || [];
+  } catch (_) {}
+
+  // Fetch all event meetings for this customer
+  let meetings: any[] = [];
+  try {
+    const { data: meetingsData } = await supabase
+      .from("event_meetings")
+      .select(`
+        *,
+        event_requests (
+          event_type,
+          celebrant_name
+        )
+      `)
+      .eq("customer_id", user.id)
+      .order("created_at", { ascending: false });
+    meetings = meetingsData || [];
+  } catch (_) {}
+
   if (error) {
     return (
       <div className="p-6 bg-red-950/40 border border-red-800/40 text-red-400 text-sm rounded-2xl animate-fade-in-up">
         <h2 className="text-base font-bold mb-2">Failed to load planning dashboard</h2>
         <p className="text-xs opacity-90">{error.message}</p>
         <p className="text-xs mt-4 opacity-75">
-          Please verify that you have run the database migrations (`migration_milestone_2.sql` and `migration_documents.sql`) in the Supabase SQL editor to create all required tables.
+          Please verify that you have run the database migrations (`migration_customer_workspace.sql`) in the Supabase SQL editor to create all required tables.
         </p>
       </div>
     );
@@ -96,7 +124,12 @@ export default async function CustomerDashboardPage() {
         </a>
       </div>
 
-      <DashboardList requests={requests} notifications={notifications} />
+      <DashboardList
+        requests={requests}
+        notifications={notifications}
+        enquiries={enquiries}
+        meetings={meetings}
+      />
     </div>
   );
 }

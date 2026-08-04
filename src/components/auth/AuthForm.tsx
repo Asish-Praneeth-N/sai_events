@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { UserRole } from "@/lib/types";
 import RoleSwitcher from "./RoleSwitcher";
@@ -21,14 +21,17 @@ const labelClass =
 
 export default function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  const initialRole: UserRole = searchParams.get("role") === "vendor" ? "vendor" : "customer";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [role, setRole] = useState<UserRole>("customer");
+  const [role, setRole] = useState<UserRole>(initialRole);
   const [businessName, setBusinessName] = useState("");
   const [address, setAddress] = useState("");
 

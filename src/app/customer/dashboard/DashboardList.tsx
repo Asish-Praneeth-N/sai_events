@@ -3,6 +3,7 @@
 import React, { useState, useTransition, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { createClient } from "@/lib/supabase/client";
 import { 
   Calendar, MapPin, Users, DollarSign, Clock, FileText, 
   Phone, Mail, ArrowRight, UserCheck, Sparkles, Upload, 
@@ -11,7 +12,7 @@ import {
   ChevronRight, CalendarDays, Compass, Info, Award, Bell
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { cancelEventRequest, uploadCustomerDocument, deleteCustomerDocument } from "../actions";
+import { cancelEventRequest, uploadCustomerDocument, deleteCustomerDocument, requestEventMeeting } from "../actions";
 
 interface RequestItem {
   quantity: number;
@@ -33,7 +34,7 @@ interface EventAssignment {
   } | null;
 }
 
-interface Document {
+interface CustomerDocument {
   id: string;
   file_name: string;
   file_url: string;
@@ -41,7 +42,7 @@ interface Document {
   created_at: string;
 }
 
-interface MilestoneTimeline {
+interface EventTimeline {
   id: string;
   milestone_name: string;
   description: string;
@@ -52,28 +53,39 @@ interface MilestoneTimeline {
 interface EventRequest {
   id: string;
   event_type: string;
-  event_date: string;
   location: string;
   guest_count: number;
   status: string;
   total_budget: number;
+  event_date: string;
   created_at: string;
-  request_items: RequestItem[];
-  event_assignments: EventAssignment[];
-  documents: Document[];
-  timelines: MilestoneTimeline[];
+  request_items?: RequestItem[];
+  event_assignments?: EventAssignment[];
+  documents?: CustomerDocument[];
+  timelines?: EventTimeline[];
 }
 
 interface Notification {
   id: string;
   message: string;
+  user_type: string;
   created_at: string;
+  status?: string;
+}
+
+interface GuestEnquiryItem {
+  id: string;
+  event_type: string;
+  event_description: string;
   status: string;
+  created_at: string;
 }
 
 interface DashboardListProps {
   requests: EventRequest[];
   notifications: Notification[];
+  enquiries?: GuestEnquiryItem[];
+  meetings?: any[];
 }
 
 const MILESTONES = [
@@ -88,7 +100,12 @@ const MILESTONES = [
   { key: "Closed", label: "Closed", desc: "Event case is officially archived." }
 ];
 
-export default function DashboardList({ requests, notifications }: DashboardListProps) {
+export default function DashboardList({
+  requests,
+  notifications,
+  enquiries = [],
+  meetings = []
+}: DashboardListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tab") || "overview";
@@ -102,6 +119,89 @@ export default function DashboardList({ requests, notifications }: DashboardList
   const [cancellationReason, setCancellationReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Interactive Planning Calendar States
+  const [calendarYear, setCalendarYear] = useState<number>(new Date().getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState<number>(new Date().getMonth());
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState<number | null>(null);
+  const [meetingFilter, setMeetingFilter] = useState<string>("all");
+
+  const handlePrevMonth = () => {
+    setSelectedCalendarDay(null);
+    if (calendarMonth === 0) {
+      setCalendarMonth(11);
+      setCalendarYear((prev) => prev - 1);
+    } else {
+      setCalendarMonth((prev) => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    setSelectedCalendarDay(null);
+    if (calendarMonth === 11) {
+      setCalendarMonth(0);
+      setCalendarYear((prev) => prev + 1);
+    } else {
+      setCalendarMonth((prev) => prev + 1);
+    }
+  };
+
+  const MONTH_NAMES = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  const firstDayOfWeek = new Date(calendarYear, calendarMonth, 1).getDay();
+
+  const activeMeetingDays = useMemo(() => {
+    const daysSet = new Set<number>();
+    meetings.forEach((m) => {
+      const dateStr = m.confirmed_date || m.preferred_date;
+      if (dateStr) {
+        const d = new Date(dateStr);
+        if (d.getFullYear() === calendarYear && d.getMonth() === calendarMonth) {
+          daysSet.add(d.getDate());
+        }
+      }
+    });
+    requests.forEach((r) => {
+      if (r.event_date) {
+        const d = new Date(r.event_date);
+        if (d.getFullYear() === calendarYear && d.getMonth() === calendarMonth) {
+          daysSet.add(d.getDate());
+        }
+      }
+    });
+    return daysSet;
+  }, [meetings, requests, calendarYear, calendarMonth]);
+
+  const filteredMeetingsList = useMemo(() => {
+    let list = [...meetings];
+
+    if (selectedCalendarDay !== null) {
+      list = list.filter((m) => {
+        const dateStr = m.confirmed_date || m.preferred_date;
+        if (!dateStr) return false;
+        const d = new Date(dateStr);
+        return (
+          d.getFullYear() === calendarYear &&
+          d.getMonth() === calendarMonth &&
+          d.getDate() === selectedCalendarDay
+        );
+      });
+    }
+
+    if (meetingFilter === "scheduled") {
+      list = list.filter((m) => m.status === "Scheduled");
+    } else if (meetingFilter === "pending") {
+      list = list.filter((m) => m.status === "Pending");
+    } else if (meetingFilter === "completed") {
+      list = list.filter((m) => m.status === "Completed" || m.status === "Rejected");
+    }
+
+    return list;
+  }, [meetings, selectedCalendarDay, calendarYear, calendarMonth, meetingFilter]);
 
   // Document Upload States
   const [isUploading, setIsUploading] = useState(false);
@@ -119,6 +219,57 @@ export default function DashboardList({ requests, notifications }: DashboardList
   const [meetingNotes, setMeetingNotes] = useState("");
   const [meetingType, setMeetingType] = useState("video");
   const [requestingMeeting, setRequestingMeeting] = useState(false);
+
+  // New Enquiry Modal States
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [enquiryEventType, setEnquiryEventType] = useState("Wedding Ceremony");
+  const [enquiryDescription, setEnquiryDescription] = useState("");
+  const [submittingEnquiry, setSubmittingEnquiry] = useState(false);
+
+  const handleEnquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!enquiryDescription.trim()) {
+      setError("Please provide enquiry details.");
+      return;
+    }
+    setSubmittingEnquiry(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Authentication required.");
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, email, phone_number")
+        .eq("id", user.id)
+        .single();
+
+      const { error: insertErr } = await supabase
+        .from("guest_enquiries")
+        .insert({
+          full_name: profile?.full_name && profile.full_name !== "Unnamed User" ? profile.full_name : "Customer",
+          email: profile?.email || user.email || "",
+          phone: profile?.phone_number && profile.phone_number !== "0000000000" ? profile.phone_number : "N/A",
+          event_type: enquiryEventType,
+          event_description: enquiryDescription.trim(),
+          linked_user_id: user.id,
+          status: "new",
+        });
+
+      if (insertErr) throw insertErr;
+
+      setSuccess("Your consultation enquiry has been submitted! Our admin team will respond shortly.");
+      setShowEnquiryModal(false);
+      setEnquiryDescription("");
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || "Failed to submit enquiry.");
+    } finally {
+      setSubmittingEnquiry(false);
+    }
+  };
 
   const activeRequest = requests.find((r) => r.id === activeEventId) || null;
 
@@ -189,17 +340,37 @@ export default function DashboardList({ requests, notifications }: DashboardList
     }
   };
 
-  const handleRequestMeetingSubmit = (e: React.FormEvent) => {
+  const handleRequestMeetingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!activeRequest) {
+      setError("Please select an active event request first.");
+      return;
+    }
+    if (!meetingDate) {
+      setError("Preferred date is required.");
+      return;
+    }
     setRequestingMeeting(true);
-    setTimeout(() => {
-      setSuccess("Meeting request logged successfully! Your coordinator will confirm shortly.");
+    setError(null);
+    try {
+      await requestEventMeeting(
+        activeRequest.id,
+        meetingType === "video" ? "Video Staging Consultation" : "In-Person Decor Sync",
+        meetingDate,
+        meetingTime || "10:00 AM - 1:00 PM",
+        meetingNotes
+      );
+      setSuccess("Meeting request submitted to SAI EVENTS Admin!");
       setShowMeetingModal(false);
       setMeetingDate("");
       setMeetingTime("");
       setMeetingNotes("");
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || "Failed to submit meeting request.");
+    } finally {
       setRequestingMeeting(false);
-    }, 1000);
+    }
   };
 
   const getActiveMilestoneIndex = (status: string) => {
@@ -351,7 +522,10 @@ export default function DashboardList({ requests, notifications }: DashboardList
                 className="space-y-10"
               >
                 {/* Dashboard Hero Block */}
-                <div className="p-8 md:p-10 rounded-3xl bg-surface border border-border/80 shadow-md relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+                <div
+                  onClick={() => router.push(`/customer/events/${activeRequest.id}`)}
+                  className="p-8 md:p-10 rounded-3xl bg-surface border border-border/80 hover:border-accent-gold/45 shadow-md relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 cursor-pointer transition-all duration-300 group"
+                >
                   {/* Subtle Light leak effect */}
                   <div className="light-leak" />
 
@@ -429,7 +603,10 @@ export default function DashboardList({ requests, notifications }: DashboardList
                       {activeRequest.status !== "Cancelled" && (
                         <button
                           type="button"
-                          onClick={() => openCancelModal(activeRequest.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openCancelModal(activeRequest.id);
+                          }}
                           className="w-full text-center px-4 py-2 border border-red-500/30 hover:bg-red-500/10 text-red-400 text-xs font-semibold rounded-xl transition cursor-pointer"
                         >
                           Cancel Event Request
@@ -437,12 +614,16 @@ export default function DashboardList({ requests, notifications }: DashboardList
                       )}
                     </div>
 
-                    <a
-                      href="/customer/dashboard?tab=journey"
-                      className="w-full text-center px-4 py-2.5 bg-surface-raised border border-border hover:border-accent-gold/40 text-xs font-semibold rounded-xl transition duration-200 block"
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/customer/events/${activeRequest.id}`);
+                      }}
+                      className="w-full text-center px-4 py-2.5 bg-accent-gold text-black font-bold text-xs uppercase tracking-wider rounded-xl transition shadow hover:brightness-110 cursor-pointer block"
                     >
-                      View Live Timeline
-                    </a>
+                      View Event Details & Journey
+                    </button>
                   </div>
                 </div>
 
@@ -453,7 +634,10 @@ export default function DashboardList({ requests, notifications }: DashboardList
                   <div className="lg:col-span-8 space-y-8">
                     
                     {/* Active Event luxury Itinerary */}
-                    <div className="p-6.5 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-5">
+                    <div
+                      onClick={() => router.push(`/customer/events/${activeRequest.id}`)}
+                      className="p-6.5 rounded-3xl bg-surface border border-border/80 hover:border-accent-gold/45 shadow-sm space-y-5 cursor-pointer transition-all duration-300"
+                    >
                       <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                         Active Event Specification
                       </h3>
@@ -677,11 +861,7 @@ export default function DashboardList({ requests, notifications }: DashboardList
                     return (
                       <div
                         key={req.id}
-                        onClick={() => {
-                          setActiveEventId(req.id);
-                          setError(null);
-                          setSuccess(null);
-                        }}
+                        onClick={() => router.push(`/customer/events/${req.id}`)}
                         className={`rounded-3xl border p-6 flex flex-col justify-between gap-6 transition-all duration-300 cursor-pointer relative overflow-hidden ${
                           isCancelled 
                             ? "bg-surface/30 border-border/40 opacity-60 hover:opacity-85" 
@@ -741,10 +921,17 @@ export default function DashboardList({ requests, notifications }: DashboardList
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-1.5 text-accent-gold text-[10px] font-bold uppercase tracking-wider group-hover:translate-x-1.5 transition-transform">
-                            <span>Open Details</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/customer/events/${req.id}`);
+                            }}
+                            className="px-3.5 py-1.5 bg-accent-gold hover:brightness-110 text-black text-[10px] font-bold uppercase tracking-wider rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow"
+                          >
+                            <span>View Details</span>
                             <ArrowRight className="w-3.5 h-3.5" />
-                          </div>
+                          </button>
                         </div>
                       </div>
                     );
@@ -753,109 +940,30 @@ export default function DashboardList({ requests, notifications }: DashboardList
               </motion.div>
             )}
 
-            {/* 3. EVENT JOURNEY CENTERPIECE TIMELINE TAB */}
-            {currentTab === "journey" && activeRequest && (
+            {/* 3. EVENT JOURNEY CONSOLIDATED INTO EVENT WORKSPACE */}
+            {currentTab === "journey" && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-8"
+                className="p-8 sm:p-10 rounded-3xl bg-surface border border-border/80 text-center space-y-4 max-w-2xl mx-auto"
               >
-                <div>
-                  <h2 className="text-2xl font-light font-heading text-foreground">Interactive Event Journey</h2>
-                  <p className="text-xs text-muted-foreground mt-1 font-light">
-                    The core workflow connecting your request to the final event execution.
-                  </p>
-                </div>
-
-                <div className="p-4 sm:p-8 md:p-10 rounded-3xl bg-surface border border-border/80 shadow-md">
-                  {activeRequest.status === "Cancelled" ? (
-                    <div className="py-12 text-center text-red-400 text-xs font-light max-w-sm mx-auto space-y-3">
-                      <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
-                      <p>This event request has been cancelled. Contact support to coordinate rescheduling options.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-0 relative">
-                      {/* Flex timeline list containing dynamic line heights */}
-                      {MILESTONES.map((step, idx) => {
-                        const isPast = idx < activeMilestoneIdx;
-                        const isCurrent = idx === activeMilestoneIdx;
-                        const isFuture = idx > activeMilestoneIdx;
-
-                        // Retrieve database custom timeline milestone
-                        const milestoneDbData = activeRequest.timelines?.find(
-                          (t) => t.milestone_name.toLowerCase() === step.key.toLowerCase() && !t.is_internal
-                        );
-
-                        return (
-                          <div 
-                            key={step.key} 
-                            className={`flex gap-4 sm:gap-6 relative transition-opacity duration-300 ${
-                              isFuture ? "opacity-35" : "opacity-100"
-                            }`}
-                          >
-                            {/* Left Side: Auto Centered Circle & Vertical Line */}
-                            <div className="flex flex-col items-center shrink-0 w-11 sm:w-14">
-                              <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center border transition-all duration-300 relative z-10 shrink-0 ${
-                                isPast 
-                                  ? "bg-accent-gold border-accent-gold text-black shadow-lg shadow-[#D4AF37]/15" 
-                                  : isCurrent 
-                                  ? "bg-background border-[#D4AF37] text-accent-gold shadow-[0_0_12px_rgba(212,175,55,0.4)] animate-pulse-glow" 
-                                  : "bg-surface border-border text-muted-foreground"
-                              }`}>
-                                <span className="text-[10px] font-mono font-bold">{idx + 1}</span>
-                              </div>
-                              
-                              {idx < MILESTONES.length - 1 && (
-                                <div className="w-[1.5px] flex-1 bg-border/60 my-2" />
-                              )}
-                            </div>
-
-                            {/* Right Side: Details Card */}
-                            <div className={`flex-1 pb-8 p-4.5 sm:p-6 rounded-2xl border transition-all duration-300 ${
-                              isCurrent 
-                                ? "bg-surface-raised border-[#D4AF37]/45 shadow-sm" 
-                                : isPast 
-                                ? "bg-surface border-border/80" 
-                                : "bg-background/25 border-border/40"
-                            }`}>
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                                <h4 className={`text-xs uppercase font-bold tracking-wider ${
-                                  isCurrent ? "text-accent-gold text-sm font-black" : "text-foreground"
-                                }`}>
-                                  {step.label}
-                                </h4>
-                                
-                                {isPast && (
-                                  <span className="text-[8px] font-bold uppercase tracking-widest text-emerald-500 bg-emerald-500/5 border border-emerald-500/20 px-2 py-0.5 rounded-full inline-block w-max">
-                                    Completed
-                                  </span>
-                                )}
-                                {isCurrent && (
-                                  <span className="text-[8px] font-bold uppercase tracking-widest text-[#D4AF37] bg-accent-gold/5 border border-accent-gold/20 px-2 py-0.5 rounded-full inline-block w-max animate-pulse">
-                                    Active Stage
-                                  </span>
-                                )}
-                              </div>
-
-                              <p className="text-[10.5px] text-muted-foreground mt-2 leading-relaxed font-light">
-                                {milestoneDbData?.description || step.desc}
-                              </p>
-
-                              {milestoneDbData && (
-                                <div className="mt-3.5 text-[9px] bg-background/50 border border-border/40 px-2.5 py-1.5 rounded-lg text-accent-gold inline-flex items-center gap-1.5 font-mono">
-                                  <Clock className="w-3 h-3 shrink-0" />
-                                  <span>Sync log: {formatDate(milestoneDbData.created_at)}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <Compass className="w-10 h-10 text-accent-gold mx-auto" />
+                <h2 className="text-2xl font-light font-heading text-foreground">Event Journey Consolidated</h2>
+                <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                  The Event Journey timeline is now integrated directly inside each event workspace under My Events. Select an event to view its live execution journey.
+                </p>
+                {activeRequest && (
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/customer/events/${activeRequest.id}?tab=journey`)}
+                    className="px-6 py-3 bg-accent-gold text-black font-bold text-xs uppercase tracking-wider rounded-xl transition shadow hover:brightness-110 cursor-pointer inline-flex items-center gap-2"
+                  >
+                    <span>View Journey for {activeRequest.event_type}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
               </motion.div>
             )}
 
@@ -979,7 +1087,7 @@ export default function DashboardList({ requests, notifications }: DashboardList
             )}
 
             {/* 5. MEETINGS SCHEDULE TAB */}
-            {currentTab === "meetings" && activeRequest && (
+            {currentTab === "meetings" && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -991,13 +1099,13 @@ export default function DashboardList({ requests, notifications }: DashboardList
                   <div>
                     <h2 className="text-2xl font-light font-heading text-foreground">Meetings & Consultations</h2>
                     <p className="text-xs text-muted-foreground mt-1 font-light">
-                      Sync with your dedicated planner partner to coordinate decor details.
+                      Sync with your dedicated planner partner to coordinate decor details, staging, and catering layouts.
                     </p>
                   </div>
 
                   <button
                     onClick={() => setShowMeetingModal(true)}
-                    className="px-4.5 py-2.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold text-black text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-[#D4AF37]/10"
+                    className="px-4.5 py-2.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold text-black text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-[#D4AF37]/10 shrink-0"
                   >
                     <Plus className="w-4 h-4" /> Request Meeting
                   </button>
@@ -1005,127 +1113,225 @@ export default function DashboardList({ requests, notifications }: DashboardList
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                   
-                  {/* Left Column Calendar Mockup */}
-                  <div className="lg:col-span-4 bg-surface border border-border/80 rounded-2xl p-5 space-y-4 w-full">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Planning Calendar</h3>
+                  {/* Left Column Interactive Moving Planning Calendar */}
+                  <div className="lg:col-span-4 bg-surface border border-border/80 rounded-3xl p-5.5 space-y-4 w-full shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Planning Calendar</h3>
+                      {selectedCalendarDay !== null && (
+                        <button
+                          onClick={() => setSelectedCalendarDay(null)}
+                          className="text-[9.5px] uppercase font-bold text-accent-gold hover:underline cursor-pointer"
+                        >
+                          Clear Day Filter
+                        </button>
+                      )}
+                    </div>
                     
-                    {/* Calendar grid mock */}
                     <div className="space-y-3">
-                      <div className="flex justify-between items-center text-xs border-b border-border/40 pb-2">
-                        <span className="font-bold">July 2026</span>
-                        <div className="flex gap-2 text-muted-foreground">
-                          <span className="cursor-pointer hover:text-foreground">←</span>
-                          <span className="cursor-pointer hover:text-foreground">→</span>
+                      {/* Calendar Month Header with Working Prev/Next Month Controls */}
+                      <div className="flex justify-between items-center text-xs border-b border-border/40 pb-2.5">
+                        <span className="font-bold text-foreground font-heading tracking-wide">
+                          {MONTH_NAMES[calendarMonth]} {calendarYear}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={handlePrevMonth}
+                            className="w-7 h-7 rounded-lg bg-surface-raised border border-border flex items-center justify-center text-foreground hover:border-accent-gold/40 hover:text-accent-gold transition cursor-pointer text-xs font-bold"
+                            title="Previous Month"
+                          >
+                            ←
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleNextMonth}
+                            className="w-7 h-7 rounded-lg bg-surface-raised border border-border flex items-center justify-center text-foreground hover:border-accent-gold/40 hover:text-accent-gold transition cursor-pointer text-xs font-bold"
+                            title="Next Month"
+                          >
+                            →
+                          </button>
                         </div>
                       </div>
 
+                      {/* Calendar Grid */}
                       <div className="grid grid-cols-7 gap-1.5 text-center text-[10px] font-mono">
                         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => (
-                          <span key={d} className="text-muted-foreground font-bold">{d}</span>
+                          <span key={d} className="text-muted-foreground font-bold py-1">{d}</span>
                         ))}
-                        {Array.from({ length: 31 }).map((_, idx) => {
+                        
+                        {/* Blank padding cells before 1st day of month */}
+                        {Array.from({ length: firstDayOfWeek }).map((_, idx) => (
+                          <span key={`blank-${idx}`} className="py-1" />
+                        ))}
+
+                        {/* Actual days of month */}
+                        {Array.from({ length: daysInMonth }).map((_, idx) => {
                           const day = idx + 1;
-                          const isMeetingDay = day === 10 || day === 15;
+                          const hasActivity = activeMeetingDays.has(day);
+                          const isSelected = selectedCalendarDay === day;
+
                           return (
-                            <span 
-                              key={idx} 
-                              className={`py-1 rounded-md ${
-                                isMeetingDay 
-                                  ? "bg-accent-gold text-black font-black" 
-                                  : "hover:bg-surface-raised text-foreground/75"
+                            <button 
+                              key={day} 
+                              type="button"
+                              onClick={() => setSelectedCalendarDay(isSelected ? null : day)}
+                              className={`py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                                isSelected
+                                  ? "bg-accent-gold text-black shadow-md shadow-accent-gold/20 scale-105"
+                                  : hasActivity
+                                  ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/40 hover:bg-accent-gold hover:text-black"
+                                  : "hover:bg-surface-raised text-foreground/80"
                               }`}
                             >
                               {day}
-                            </span>
+                            </button>
                           );
                         })}
                       </div>
 
-                      <div className="text-[9.5px] text-muted-foreground flex gap-1.5 items-center font-light pt-2">
-                        <span className="w-2 h-2 rounded-full bg-accent-gold inline-block" />
-                        <span>Highlighted days represent active staging calls.</span>
+                      <div className="text-[9.5px] text-muted-foreground flex items-center gap-1.5 font-light pt-2 border-t border-border/40">
+                        <span className="w-2 h-2 rounded-full bg-accent-gold inline-block shrink-0" />
+                        <span>Highlighted days represent active staging calls or event dates.</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Right Column Meetings list */}
+                  {/* Right Column Dynamic Database Meetings List */}
                   <div className="lg:col-span-8 space-y-5 w-full">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground pl-1">Scheduled Staging Calls</h3>
-                    
-                    {/* Upcoming meetings */}
-                    <div className="space-y-4">
-                      
-                      {/* Meeting 1 */}
-                      <div className="p-5.5 bg-surface border border-border/80 rounded-3xl space-y-4 hover:border-accent-gold/25 transition duration-205">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                          <div>
-                            <span className="text-[8.5px] uppercase font-bold text-accent-gold tracking-widest bg-accent-gold/5 border border-accent-gold/20 px-2 py-0.5 rounded">Upcoming Sync</span>
-                            <h4 className="text-sm font-bold text-foreground mt-2">Layout & Theme Finalization</h4>
-                          </div>
-
-                          <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-mono shrink-0">
-                            <CalendarDays className="w-4 h-4 text-accent-gold" />
-                            <span>10th July 2026 · 14:00</span>
-                          </div>
-                        </div>
-
-                        <p className="text-[11px] text-muted-foreground leading-relaxed font-light">
-                          Reviewing three alternative layout styles for mandap staging, floral arrangements, and stage decoration presets.
-                        </p>
-
-                        <div className="border-t border-border/40 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4.5 text-xs">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Video className="w-4 h-4 text-accent-gold" />
-                            <span className="font-mono text-[10px]">Room Code: sai-decor-sync</span>
-                          </div>
-
-                          <a
-                            href="https://meet.google.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="px-4.5 py-1.5 bg-gradient-to-r from-accent-gold to-amber-500 text-black text-[10px] font-bold uppercase tracking-wider rounded-xl transition flex items-center gap-1 cursor-pointer"
-                          >
-                            Join Video Call <ArrowUpRight className="w-3.5 h-3.5" />
-                          </a>
-                        </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          Staging Calls & Consultations ({filteredMeetingsList.length})
+                        </h3>
+                        {selectedCalendarDay !== null && (
+                          <span className="text-[10px] font-bold text-accent-gold block mt-0.5">
+                            Filtered for {MONTH_NAMES[calendarMonth]} {selectedCalendarDay}, {calendarYear}
+                          </span>
+                        )}
                       </div>
 
-                      {/* Meeting 2 */}
-                      <div className="p-5.5 bg-surface border border-border/80 rounded-3xl space-y-4 hover:border-accent-gold/25 transition duration-205">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                          <div>
-                            <span className="text-[8.5px] uppercase font-bold text-accent-gold tracking-widest bg-accent-gold/5 border border-accent-gold/20 px-2 py-0.5 rounded">Upcoming Sync</span>
-                            <h4 className="text-sm font-bold text-foreground mt-2">Menu Testing & Catering Check</h4>
-                          </div>
-
-                          <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-mono shrink-0">
-                            <CalendarDays className="w-4 h-4 text-accent-gold" />
-                            <span>15th July 2026 · 11:30</span>
-                          </div>
-                        </div>
-
-                        <p className="text-[11px] text-muted-foreground leading-relaxed font-light">
-                          Selecting catering layouts, platings configuration, and final plate pricing under our managed catering services.
-                        </p>
-
-                        <div className="border-t border-border/40 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4.5 text-xs">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Video className="w-4 h-4 text-accent-gold" />
-                            <span className="font-mono text-[10px]">Room Code: sai-catering- tasting</span>
-                          </div>
-
-                          <a
-                            href="https://meet.google.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="px-4.5 py-1.5 bg-gradient-to-r from-accent-gold to-amber-500 text-black text-[10px] font-bold uppercase tracking-wider rounded-xl transition flex items-center gap-1 cursor-pointer"
+                      {/* Filter Pills */}
+                      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+                        {[
+                          { id: "all", label: "All Calls" },
+                          { id: "scheduled", label: "Scheduled" },
+                          { id: "pending", label: "Pending" },
+                          { id: "completed", label: "Past / Closed" },
+                        ].map((f) => (
+                          <button
+                            key={f.id}
+                            type="button"
+                            onClick={() => setMeetingFilter(f.id)}
+                            className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition cursor-pointer ${
+                              meetingFilter === f.id
+                                ? "bg-accent-gold text-black shadow-sm"
+                                : "bg-surface border border-border text-muted-foreground hover:text-foreground"
+                            }`}
                           >
-                            Join Video Call <ArrowUpRight className="w-3.5 h-3.5" />
-                          </a>
-                        </div>
+                            {f.label}
+                          </button>
+                        ))}
                       </div>
-
                     </div>
+
+                    {filteredMeetingsList.length === 0 ? (
+                      <div className="p-10 border border-dashed border-border rounded-3xl bg-surface/50 text-center space-y-3">
+                        <Video className="w-8 h-8 text-muted-foreground mx-auto" />
+                        <h4 className="text-sm font-bold text-foreground">No Consultations Found</h4>
+                        <p className="text-xs text-muted-foreground max-w-sm mx-auto font-light leading-relaxed">
+                          {selectedCalendarDay !== null
+                            ? `No meetings scheduled on ${MONTH_NAMES[calendarMonth]} ${selectedCalendarDay}, ${calendarYear}.`
+                            : "Click 'Request Meeting' above to schedule a sync with your SAI EVENTS Operational Manager."}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {filteredMeetingsList.map((m) => {
+                          const isScheduled = m.status === "Scheduled";
+                          const isPending = m.status === "Pending";
+                          const isRejected = m.status === "Rejected";
+
+                          return (
+                            <div
+                              key={m.id}
+                              className={`p-5 sm:p-6 rounded-3xl bg-surface border transition-all space-y-4 shadow-sm ${
+                                isScheduled
+                                  ? "border-accent-gold/40 hover:border-accent-gold"
+                                  : isPending
+                                  ? "border-amber-500/30 hover:border-amber-500/50"
+                                  : "border-border/80"
+                              }`}
+                            >
+                              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`text-[8.5px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full border ${
+                                      isScheduled
+                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+                                        : isPending
+                                        ? "bg-amber-500/10 text-amber-400 border-amber-500/25"
+                                        : isRejected
+                                        ? "bg-red-500/10 text-red-400 border-red-500/25"
+                                        : "bg-surface-raised text-muted-foreground border-border"
+                                    }`}>
+                                      {m.status} Sync
+                                    </span>
+                                    {m.event_requests?.event_type && (
+                                      <span className="text-[10px] text-muted-foreground font-mono">
+                                        · {m.event_requests.event_type}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h4 className="text-sm sm:text-base font-bold text-foreground font-heading mt-1.5">
+                                    {m.purpose}
+                                  </h4>
+                                </div>
+
+                                <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-mono shrink-0">
+                                  <CalendarDays className="w-4 h-4 text-accent-gold" />
+                                  <span>
+                                    {m.confirmed_date || m.preferred_date} {m.confirmed_time ? `· ${m.confirmed_time}` : `(${m.preferred_time_window})`}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {m.notes && (
+                                <p className="text-xs text-muted-foreground leading-relaxed font-light bg-background/50 p-3 rounded-xl border border-border/40">
+                                  {m.notes}
+                                </p>
+                              )}
+
+                              {m.admin_notes && (
+                                <div className="text-xs text-accent-gold bg-accent-gold/5 p-3 rounded-xl border border-accent-gold/20 space-y-1">
+                                  <span className="text-[9px] uppercase font-bold tracking-wider block text-accent-gold">Admin Response Note:</span>
+                                  <p className="font-light">{m.admin_notes}</p>
+                                </div>
+                              )}
+
+                              <div className="border-t border-border/40 pt-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
+                                <div className="flex items-center gap-2 text-muted-foreground font-mono text-[10px]">
+                                  <Video className="w-4 h-4 text-accent-gold" />
+                                  <span>
+                                    {isScheduled ? "Live Sync Link Available" : "Waiting for Admin Link Allocation"}
+                                  </span>
+                                </div>
+
+                                {isScheduled && m.meeting_link && (
+                                  <a
+                                    href={m.meeting_link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-5 py-2 bg-gradient-to-r from-accent-gold to-amber-500 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition shadow flex items-center gap-1.5 hover:brightness-110 cursor-pointer"
+                                  >
+                                    Join Video Call <ArrowUpRight className="w-4 h-4" />
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                 </div>
@@ -1299,6 +1505,113 @@ export default function DashboardList({ requests, notifications }: DashboardList
                     </div>
                   </div>
 
+                </div>
+              </motion.div>
+            )}
+
+            {/* 8. MY ENQUIRIES TAB */}
+            {currentTab === "enquiries" && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <div className="bg-surface border border-border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/50">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent-gold block">
+                        Customer Concierge History
+                      </span>
+                      <h3 className="text-xl font-bold font-heading text-foreground mt-1">
+                        Previous Enquiries & Consultations
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-1 font-light">
+                        Historical record of enquiries raised with SAI EVENTS before or after creating your account.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowEnquiryModal(true)}
+                      className="px-5 py-2.5 bg-accent-gold text-black text-xs font-bold uppercase tracking-wider rounded-xl transition shadow hover:brightness-110 inline-flex items-center gap-2 cursor-pointer shrink-0"
+                    >
+                      <HelpCircle className="w-4 h-4" />
+                      New Consultation
+                    </button>
+                  </div>
+
+                  {enquiries.length === 0 ? (
+                    <div className="text-center py-16 px-4 border border-dashed border-border rounded-2xl bg-muted/10 space-y-4">
+                      <HelpCircle className="w-8 h-8 text-accent-gold/60 mx-auto" />
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-foreground">No Previous Enquiries Found</h4>
+                        <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                          You have not submitted any consultation enquiries with your registered email address yet.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowEnquiryModal(true)}
+                        className="px-5 py-2.5 bg-accent-gold text-black text-xs font-bold uppercase tracking-wider rounded-xl shadow transition hover:brightness-110 cursor-pointer"
+                      >
+                        Submit Consultation Enquiry
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {enquiries.map((enquiry) => (
+                        <div
+                          key={enquiry.id}
+                          className="p-5 rounded-2xl bg-surface-raised border border-border/80 hover:border-accent-gold/30 transition-all space-y-3 shadow-sm"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-3">
+                            <div className="flex items-center gap-2.5">
+                              <span className="px-3 py-1 bg-accent-gold/10 text-accent-gold border border-accent-gold/20 text-xs font-bold rounded-lg uppercase tracking-wider">
+                                {enquiry.event_type}
+                              </span>
+                              <span className="text-xs text-muted-foreground font-mono">
+                                Submitted: {formatDate(enquiry.created_at)}
+                              </span>
+                            </div>
+
+                            <div>
+                              {enquiry.status === "resolved" ? (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold rounded-full uppercase tracking-wider">
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  Resolved
+                                </span>
+                              ) : enquiry.status === "in_progress" ? (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-bold rounded-full uppercase tracking-wider">
+                                  <Clock className="w-3.5 h-3.5" />
+                                  In Progress
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-bold rounded-full uppercase tracking-wider">
+                                  <AlertCircle className="w-3.5 h-3.5" />
+                                  Submitted
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Enquiry Details:
+                            </span>
+                            <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap font-sans font-light">
+                              {enquiry.event_description}
+                            </p>
+                          </div>
+
+                          <div className="pt-2 border-t border-border/30 flex items-center gap-2 text-[10px] text-muted-foreground">
+                            <Shield className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                            <span>SAI EVENTS Managed Operations: Our team directly coordinates all consultation requests.</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -1508,6 +1821,76 @@ export default function DashboardList({ requests, notifications }: DashboardList
               </div>
             </form>
           </div>
+        </div>
+      )}
+      {/* ─── NEW CONSULTATION ENQUIRY MODAL ─── */}
+      {showEnquiryModal && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <form onSubmit={handleEnquirySubmit} className="bg-surface border border-border/80 rounded-3xl max-w-md w-full overflow-hidden p-6.5 space-y-6 shadow-2xl animate-scale-in">
+            <div className="flex justify-between items-center border-b border-border/50 pb-4">
+              <div>
+                <span className="text-[9px] uppercase font-bold tracking-widest text-accent-gold">SAI EVENTS Operations</span>
+                <h3 className="text-lg font-bold font-heading text-foreground mt-0.5">Submit Consultation Enquiry</h3>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setShowEnquiryModal(false)}
+                className="p-1 text-muted-foreground hover:text-foreground rounded-lg cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div className="space-y-1.5">
+                <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Event Archetype *</label>
+                <select
+                  value={enquiryEventType}
+                  onChange={(e) => setEnquiryEventType(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-background border border-border/80 rounded-xl text-xs text-foreground cursor-pointer"
+                >
+                  <option value="Wedding Ceremony">Wedding Ceremony</option>
+                  <option value="Wedding Reception">Wedding Reception</option>
+                  <option value="Engagement Party">Engagement Party</option>
+                  <option value="Birthday Celebration">Birthday Celebration</option>
+                  <option value="Corporate Event">Corporate Event</option>
+                  <option value="Anniversary Gala">Anniversary Gala</option>
+                  <option value="Housewarming">Housewarming</option>
+                  <option value="Sreemantham / Baby Shower">Sreemantham / Baby Shower</option>
+                  <option value="General Consultation">General Consultation</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Enquiry / Requirements Description *</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={enquiryDescription}
+                  onChange={(e) => setEnquiryDescription(e.target.value)}
+                  placeholder="Describe your event ideas, dates, estimated budget, or specific questions..."
+                  className="w-full p-3.5 bg-background border border-border/80 rounded-xl text-xs text-foreground placeholder:text-muted-foreground/60 resize-none font-light leading-relaxed focus:ring-2 focus:ring-accent-gold/30"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button 
+                type="button" 
+                onClick={() => setShowEnquiryModal(false)} 
+                className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submittingEnquiry}
+                className="px-6 py-2.5 bg-accent-gold text-black font-bold text-xs uppercase tracking-wider rounded-xl hover:brightness-110 transition shadow cursor-pointer disabled:opacity-50"
+              >
+                {submittingEnquiry ? "Submitting..." : "Submit Enquiry"}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

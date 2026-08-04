@@ -171,7 +171,7 @@ export default function VendorProfileForm({
   };
 
   return (
-    <div className="space-y-8 select-none max-w-5xl mx-auto pb-12">
+    <div className="space-y-8 max-w-5xl mx-auto pb-12">
       {error && (
         <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-2">

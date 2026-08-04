@@ -4,8 +4,52 @@ import { EventPart, Recommendation } from "@/lib/types";
 
 export default async function PlanEventPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // 1. Fetch active Categories
+  // 1. Fetch user profile for contact prefill
+  let userProfile = null;
+  let existingDraft = null;
+
+  if (user) {
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("full_name, email, phone_number, phone_country_code, whatsapp_number, whatsapp_country_code")
+      .eq("id", user.id)
+      .single();
+
+    userProfile = prof ? {
+      fullName: prof.full_name && prof.full_name !== "Unnamed User" ? prof.full_name : "",
+      email: prof.email || user.email || "",
+      phoneNumber: prof.phone_number === "0000000000" ? "" : prof.phone_number || "",
+      phoneCountryCode: prof.phone_country_code || "+91",
+      whatsappNumber: prof.whatsapp_number || (prof.phone_number === "0000000000" ? "" : prof.phone_number || ""),
+      whatsappCountryCode: prof.whatsapp_country_code || "+91",
+    } : {
+      fullName: "",
+      email: user.email || "",
+      phoneNumber: "",
+      phoneCountryCode: "+91",
+      whatsappNumber: "",
+      whatsappCountryCode: "+91",
+    };
+
+    // 2. Fetch existing active draft if any
+    try {
+      const { data: draft } = await supabase
+        .from("event_requests")
+        .select("*")
+        .eq("customer_id", user.id)
+        .eq("is_draft", true)
+        .eq("draft_status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      existingDraft = draft || null;
+    } catch (_) {}
+  }
+
+  // 3. Fetch active Categories
   const { data: categoriesData } = await supabase
     .from("categories")
     .select("id, name, description, is_active, sort_order, created_at, updated_at")
@@ -13,7 +57,7 @@ export default async function PlanEventPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  // 2. Fetch active Subcategories
+  // 4. Fetch active Subcategories
   const { data: subcategoriesData } = await supabase
     .from("subcategories")
     .select("id, category_id, name, description, is_active, sort_order, created_at, updated_at")
@@ -21,7 +65,7 @@ export default async function PlanEventPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  // 3. Fetch active Service Items and media
+  // 5. Fetch active Service Items and media
   const { data: itemsData } = await supabase
     .from("service_items")
     .select(`
@@ -34,14 +78,14 @@ export default async function PlanEventPage() {
     .eq("is_available", true)
     .order("sort_order", { ascending: true });
 
-  // 4. Fetch active Event Parts Master
+  // 6. Fetch active Event Parts Master
   const { data: eventPartsData } = await supabase
     .from("event_parts")
     .select("*")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  // 5. Fetch active Recommendations Master
+  // 7. Fetch active Recommendations Master
   const { data: recommendationsData } = await supabase
     .from("recommendations")
     .select(`
@@ -77,6 +121,8 @@ export default async function PlanEventPage() {
         items={items}
         eventParts={eventParts}
         recommendations={recommendations}
+        userProfile={userProfile}
+        existingDraft={existingDraft}
       />
     </div>
   );

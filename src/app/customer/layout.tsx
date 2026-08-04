@@ -16,7 +16,7 @@ export default async function CustomerLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, full_name, email")
+    .select("role, full_name, email, phone_number, profile_completed")
     .eq("id", user.id)
     .single();
 

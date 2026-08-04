@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { 
   Sparkles, ChevronLeft, ChevronRight, LayoutDashboard, GitBranch,
   Store, Users, BookOpen, Image, Bell, Settings, User, LogOut,
-  Shield, Send, Briefcase, TrendingUp, History, X, UserCheck
+  Shield, Send, Briefcase, TrendingUp, History, X, UserCheck, HelpCircle, Video
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -44,6 +44,8 @@ export default function AdminSidebar({ adminName, adminEmail, onClose }: AdminSi
     {
       group: "Workforce & Operations",
       items: [
+        { href: "/admin/enquiries", label: "Guest Enquiries", icon: HelpCircle },
+        { href: "/admin/meetings", label: "Meeting Requests", icon: Video },
         { href: "/admin/bookings", label: "Event Cases", icon: GitBranch },
         { href: "/admin/assignments", label: "Event Assignments", icon: Shield },
         { href: "/admin/vendor-invitations", label: "Vendor Invitations", icon: Send },

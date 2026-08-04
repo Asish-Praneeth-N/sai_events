@@ -80,6 +80,17 @@ export default async function VendorDashboardPage() {
     .select("*", { count: "exact", head: true })
     .eq("vendor_id", user.id);
 
+  // Fetch previous guest enquiries linked to vendor account
+  let previousEnquiries: any[] = [];
+  try {
+    const { data: enquiriesData } = await supabase
+      .from("guest_enquiries")
+      .select("id, event_type, event_description, status, created_at")
+      .eq("linked_user_id", user.id)
+      .order("created_at", { ascending: false });
+    previousEnquiries = enquiriesData || [];
+  } catch (_) {}
+
   return (
     <VendorCommandCenter
       profile={profile as any}
@@ -87,6 +98,7 @@ export default async function VendorDashboardPage() {
       assignments={(assignments || []) as any[]}
       notifications={(notifications || []) as any[]}
       portfolioCount={portfolioCount || 0}
+      previousEnquiries={previousEnquiries}
     />
   );
 }

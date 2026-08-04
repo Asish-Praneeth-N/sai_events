@@ -6,7 +6,7 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { 
   Sparkles, LayoutDashboard, Calendar, Compass, FileText, 
-  Video, Bell, User, HeartHandshake, LogOut, X 
+  Video, Bell, User, HeartHandshake, LogOut, X, HelpCircle 
 } from "lucide-react";
 
 interface CustomerSidebarProps {
@@ -37,7 +37,7 @@ export default function CustomerSidebar({ customerName, customerEmail, onClose }
   const navItems = [
     { href: "/customer/dashboard", tab: "overview", label: "Overview", icon: LayoutDashboard },
     { href: "/customer/dashboard", tab: "events", label: "My Events", icon: Calendar },
-    { href: "/customer/dashboard", tab: "journey", label: "Event Journey", icon: Compass },
+    { href: "/customer/dashboard", tab: "enquiries", label: "My Enquiries", icon: HelpCircle },
     { href: "/customer/dashboard", tab: "documents", label: "Documents", icon: FileText },
     { href: "/customer/dashboard", tab: "meetings", label: "Meetings", icon: Video },
     { href: "/customer/dashboard", tab: "notifications", label: "Notifications", icon: Bell },

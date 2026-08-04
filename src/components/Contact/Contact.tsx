@@ -11,19 +11,42 @@ export default function Contact() {
     name: "",
     email: "",
     phone: "",
-    eventType: "wedding",
+    eventType: "Wedding",
     message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: "", email: "", phone: "", eventType: "wedding", message: "" });
-    }, 3000);
+    if (submitting) return;
+
+    setSubmitting(true);
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/guest-enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit enquiry.");
+      }
+
+      setSuccessMessage(data.message || "Thank you for reaching out. Our team has received your enquiry and will get in touch with you soon.");
+      setFormData({ name: "", email: "", phone: "", eventType: "Wedding", message: "" });
+    } catch (err: any) {
+      setErrorMessage(err.message || "An error occurred while sending your enquiry.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const contactInfoItems = [
@@ -156,13 +179,25 @@ export default function Contact() {
             variants={entryVariants}
             className="lg:col-span-7"
           >
-            <div className="p-8 rounded-3xl bg-card-bg border border-card-border shadow-2xl">
+            <div className="p-8 rounded-3xl bg-card-bg border border-card-border shadow-2xl space-y-6">
               <h3
-                className="text-2xl font-light text-foreground mb-6 tracking-wide"
+                className="text-2xl font-light text-foreground tracking-wide"
                 style={{ fontFamily: "Playfair Display, serif" }}
               >
-                Send A Message
+                Send An Enquiry
               </h3>
+
+              {successMessage && (
+                <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold rounded-2xl leading-relaxed">
+                  ✓ {successMessage}
+                </div>
+              )}
+
+              {errorMessage && (
+                <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-2xl">
+                  ⚠️ {errorMessage}
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name */}
@@ -177,7 +212,7 @@ export default function Contact() {
                     className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
                   />
                   <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                    Your Name
+                    Full Name *
                   </label>
                 </div>
 
@@ -194,7 +229,7 @@ export default function Contact() {
                       className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
                     />
                     <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                      Email Address
+                      Email Address *
                     </label>
                   </div>
 
@@ -210,25 +245,31 @@ export default function Contact() {
                       className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
                     />
                     <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                      Phone Number
+                      Phone Number *
                     </label>
                   </div>
                 </div>
 
                 {/* Event Type selection */}
-                <select
-                  name="eventType"
-                  value={formData.eventType}
-                  onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                  className="w-full bg-input-bg border border-card-border focus:border-[#D4AF37] rounded-xl px-4 py-4 text-xs text-foreground focus:outline-none transition-colors duration-300 uppercase tracking-widest font-bold"
-                >
-                  <option value="wedding"    className="bg-surface text-foreground">Weddings</option>
-                  <option value="engagement" className="bg-surface text-foreground">Engagements</option>
-                  <option value="birthday"   className="bg-surface text-foreground">Birthdays</option>
-                  <option value="corporate"  className="bg-surface text-foreground">Corporate Events</option>
-                  <option value="baby-shower" className="bg-surface text-foreground">Baby Showers</option>
-                  <option value="decoration" className="bg-surface text-foreground">Decorations & Design</option>
-                </select>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-foreground/45 uppercase tracking-widest font-bold block px-1">
+                    Event Being Planned / Event Type *
+                  </label>
+                  <select
+                    name="eventType"
+                    value={formData.eventType}
+                    onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
+                    className="w-full bg-input-bg border border-card-border focus:border-[#D4AF37] rounded-xl px-4 py-4 text-xs text-foreground focus:outline-none transition-colors duration-300 uppercase tracking-widest font-bold"
+                  >
+                    <option value="Wedding" className="bg-surface text-foreground">Wedding</option>
+                    <option value="Corporate Event" className="bg-surface text-foreground">Corporate Event</option>
+                    <option value="Birthday" className="bg-surface text-foreground">Birthday</option>
+                    <option value="Engagement" className="bg-surface text-foreground">Engagement</option>
+                    <option value="Reception" className="bg-surface text-foreground">Reception</option>
+                    <option value="Private Event" className="bg-surface text-foreground">Private Event</option>
+                    <option value="Other" className="bg-surface text-foreground">Other</option>
+                  </select>
+                </div>
 
                 {/* Message */}
                 <div className="relative">
@@ -242,24 +283,24 @@ export default function Contact() {
                     className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300 resize-none"
                   />
                   <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                    Tell Us About Your Event
+                    Tell Us About the Event *
                   </label>
                 </div>
 
                 {/* Submit button */}
                 <motion.button
                   type="submit"
-                  disabled={submitted}
-                  whileHover={submitted ? {} : { scale: 1.02, boxShadow: "0 0 24px rgba(212,175,55,0.35)" }}
+                  disabled={submitting}
+                  whileHover={submitting ? {} : { scale: 1.02, boxShadow: "0 0 24px rgba(212,175,55,0.35)" }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full px-8 py-4 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer"
+                  className="w-full px-8 py-4 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
                 >
-                  {submitted ? (
-                    "Sent Successfully ✓"
+                  {submitting ? (
+                    "Sending Enquiry..."
                   ) : (
                     <>
                       <Send className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
-                      Send Inquiry
+                      Send Enquiry
                     </>
                   )}
                 </motion.button>
