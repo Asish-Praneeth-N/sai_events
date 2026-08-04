@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { UserRole } from "@/lib/types";
@@ -19,7 +19,7 @@ const inputClass =
 const labelClass =
   "text-[9px] font-bold text-[#D87A5E] dark:text-[#D4AF37]/80 uppercase tracking-[0.2em] transition-colors duration-300";
 
-export default function AuthForm({ mode }: AuthFormProps) {
+function AuthFormInner({ mode }: AuthFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -378,5 +378,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+export default function AuthForm({ mode }: AuthFormProps) {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" /></div>}>
+      <AuthFormInner mode={mode} />
+    </Suspense>
   );
 }

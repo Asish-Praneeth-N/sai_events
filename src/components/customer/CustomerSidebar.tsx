@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -15,7 +15,7 @@ interface CustomerSidebarProps {
   onClose?: () => void;
 }
 
-export default function CustomerSidebar({ customerName, customerEmail, onClose }: CustomerSidebarProps) {
+function CustomerSidebarInner({ customerName, customerEmail, onClose }: CustomerSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -127,5 +127,13 @@ export default function CustomerSidebar({ customerName, customerEmail, onClose }
         </button>
       </div>
     </aside>
+  );
+}
+
+export default function CustomerSidebar(props: CustomerSidebarProps) {
+  return (
+    <Suspense fallback={null}>
+      <CustomerSidebarInner {...props} />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition, useMemo } from "react";
+import React, { useState, useTransition, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
@@ -100,7 +100,7 @@ const MILESTONES = [
   { key: "Closed", label: "Closed", desc: "Event case is officially archived." }
 ];
 
-export default function DashboardList({
+function DashboardListInner({
   requests,
   notifications,
   enquiries = [],
@@ -1895,5 +1895,13 @@ export default function DashboardList({
       )}
 
     </div>
+  );
+}
+
+export default function DashboardList(props: DashboardListProps) {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" /></div>}>
+      <DashboardListInner {...props} />
+    </Suspense>
   );
 }
