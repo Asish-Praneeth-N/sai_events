@@ -1,12 +1,33 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type Variants,
+} from "framer-motion";
+
 import { LANDING_PAGE_CONFIG } from "@/constants/introConfig";
-import { Mail, Phone, MapPin, Clock, Send, Map } from "lucide-react";
-import ScrollHeading from "@/components/Common/ScrollHeading";
+
+import {
+  ArrowUpRight,
+  Check,
+  Clock,
+  Mail,
+  MapPin,
+  Phone,
+  Send,
+  Sparkles,
+} from "lucide-react";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function Contact() {
+  /* ====================================================================== */
+  /* FORM STATE                                                             */
+  /* ====================================================================== */
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,13 +35,26 @@ export default function Contact() {
     eventType: "Wedding",
     message: "",
   });
+
   const [submitting, setSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [successMessage, setSuccessMessage] =
+    useState<string | null>(null);
+
+  const [errorMessage, setErrorMessage] =
+    useState<string | null>(null);
+
   const shouldReduceMotion = useReducedMotion();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /* ====================================================================== */
+  /* SUBMISSION                                                             */
+  /* ====================================================================== */
+
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
+
     if (submitting) return;
 
     setSubmitting(true);
@@ -28,287 +62,1495 @@ export default function Contact() {
     setErrorMessage(null);
 
     try {
-      const res = await fetch("/api/guest-enquiry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        "/api/guest-enquiry",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify(
+            formData
+          ),
+        }
+      );
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to submit enquiry.");
+        throw new Error(
+          data.error ||
+            "Failed to submit enquiry."
+        );
       }
 
-      setSuccessMessage(data.message || "Thank you for reaching out. Our team has received your enquiry and will get in touch with you soon.");
-      setFormData({ name: "", email: "", phone: "", eventType: "Wedding", message: "" });
+      setSuccessMessage(
+        data.message ||
+          "Thank you for reaching out. Our team has received your enquiry and will get in touch with you soon."
+      );
+
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        eventType: "Wedding",
+        message: "",
+      });
     } catch (err: any) {
-      setErrorMessage(err.message || "An error occurred while sending your enquiry.");
+      setErrorMessage(
+        err.message ||
+          "An error occurred while sending your enquiry."
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
+  /* ====================================================================== */
+  /* CONTACT INFORMATION                                                    */
+  /* ====================================================================== */
+
   const contactInfoItems = [
-    { Icon: Mail, label: "Email Us", value: LANDING_PAGE_CONFIG.contact.email, href: `mailto:${LANDING_PAGE_CONFIG.contact.email}`, isLink: true },
-    { Icon: Phone, label: "Call Us", value: LANDING_PAGE_CONFIG.contact.phone, href: `tel:${LANDING_PAGE_CONFIG.contact.phone}`, isLink: true },
-    { Icon: MapPin, label: "Visit Us", value: LANDING_PAGE_CONFIG.contact.address, isLink: false },
-    { Icon: Clock, label: "Office Hours", value: LANDING_PAGE_CONFIG.contact.workingHours, isLink: false },
+    {
+      Icon: Mail,
+      label: "Email",
+      value:
+        LANDING_PAGE_CONFIG.contact.email,
+      href: `mailto:${LANDING_PAGE_CONFIG.contact.email}`,
+    },
+
+    {
+      Icon: Phone,
+      label: "Telephone",
+      value:
+        LANDING_PAGE_CONFIG.contact.phone,
+      href: `tel:${LANDING_PAGE_CONFIG.contact.phone}`,
+    },
+
+    {
+      Icon: MapPin,
+      label: "Studio",
+      value:
+        LANDING_PAGE_CONFIG.contact.address,
+    },
+
+    {
+      Icon: Clock,
+      label: "Office Hours",
+      value:
+        LANDING_PAGE_CONFIG.contact
+          .workingHours,
+    },
   ];
+
+  /* ====================================================================== */
+  /* MOTION                                                                 */
+  /* ====================================================================== */
 
   const containerVariants: Variants = {
     hidden: {},
+
     visible: {
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren:
+          shouldReduceMotion ? 0 : 0.1,
       },
     },
   };
 
   const entryVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: {
+      opacity: 0,
+      y: shouldReduceMotion ? 0 : 24,
+    },
+
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
+
+      transition: {
+        duration:
+          shouldReduceMotion
+            ? 0.2
+            : 0.75,
+
+        ease: EASE,
+      },
     },
   };
 
-  return (
-    <section className="w-full bg-transparent py-24 sm:py-32 relative overflow-hidden select-none border-t border-border">
-      {/* Light-mode: warm neutrals. Dark-mode: cinematic depth */}
-      <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-foreground/[0.015] dark:bg-[#287878]/5 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-accent-gold/3 dark:bg-[#D4AF37]/3 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[150px] bg-accent-gold/2 dark:bg-[#D4AF37]/3 rounded-full blur-[100px] pointer-events-none" />
+  /* ====================================================================== */
+  /* RENDER                                                                 */
+  /* ====================================================================== */
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
-        
-        {/* Header */}
-        <div className="text-center mb-16 sm:mb-20">
-          <span className="text-[10px] uppercase font-bold text-[#D4AF37] tracking-[0.28em] block mb-3 opacity-75">
-            Get In Touch
-          </span>
-          <ScrollHeading
-            title="Connect With Our Team"
-            className="text-3xl sm:text-5xl font-light text-foreground tracking-tight"
-          />
-          <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mx-auto mt-4" />
+  return (
+    <section
+      id="contact"
+      className="
+        relative
+        w-full
+        overflow-hidden
+
+        border-t
+        border-[#143d2b]/10
+
+        bg-[#f3eadf]
+
+        py-24
+
+        text-[#143d2b]
+
+        select-none
+
+        sm:py-32
+        lg:py-40
+
+        dark:border-white/[0.07]
+        dark:bg-[#12140f]
+        dark:text-[#eee5d7]
+      "
+    >
+      {/* ================================================================ */}
+      {/* BACKGROUND DETAILS                                               */}
+      {/* ================================================================ */}
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -right-[10%]
+          top-[10%]
+
+          h-[520px]
+          w-[520px]
+
+          rounded-full
+
+          bg-[#a47b35]/[0.04]
+
+          blur-[160px]
+
+          dark:bg-[#d4af37]/[0.02]
+        "
+      />
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          bottom-[5%]
+          left-[-10%]
+
+          h-[500px]
+          w-[500px]
+
+          rounded-full
+
+          bg-[#143d2b]/[0.025]
+
+          blur-[160px]
+
+          dark:bg-white/[0.01]
+        "
+      />
+
+      {/* huge CONTACT watermark */}
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          -right-[2%]
+          top-[3%]
+
+          hidden
+
+          font-heading
+
+          text-[clamp(8rem,18vw,18rem)]
+          italic
+          leading-none
+          tracking-[-0.07em]
+
+          text-[#143d2b]/[0.022]
+
+          lg:block
+
+          dark:text-white/[0.014]
+        "
+        style={{
+          fontFamily:
+            '"Playfair Display", serif',
+        }}
+      >
+        Contact
+      </div>
+
+      {/* side rails */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          bottom-0
+          left-[4.5%]
+          top-0
+
+          hidden
+          w-px
+
+          bg-[#143d2b]/[0.07]
+
+          xl:block
+
+          dark:bg-white/[0.04]
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          bottom-0
+          right-[4.5%]
+          top-0
+
+          hidden
+          w-px
+
+          bg-[#143d2b]/[0.07]
+
+          xl:block
+
+          dark:bg-white/[0.04]
+        "
+      />
+
+      {/* ================================================================ */}
+      {/* CONTENT                                                          */}
+      {/* ================================================================ */}
+
+      <div
+        className="
+          relative
+          z-10
+
+          mx-auto
+          w-full
+          max-w-[1380px]
+
+          px-6
+
+          sm:px-8
+          lg:px-[7%]
+        "
+      >
+        {/* ================================================================ */}
+        {/* HEADER                                                           */}
+        {/* ================================================================ */}
+
+        <div
+          className="
+            grid
+            grid-cols-1
+
+            gap-8
+
+            border-b
+            border-[#143d2b]/10
+
+            pb-14
+
+            lg:grid-cols-[1fr_auto]
+            lg:items-end
+
+            dark:border-white/[0.07]
+          "
+        >
+          <div>
+            <motion.div
+              initial={{
+                opacity: 0,
+                x: shouldReduceMotion
+                  ? 0
+                  : -18,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+              }}
+              viewport={{ once: true }}
+              transition={{
+                duration:
+                  shouldReduceMotion
+                    ? 0.2
+                    : 0.7,
+                ease: EASE,
+              }}
+              className="
+                mb-5
+                flex
+                items-center
+                gap-3
+              "
+            >
+              <span
+                className="
+                  h-px
+                  w-8
+
+                  bg-[#9b742f]/50
+
+                  dark:bg-[#d4af37]/45
+                "
+              />
+
+              <Sparkles
+                className="
+                  h-3
+                  w-3
+
+                  text-[#9b742f]
+
+                  dark:text-[#d4af37]
+                "
+              />
+
+              <span
+                className="
+                  text-[8px]
+                  font-bold
+                  uppercase
+                  tracking-[0.32em]
+
+                  text-[#9b742f]/75
+
+                  dark:text-[#d4af37]/65
+                "
+              >
+                Get In Touch
+              </span>
+            </motion.div>
+
+            <motion.h2
+              initial={{
+                opacity: 0,
+                y: shouldReduceMotion
+                  ? 0
+                  : 22,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{ once: true }}
+              transition={{
+                duration:
+                  shouldReduceMotion
+                    ? 0.2
+                    : 0.9,
+                ease: EASE,
+              }}
+              className="
+                max-w-[850px]
+
+                font-heading
+
+                text-[clamp(3.2rem,7vw,7rem)]
+                font-normal
+                leading-[0.93]
+                tracking-[-0.055em]
+
+                text-[#143d2b]
+
+                dark:text-[#eee5d7]
+              "
+              style={{
+                fontFamily:
+                  '"Playfair Display", serif',
+              }}
+            >
+              Begin the
+              <br />
+
+              <span
+                className="
+                  italic
+
+                  text-[#9b742f]
+
+                  dark:text-[#d2b56b]
+                "
+              >
+                conversation.
+              </span>
+            </motion.h2>
+          </div>
+
+          <motion.div
+            initial={{
+              opacity: 0,
+            }}
+            whileInView={{
+              opacity: 1,
+            }}
+            viewport={{ once: true }}
+            transition={{
+              duration: 0.8,
+              delay:
+                shouldReduceMotion
+                  ? 0
+                  : 0.2,
+            }}
+            className="
+              flex
+              items-center
+              gap-3
+
+              lg:pb-2
+            "
+          >
+            <span
+              className="
+                font-heading
+
+                text-sm
+                italic
+
+                text-[#9b742f]
+
+                dark:text-[#d2b56b]
+              "
+              style={{
+                fontFamily:
+                  '"Playfair Display", serif',
+              }}
+            >
+              06
+            </span>
+
+            <span
+              className="
+                h-px
+                w-12
+
+                bg-[#143d2b]/15
+
+                dark:bg-white/10
+              "
+            />
+
+            <span
+              className="
+                text-[7px]
+                font-bold
+                uppercase
+                tracking-[0.28em]
+
+                text-[#143d2b]/35
+
+                dark:text-white/25
+              "
+            >
+              Contact
+            </span>
+          </motion.div>
         </div>
 
-        {/* Content Layout */}
-        <motion.div 
+        {/* ================================================================ */}
+        {/* MAIN GRID                                                        */}
+        {/* ================================================================ */}
+
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start w-full"
+          viewport={{
+            once: true,
+            margin: "-80px",
+          }}
+          className="
+            mt-14
+
+            grid
+            grid-cols-1
+
+            gap-16
+
+            lg:mt-20
+            lg:grid-cols-[0.78fr_1.22fr]
+            lg:gap-20
+
+            xl:gap-28
+          "
         >
-          {/* Left Column: Contact details (5 cols) */}
+          {/* ============================================================== */}
+          {/* LEFT INFORMATION                                               */}
+          {/* ============================================================== */}
+
           <motion.div
             variants={entryVariants}
-            className="lg:col-span-5 space-y-8"
           >
-            <div className="space-y-6">
-              <h3
-                className="text-2xl font-light text-foreground tracking-wide"
-                style={{ fontFamily: "Playfair Display, serif" }}
-              >
-                Contact Information
-              </h3>
+            <p
+              className="
+                max-w-[430px]
 
-              <div className="space-y-5">
-                {contactInfoItems.map(({ Icon, label, value, href, isLink }, i) => (
-                  <div key={label} className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-card-bg border border-card-border flex items-center justify-center text-[#D4AF37] shrink-0">
-                      <Icon className="w-4 h-4" />
-                    </div>
+                text-[12px]
+                leading-[1.9]
+
+                text-[#143d2b]/50
+
+                sm:text-[13px]
+
+                dark:text-[#eee5d7]/42
+              "
+              style={{
+                fontFamily:
+                  '"Poppins", sans-serif',
+              }}
+            >
+              Planning something meaningful?
+              Share the first details with us.
+              Our team will guide you through
+              the possibilities, the process,
+              and what happens next.
+            </p>
+
+            {/* contact rows */}
+
+            <div
+              className="
+                mt-10
+
+                border-t
+                border-[#143d2b]/10
+
+                dark:border-white/[0.07]
+              "
+            >
+              {contactInfoItems.map(
+                (
+                  {
+                    Icon,
+                    label,
+                    value,
+                    href,
+                  },
+                  index
+                ) => (
+                  <motion.div
+                    key={label}
+                    initial={{
+                      opacity: 0,
+                      x: shouldReduceMotion
+                        ? 0
+                        : -15,
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      x: 0,
+                    }}
+                    viewport={{
+                      once: true,
+                    }}
+                    transition={{
+                      duration:
+                        shouldReduceMotion
+                          ? 0.2
+                          : 0.6,
+
+                      delay:
+                        shouldReduceMotion
+                          ? 0
+                          : index *
+                            0.07,
+
+                      ease: EASE,
+                    }}
+                    className="
+                      group
+
+                      grid
+                      grid-cols-[32px_1fr]
+
+                      gap-4
+
+                      border-b
+                      border-[#143d2b]/10
+
+                      py-6
+
+                      dark:border-white/[0.07]
+                    "
+                  >
+                    <Icon
+                      className="
+                        mt-0.5
+
+                        h-4
+                        w-4
+
+                        stroke-[1.35]
+
+                        text-[#9b742f]
+
+                        transition-transform
+                        duration-300
+
+                        group-hover:scale-110
+
+                        dark:text-[#d2b56b]
+                      "
+                    />
+
                     <div>
-                      <span className="text-[10px] text-foreground/45 uppercase tracking-widest block font-bold mb-0.5">
+                      <span
+                        className="
+                          block
+
+                          text-[7px]
+                          font-bold
+                          uppercase
+                          tracking-[0.28em]
+
+                          text-[#143d2b]/35
+
+                          dark:text-white/25
+                        "
+                      >
                         {label}
                       </span>
-                      {isLink && href ? (
+
+                      {href ? (
                         <a
                           href={href}
-                          className="text-sm text-foreground hover:text-[#D4AF37] transition-colors duration-300 font-light"
+                          className="
+                            mt-2
+                            inline-block
+
+                            font-heading
+
+                            text-[17px]
+                            font-normal
+
+                            text-[#143d2b]/80
+
+                            transition-colors
+
+                            hover:text-[#9b742f]
+
+                            dark:text-[#eee5d7]/70
+                            dark:hover:text-[#d2b56b]
+                          "
+                          style={{
+                            fontFamily:
+                              '"Playfair Display", serif',
+                          }}
                         >
                           {value}
                         </a>
                       ) : (
-                        <span className="text-sm text-foreground leading-snug block font-light">{value}</span>
+                        <span
+                          className="
+                            mt-2
+                            block
+
+                            max-w-[360px]
+
+                            font-heading
+
+                            text-[17px]
+                            font-normal
+                            leading-[1.45]
+
+                            text-[#143d2b]/80
+
+                            dark:text-[#eee5d7]/70
+                          "
+                          style={{
+                            fontFamily:
+                              '"Playfair Display", serif',
+                          }}
+                        >
+                          {value}
+                        </span>
                       )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  </motion.div>
+                )
+              )}
             </div>
 
-            {/* Office map preview box */}
-            <div className="relative h-[200px] rounded-2xl overflow-hidden border border-border shadow-xl bg-surface-raised flex flex-col items-center justify-center p-6 text-center">
-              <div
-                className="absolute inset-0 z-0 opacity-15 bg-cover bg-center"
-                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=500&q=80')" }}
-              />
-              <div className="relative z-10 flex flex-col items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/45 flex items-center justify-center text-[#D4AF37] relative">
-                  <MapPin className="w-5 h-5 animate-bounce" />
-                  <div className="absolute inset-0 rounded-full border border-[#D4AF37] animate-ping opacity-10" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-foreground tracking-widest uppercase">
-                    Jubilee Hills Office
-                  </h4>
-                  <p className="text-[10px] text-foreground/60 mt-1 max-w-[220px] mx-auto leading-relaxed">
-                    Sai Events Tower, Hyderabad, Telangana, India
-                  </p>
-                </div>
-                <a
-                  href="https://maps.google.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 text-[9px] uppercase font-bold tracking-widest text-[#D4AF37] hover:text-foreground flex items-center gap-1.5 transition-colors duration-300 cursor-pointer"
-                >
-                  <Map className="w-3.5 h-3.5" />
-                  Open in Maps
-                </a>
-              </div>
+            {/* location footer */}
+
+            <div className="mt-9">
+              <a
+                href="https://maps.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  group
+
+                  inline-flex
+                  items-center
+                  gap-3
+
+                  text-[8px]
+                  font-bold
+                  uppercase
+                  tracking-[0.24em]
+
+                  text-[#9b742f]
+
+                  transition-colors
+
+                  hover:text-[#143d2b]
+
+                  dark:text-[#d2b56b]
+                  dark:hover:text-[#eee5d7]
+                "
+              >
+                View Our Location
+
+                <ArrowUpRight
+                  className="
+                    h-3.5
+                    w-3.5
+
+                    transition-transform
+                    duration-300
+
+                    group-hover:translate-x-0.5
+                    group-hover:-translate-y-0.5
+                  "
+                />
+              </a>
             </div>
           </motion.div>
 
-          {/* Right Column: Contact form (7 cols) */}
+          {/* ============================================================== */}
+          {/* FORM                                                           */}
+          {/* ============================================================== */}
+
           <motion.div
             variants={entryVariants}
-            className="lg:col-span-7"
-          >
-            <div className="p-8 rounded-3xl bg-card-bg border border-card-border shadow-2xl space-y-6">
-              <h3
-                className="text-2xl font-light text-foreground tracking-wide"
-                style={{ fontFamily: "Playfair Display, serif" }}
-              >
-                Send An Enquiry
-              </h3>
+            className="
+              relative
 
+              border-l-0
+              border-[#143d2b]/10
+
+              lg:border-l
+              lg:pl-14
+
+              xl:pl-20
+
+              dark:border-white/[0.07]
+            "
+          >
+            {/* form heading */}
+
+            <div
+              className="
+                mb-9
+
+                flex
+                items-end
+                justify-between
+
+                border-b
+                border-[#143d2b]/10
+
+                pb-5
+
+                dark:border-white/[0.07]
+              "
+            >
+              <div>
+                <span
+                  className="
+                    text-[7px]
+                    font-bold
+                    uppercase
+                    tracking-[0.3em]
+
+                    text-[#9b742f]/70
+
+                    dark:text-[#d4af37]/55
+                  "
+                >
+                  Your Enquiry
+                </span>
+
+                <h3
+                  className="
+                    mt-2
+
+                    font-heading
+
+                    text-2xl
+                    font-normal
+
+                    text-[#143d2b]
+
+                    sm:text-3xl
+
+                    dark:text-[#eee5d7]
+                  "
+                  style={{
+                    fontFamily:
+                      '"Playfair Display", serif',
+                  }}
+                >
+                  Tell us what you&apos;re
+                  planning.
+                </h3>
+              </div>
+
+              <span
+                className="
+                  hidden
+
+                  text-[7px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.2em]
+
+                  text-[#143d2b]/25
+
+                  sm:block
+
+                  dark:text-white/20
+                "
+              >
+                * Required
+              </span>
+            </div>
+
+            {/* status messages */}
+
+            <AnimatePresence mode="wait">
               {successMessage && (
-                <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold rounded-2xl leading-relaxed">
-                  ✓ {successMessage}
-                </div>
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    height: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    height: "auto",
+                  }}
+                  exit={{
+                    opacity: 0,
+                    height: 0,
+                  }}
+                  className="
+                    mb-7
+
+                    overflow-hidden
+
+                    border-y
+                    border-emerald-700/20
+
+                    py-4
+
+                    text-[11px]
+                    leading-relaxed
+
+                    text-emerald-800
+
+                    dark:border-emerald-400/15
+                    dark:text-emerald-300
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      items-start
+                      gap-3
+                    "
+                  >
+                    <Check
+                      className="
+                        mt-0.5
+                        h-3.5
+                        w-3.5
+                        shrink-0
+                      "
+                    />
+
+                    {successMessage}
+                  </div>
+                </motion.div>
               )}
 
               {errorMessage && (
-                <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-2xl">
-                  ⚠️ {errorMessage}
-                </div>
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    height: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    height: "auto",
+                  }}
+                  exit={{
+                    opacity: 0,
+                    height: 0,
+                  }}
+                  className="
+                    mb-7
+
+                    overflow-hidden
+
+                    border-y
+                    border-red-700/20
+
+                    py-4
+
+                    text-[11px]
+                    leading-relaxed
+
+                    text-red-700
+
+                    dark:border-red-400/15
+                    dark:text-red-300
+                  "
+                >
+                  {errorMessage}
+                </motion.div>
               )}
+            </AnimatePresence>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Name */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    placeholder=" "
-                    className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
-                  />
-                  <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                    Full Name *
-                  </label>
-                </div>
+            {/* ============================================================ */}
+            {/* ACTUAL FORM                                                  */}
+            {/* ============================================================ */}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {/* Email */}
-                  <div className="relative">
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      required
-                      placeholder=" "
-                      className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
-                    />
-                    <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                      Email Address *
-                    </label>
-                  </div>
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-8"
+            >
+              {/* name */}
 
-                  {/* Phone */}
-                  <div className="relative">
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      required
-                      placeholder=" "
-                      className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300"
-                    />
-                    <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                      Phone Number *
-                    </label>
-                  </div>
-                </div>
+              <EditorialInput
+                label="Full Name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    name: value,
+                  })
+                }
+                required
+              />
 
-                {/* Event Type selection */}
-                <div className="space-y-1">
-                  <label className="text-[10px] text-foreground/45 uppercase tracking-widest font-bold block px-1">
-                    Event Being Planned / Event Type *
-                  </label>
-                  <select
-                    name="eventType"
-                    value={formData.eventType}
-                    onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                    className="w-full bg-input-bg border border-card-border focus:border-[#D4AF37] rounded-xl px-4 py-4 text-xs text-foreground focus:outline-none transition-colors duration-300 uppercase tracking-widest font-bold"
+              {/* email + phone */}
+
+              <div
+                className="
+                  grid
+                  grid-cols-1
+
+                  gap-8
+
+                  sm:grid-cols-2
+                  sm:gap-7
+                "
+              >
+                <EditorialInput
+                  label="Email Address"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      email: value,
+                    })
+                  }
+                  required
+                />
+
+                <EditorialInput
+                  label="Phone Number"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      phone: value,
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              {/* event type */}
+
+              <div className="relative">
+                <label
+                  htmlFor="eventType"
+                  className="
+                    mb-3
+                    block
+
+                    text-[7px]
+                    font-bold
+                    uppercase
+                    tracking-[0.28em]
+
+                    text-[#143d2b]/40
+
+                    dark:text-white/30
+                  "
+                >
+                  Event Being Planned *
+                </label>
+
+                <select
+                  id="eventType"
+                  name="eventType"
+                  value={formData.eventType}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      eventType:
+                        e.target.value,
+                    })
+                  }
+                  className="
+                    w-full
+
+                    appearance-none
+
+                    border-0
+                    border-b
+                    border-[#143d2b]/20
+
+                    bg-transparent
+
+                    px-0
+                    py-3
+
+                    font-heading
+
+                    text-[16px]
+
+                    text-[#143d2b]
+
+                    outline-none
+
+                    transition-colors
+                    duration-300
+
+                    focus:border-[#9b742f]
+
+                    dark:border-white/15
+                    dark:text-[#eee5d7]
+                    dark:focus:border-[#d2b56b]
+                  "
+                  style={{
+                    fontFamily:
+                      '"Playfair Display", serif',
+                  }}
+                >
+                  <option
+                    value="Wedding"
+                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
                   >
-                    <option value="Wedding" className="bg-surface text-foreground">Wedding</option>
-                    <option value="Corporate Event" className="bg-surface text-foreground">Corporate Event</option>
-                    <option value="Birthday" className="bg-surface text-foreground">Birthday</option>
-                    <option value="Engagement" className="bg-surface text-foreground">Engagement</option>
-                    <option value="Reception" className="bg-surface text-foreground">Reception</option>
-                    <option value="Private Event" className="bg-surface text-foreground">Private Event</option>
-                    <option value="Other" className="bg-surface text-foreground">Other</option>
-                  </select>
-                </div>
+                    Wedding
+                  </option>
 
-                {/* Message */}
-                <div className="relative">
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    required
-                    rows={4}
-                    placeholder=" "
-                    className="peer w-full bg-input-bg border border-card-border focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] rounded-xl px-4 pt-6 pb-2 text-sm text-foreground placeholder-transparent focus:outline-none transition-colors duration-300 resize-none"
-                  />
-                  <label className="absolute left-4 top-4 text-xs font-light text-foreground/45 pointer-events-none transition-all duration-300 peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:text-[#D4AF37] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-[#D4AF37] uppercase tracking-wider font-sans">
-                    Tell Us About the Event *
-                  </label>
-                </div>
+                  <option
+                    value="Corporate Event"
+                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
+                  >
+                    Corporate Event
+                  </option>
 
-                {/* Submit button */}
+                  <option
+                    value="Birthday"
+                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
+                  >
+                    Birthday
+                  </option>
+
+                  <option
+                    value="Engagement"
+                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
+                  >
+                    Engagement
+                  </option>
+
+                  <option
+                    value="Reception"
+                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
+                  >
+                    Reception
+                  </option>
+
+                  <option
+                    value="Private Event"
+                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
+                  >
+                    Private Event
+                  </option>
+
+                  <option
+                    value="Other"
+                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
+                  >
+                    Other
+                  </option>
+                </select>
+
+                <span
+                  className="
+                    pointer-events-none
+
+                    absolute
+                    bottom-[14px]
+                    right-1
+
+                    text-[10px]
+
+                    text-[#9b742f]
+
+                    dark:text-[#d2b56b]
+                  "
+                >
+                  ↓
+                </span>
+              </div>
+
+              {/* message */}
+
+              <div className="relative">
+                <label
+                  htmlFor="message"
+                  className="
+                    mb-3
+                    block
+
+                    text-[7px]
+                    font-bold
+                    uppercase
+                    tracking-[0.28em]
+
+                    text-[#143d2b]/40
+
+                    dark:text-white/30
+                  "
+                >
+                  Tell Us About The Event *
+                </label>
+
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      message:
+                        e.target.value,
+                    })
+                  }
+                  required
+                  rows={5}
+                  placeholder="Share your vision, date, location, guest count, or anything else you'd like us to know..."
+                  className="
+                    w-full
+
+                    resize-none
+
+                    border-0
+                    border-b
+                    border-[#143d2b]/20
+
+                    bg-transparent
+
+                    px-0
+                    py-3
+
+                    text-[12px]
+                    leading-[1.8]
+
+                    text-[#143d2b]
+
+                    outline-none
+
+                    placeholder:text-[#143d2b]/25
+
+                    transition-colors
+                    duration-300
+
+                    focus:border-[#9b742f]
+
+                    dark:border-white/15
+                    dark:text-[#eee5d7]
+                    dark:placeholder:text-white/20
+                    dark:focus:border-[#d2b56b]
+                  "
+                  style={{
+                    fontFamily:
+                      '"Poppins", sans-serif',
+                  }}
+                />
+              </div>
+
+              {/* submit */}
+
+              <div
+                className="
+                  flex
+                  flex-col
+
+                  gap-4
+
+                  pt-2
+
+                  sm:flex-row
+                  sm:items-center
+                  sm:justify-between
+                "
+              >
+                <p
+                  className="
+                    max-w-[310px]
+
+                    text-[9px]
+                    leading-[1.7]
+
+                    text-[#143d2b]/30
+
+                    dark:text-white/22
+                  "
+                >
+                  By submitting this enquiry,
+                  you&apos;re simply starting a
+                  conversation with our event
+                  team.
+                </p>
+
                 <motion.button
                   type="submit"
                   disabled={submitting}
-                  whileHover={submitting ? {} : { scale: 1.02, boxShadow: "0 0 24px rgba(212,175,55,0.35)" }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full px-8 py-4 bg-gradient-to-r from-[#D4AF37] to-[#e4bf47] text-black font-bold text-xs uppercase tracking-[0.2em] rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
+                  whileHover={
+                    submitting ||
+                    shouldReduceMotion
+                      ? undefined
+                      : {
+                          y: -3,
+                        }
+                  }
+                  whileTap={
+                    submitting ||
+                    shouldReduceMotion
+                      ? undefined
+                      : {
+                          scale: 0.98,
+                        }
+                  }
+                  className="
+                    group
+
+                    flex
+                    min-w-[190px]
+
+                    cursor-pointer
+
+                    items-center
+                    justify-center
+                    gap-3
+
+                    bg-[#143d2b]
+
+                    px-7
+                    py-4
+
+                    text-[8px]
+                    font-bold
+                    uppercase
+                    tracking-[0.22em]
+
+                    text-[#f7f0e6]
+
+                    shadow-[0_12px_30px_rgba(20,61,43,0.12)]
+
+                    transition-colors
+                    duration-300
+
+                    hover:bg-[#1b4a35]
+
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+
+                    dark:bg-[#d2b56b]
+                    dark:text-[#11130f]
+                    dark:hover:bg-[#dec47c]
+                  "
                 >
                   {submitting ? (
-                    "Sending Enquiry..."
+                    <>
+                      <span
+                        className="
+                          h-3
+                          w-3
+
+                          animate-spin
+
+                          rounded-full
+
+                          border
+                          border-current
+                          border-t-transparent
+                        "
+                      />
+
+                      Sending...
+                    </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                      <Send
+                        className="
+                          h-3.5
+                          w-3.5
+
+                          transition-transform
+                          duration-300
+
+                          group-hover:translate-x-0.5
+                          group-hover:-translate-y-0.5
+                        "
+                      />
+
                       Send Enquiry
+
+                      <ArrowUpRight
+                        className="
+                          h-3
+                          w-3
+
+                          opacity-50
+
+                          transition-transform
+                          duration-300
+
+                          group-hover:translate-x-0.5
+                          group-hover:-translate-y-0.5
+                        "
+                      />
                     </>
                   )}
                 </motion.button>
-              </form>
-            </div>
+              </div>
+            </form>
           </motion.div>
         </motion.div>
       </div>
     </section>
+  );
+}
+
+/* ======================================================================== */
+/* EDITORIAL INPUT                                                          */
+/* ======================================================================== */
+
+function EditorialInput({
+  label,
+  name,
+  type,
+  value,
+  onChange,
+  required = false,
+}: {
+  label: string;
+  name: string;
+  type: string;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+}) {
+  return (
+    <div className="group relative">
+      <label
+        htmlFor={name}
+        className="
+          mb-3
+          block
+
+          text-[7px]
+          font-bold
+          uppercase
+          tracking-[0.28em]
+
+          text-[#143d2b]/40
+
+          transition-colors
+
+          group-focus-within:text-[#9b742f]
+
+          dark:text-white/30
+          dark:group-focus-within:text-[#d2b56b]
+        "
+      >
+        {label}
+        {required && " *"}
+      </label>
+
+      <input
+        id={name}
+        name={name}
+        type={type}
+        value={value}
+        onChange={(e) =>
+          onChange(e.target.value)
+        }
+        required={required}
+        className="
+          w-full
+
+          border-0
+          border-b
+          border-[#143d2b]/20
+
+          bg-transparent
+
+          px-0
+          py-3
+
+          font-heading
+
+          text-[16px]
+
+          text-[#143d2b]
+
+          outline-none
+
+          transition-colors
+          duration-300
+
+          focus:border-[#9b742f]
+
+          dark:border-white/15
+          dark:text-[#eee5d7]
+          dark:focus:border-[#d2b56b]
+        "
+        style={{
+          fontFamily:
+            '"Playfair Display", serif',
+        }}
+      />
+    </div>
   );
 }
