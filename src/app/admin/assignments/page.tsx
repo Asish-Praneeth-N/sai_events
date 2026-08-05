@@ -1,7 +1,20 @@
+
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { Shield, AlertTriangle, User, Calendar, MapPin, Activity, HelpCircle } from "lucide-react";
+import {
+  Activity,
+  AlertCircle,
+  AlertTriangle,
+  ArrowUpRight,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  MapPin,
+  ShieldCheck,
+  UserRound,
+  UsersRound,
+} from "lucide-react";
 
 export default async function AdminEventAssignmentsPage() {
   const supabase = await createClient();
@@ -10,6 +23,7 @@ export default async function AdminEventAssignmentsPage() {
   let tableMissing = false;
 
   let dbError: Error | null = null;
+
   try {
     const { data: assignmentsData, error } = await supabase
       .from("event_assignments")
@@ -36,149 +50,1259 @@ export default async function AdminEventAssignmentsPage() {
       .order("updated_at", { ascending: false });
 
     if (error) throw error;
+
     assignments = assignmentsData || [];
   } catch (err: any) {
     dbError = err;
   }
 
+  /* ==========================================================================
+     ERROR STATE
+  ========================================================================== */
+
   if (dbError) {
     return (
-      <div className="p-6 bg-red-950/40 border border-red-800/40 text-red-400 text-sm rounded-2xl animate-fade-in-up">
-        <h2 className="text-base font-bold mb-2">Failed to load event assignments</h2>
-        <p className="text-xs opacity-90">{dbError.message}</p>
-        <p className="text-xs mt-4 opacity-75">Please execute the database migration script (`migration_milestone_2.sql`) in the Supabase SQL editor to create the required tables.</p>
+      <div className="space-y-6">
+        <section
+          className="
+            relative overflow-hidden
+            border border-red-500/20
+            bg-red-500/[0.04]
+            p-5 sm:p-6
+          "
+        >
+          <span className="absolute left-0 top-0 h-full w-[2px] bg-red-500" />
+
+          <div className="flex items-start gap-4">
+            <div
+              className="
+                flex h-10 w-10 shrink-0
+                items-center justify-center
+                border border-red-500/20
+                bg-red-500/[0.06]
+                text-red-500
+              "
+            >
+              <AlertTriangle className="h-4 w-4" />
+            </div>
+
+            <div className="min-w-0">
+              <span
+                className="
+                  text-[7px] font-bold uppercase
+                  tracking-[0.26em]
+                  text-red-500
+                "
+              >
+                Assignment Registry Error
+              </span>
+
+              <h2
+                className="
+                  mt-2 text-xl font-normal
+                  text-foreground sm:text-2xl
+                "
+                style={{
+                  fontFamily: '"Playfair Display", serif',
+                }}
+              >
+                Failed to load event assignments
+              </h2>
+
+              <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
+                {dbError.message}
+              </p>
+
+              <div
+                className="
+                  mt-4 border-l border-red-500/30
+                  pl-3 text-[9px] leading-5
+                  text-muted-foreground
+                "
+              >
+                Execute{" "}
+                <code className="font-mono text-foreground">
+                  migration_milestone_2.sql
+                </code>{" "}
+                in the Supabase SQL editor to create the required
+                assignment tables.
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
 
-  const getEscalationBadge = (level: number, reason: string | null) => {
+  /* ==========================================================================
+     HELPERS
+  ========================================================================== */
+
+  const getEscalationConfig = (level: number) => {
     switch (level) {
       case 3:
-        return (
-          <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-red-500 bg-red-500/10 border border-red-500/20 px-2.5 py-0.5 rounded-full animate-pulse">
-            <AlertTriangle className="w-3 h-3" /> High Escalation ({reason})
-          </span>
-        );
+        return {
+          label: "High Escalation",
+          className:
+            "border-red-500/20 bg-red-500/[0.07] text-red-500",
+          dot: "bg-red-500",
+        };
+
       case 2:
-        return (
-          <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
-            <AlertTriangle className="w-3 h-3" /> Medium Escalation ({reason})
-          </span>
-        );
+        return {
+          label: "Medium",
+          className:
+            "border-amber-500/20 bg-amber-500/[0.07] text-amber-500",
+          dot: "bg-amber-500",
+        };
+
       case 1:
-        return (
-          <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-yellow-500 bg-yellow-500/10 border border-yellow-500/20 px-2.5 py-0.5 rounded-full">
-            <AlertTriangle className="w-3 h-3" /> Low Escalation
-          </span>
-        );
+        return {
+          label: "Low",
+          className:
+            "border-yellow-500/20 bg-yellow-500/[0.07] text-yellow-500",
+          dot: "bg-yellow-500",
+        };
+
       default:
-        return (
-          <span className="text-zinc-500 text-[9px] font-bold uppercase tracking-wider bg-zinc-500/5 px-2.5 py-0.5 rounded-full border border-zinc-500/10">
-            Stable
-          </span>
-        );
+        return {
+          label: "Stable",
+          className:
+            "border-border bg-foreground/[0.025] text-muted-foreground",
+          dot: "bg-emerald-500",
+        };
     }
   };
 
-  const getStatusBadgeColor = (status: string) => {
+  const getStatusConfig = (status: string) => {
     switch (status) {
       case "Closed":
       case "Execution Complete":
-        return "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/30 text-emerald-600 dark:text-emerald-400";
+        return {
+          className:
+            "border-emerald-500/20 bg-emerald-500/[0.07] text-emerald-500",
+          dot: "bg-emerald-500",
+        };
+
       case "Execution Started":
       case "Accepted":
-        return "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800/30 text-blue-600 dark:text-blue-400";
+        return {
+          className:
+            "border-blue-500/20 bg-blue-500/[0.07] text-blue-500",
+          dot: "bg-blue-500",
+        };
+
       case "Pending":
       case "Assigned":
-        return "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/30 text-amber-600 dark:text-amber-400";
+        return {
+          className:
+            "border-amber-500/20 bg-amber-500/[0.07] text-amber-500",
+          dot: "bg-amber-500",
+        };
+
       default:
-        return "bg-muted text-muted-foreground border-border/50";
+        return {
+          className:
+            "border-border bg-foreground/[0.025] text-muted-foreground",
+          dot: "bg-muted-foreground",
+        };
     }
   };
 
+  /* ==========================================================================
+     SUMMARY
+  ========================================================================== */
+
+  const activeAssignments = assignments.filter(
+    (assignment) =>
+      assignment.status !== "Closed" &&
+      assignment.status !== "Execution Complete"
+  ).length;
+
+  const escalatedAssignments = assignments.filter(
+    (assignment) => Number(assignment.escalation_level) > 0
+  ).length;
+
+  const criticalAssignments = assignments.filter(
+    (assignment) => Number(assignment.escalation_level) >= 3
+  ).length;
+
+  /* ==========================================================================
+     RENDER
+  ========================================================================== */
+
   return (
-    <div className="space-y-6 animate-fade-in-up">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-light font-heading text-foreground">Event Assignments</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Monitor Operational Managers dispatched to execute finalized events. Audit handover notes and logs.
-        </p>
-      </div>
+    <div className="space-y-6">
+      {/* ================================================================
+          PAGE HEADER
+      ================================================================ */}
+
+      <section
+        className="
+          relative overflow-hidden
+          border border-border
+          bg-surface/40
+        "
+      >
+        <div
+          className="
+            absolute left-0 top-0
+            h-[2px] w-full
+            bg-gradient-to-r
+            from-transparent
+            via-accent-gold/70
+            to-transparent
+          "
+        />
+
+        <div className="p-5 sm:p-6 lg:p-7">
+          <div
+            className="
+              flex flex-col gap-5
+              lg:flex-row
+              lg:items-end
+              lg:justify-between
+            "
+          >
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="h-4 w-4 text-accent-gold" />
+
+                <span
+                  className="
+                    text-[7px] font-bold uppercase
+                    tracking-[0.28em]
+                    text-accent-gold
+                  "
+                >
+                  Operations Control
+                </span>
+              </div>
+
+              <h1
+                className="
+                  mt-3 text-3xl font-normal
+                  tracking-[-0.025em]
+                  text-foreground
+                  sm:text-4xl
+                "
+                style={{
+                  fontFamily: '"Playfair Display", serif',
+                }}
+              >
+                Event Assignments
+              </h1>
+
+              <p
+                className="
+                  mt-2 max-w-xl
+                  text-[10px] leading-5
+                  text-muted-foreground
+                  sm:text-[11px]
+                "
+              >
+                Monitor Operational Managers dispatched to finalized
+                events, review execution ownership and identify
+                assignments requiring administrative attention.
+              </p>
+            </div>
+
+            <div
+              className="
+                flex items-center gap-2
+                border-l-2 border-accent-gold/50
+                pl-4
+              "
+            >
+              <div>
+                <span
+                  className="
+                    block text-[7px]
+                    font-bold uppercase
+                    tracking-[0.2em]
+                    text-muted-foreground/60
+                  "
+                >
+                  Assignment Registry
+                </span>
+
+                <span
+                  className="
+                    mt-1 block text-sm
+                    font-semibold text-foreground
+                  "
+                >
+                  {assignments.length} Total Records
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================
+          DATABASE NOTICE
+      ================================================================ */}
 
       {tableMissing && (
-        <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 text-xs rounded-2xl">
-          <strong>⚠️ Database Note:</strong> Running on mock data. Apply migrations to track real event assignments.
+        <div
+          className="
+            relative overflow-hidden
+            border border-amber-500/20
+            bg-amber-500/[0.05]
+            px-4 py-4 sm:px-5
+          "
+        >
+          <span className="absolute left-0 top-0 h-full w-[2px] bg-amber-500" />
+
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+
+            <div>
+              <span
+                className="
+                  text-[8px] font-bold uppercase
+                  tracking-[0.25em]
+                  text-amber-500
+                "
+              >
+                Database Migration Required
+              </span>
+
+              <p className="mt-1 text-[10px] leading-5 text-muted-foreground">
+                Assignment tracking is currently running on mock data.
+                Apply the required migrations to track real event
+                assignments.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Grid Table */}
-      <div className="p-6 rounded-2xl bg-surface border border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
+      {/* ================================================================
+          OPERATIONAL SUMMARY
+      ================================================================ */}
+
+      <section
+        className="
+          grid grid-cols-2
+          border border-border
+          bg-surface/40
+          lg:grid-cols-4
+        "
+      >
+        <SummaryMetric
+          icon={<UsersRound />}
+          label="Total Assignments"
+          value={assignments.length}
+          description="Registry records"
+        />
+
+        <SummaryMetric
+          icon={<Activity />}
+          label="Active Cases"
+          value={activeAssignments}
+          description="In operational flow"
+        />
+
+        <SummaryMetric
+          icon={<AlertTriangle />}
+          label="Escalated"
+          value={escalatedAssignments}
+          description="Require attention"
+          warning={escalatedAssignments > 0}
+        />
+
+        <SummaryMetric
+          icon={<ShieldCheck />}
+          label="Critical"
+          value={criticalAssignments}
+          description="High escalation"
+          danger={criticalAssignments > 0}
+        />
+      </section>
+
+      {/* ================================================================
+          ASSIGNMENT REGISTRY
+      ================================================================ */}
+
+      <section className="border border-border bg-surface/50">
+        {/* REGISTRY HEADER */}
+
+        <div
+          className="
+            flex flex-col gap-3
+            border-b border-border
+            p-4 sm:p-5
+            lg:flex-row
+            lg:items-center
+            lg:justify-between
+          "
+        >
+          <div>
+            <div className="flex items-center gap-2.5">
+              <Activity className="h-4 w-4 text-accent-gold" />
+
+              <span
+                className="
+                  text-[8px] font-bold uppercase
+                  tracking-[0.28em]
+                  text-accent-gold
+                "
+              >
+                Live Assignment Registry
+              </span>
+            </div>
+
+            <p className="mt-1.5 text-[10px] text-muted-foreground">
+              Operational ownership and event execution status
+            </p>
+          </div>
+
+          <div
+            className="
+              flex items-center gap-2
+              text-[8px] font-semibold
+              uppercase tracking-[0.16em]
+              text-muted-foreground
+            "
+          >
+            <span className="relative flex h-2 w-2">
+              <span
+                className="
+                  absolute inline-flex h-full w-full
+                  animate-ping rounded-full
+                  bg-emerald-500 opacity-30
+                "
+              />
+
+              <span
+                className="
+                  relative inline-flex
+                  h-2 w-2 rounded-full
+                  bg-emerald-500
+                "
+              />
+            </span>
+
+            Registry Active
+          </div>
+        </div>
+
+        {/* EMPTY STATE */}
+
         {assignments.length === 0 ? (
-          <div className="text-center py-16 text-sm text-muted-foreground border border-dashed border-border rounded-2xl bg-muted/10">
-            No Event Assignments created yet.
+          <div
+            className="
+              flex min-h-[340px]
+              flex-col items-center
+              justify-center
+              px-6 py-16
+              text-center
+            "
+          >
+            <div
+              className="
+                flex h-14 w-14
+                items-center justify-center
+                border border-accent-gold/20
+                bg-accent-gold/[0.04]
+                text-accent-gold
+              "
+            >
+              <CalendarDays className="h-5 w-5" />
+            </div>
+
+            <span
+              className="
+                mt-5 text-[7px]
+                font-bold uppercase
+                tracking-[0.26em]
+                text-accent-gold
+              "
+            >
+              Operations Registry
+            </span>
+
+            <h3
+              className="
+                mt-2 text-2xl
+                font-normal text-foreground
+              "
+              style={{
+                fontFamily: '"Playfair Display", serif',
+              }}
+            >
+              No event assignments yet.
+            </h3>
+
+            <p
+              className="
+                mt-2 max-w-sm
+                text-[10px] leading-5
+                text-muted-foreground
+              "
+            >
+              Operational assignments will appear here after an
+              event is finalized and a manager is dispatched.
+            </p>
           </div>
         ) : (
-          <div className="overflow-x-auto -mx-6 px-6">
-            <table className="w-full text-left border-collapse min-w-[900px]">
-              <thead>
-                <tr className="border-b border-border/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  <th className="pb-4 px-3">Assignment ID</th>
-                  <th className="pb-4 px-3">Event Details</th>
-                  <th className="pb-4 px-3">Assigned Manager</th>
-                  <th className="pb-4 px-3">Expected Completion</th>
-                  <th className="pb-4 px-3">Escalation Status</th>
-                  <th className="pb-4 px-3">Status</th>
-                  <th className="pb-4 px-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50 text-sm">
-                {assignments.map((assign) => (
-                  <tr key={assign.id} className="hover:bg-muted/30 transition-colors duration-150">
-                    <td className="py-4 px-3 font-mono text-xs text-muted-foreground">
-                      {assign.id.substring(0, 8)}...
-                    </td>
-                    <td className="py-4 px-3">
-                      <Link
-                        href={`/admin/bookings/${assign.event_id}`}
-                        className="font-bold text-accent-gold hover:underline transition"
+          <>
+            {/* ============================================================
+                DESKTOP TABLE
+            ============================================================ */}
+
+            <div className="hidden overflow-x-auto lg:block">
+              <table className="w-full min-w-[1050px] border-collapse text-left">
+                <thead>
+                  <tr
+                    className="
+                      border-b border-border
+                      bg-background/30
+                      text-[7px]
+                      font-bold uppercase
+                      tracking-[0.2em]
+                      text-muted-foreground/60
+                    "
+                  >
+                    <th className="px-5 py-4">Assignment</th>
+                    <th className="px-5 py-4">Event</th>
+                    <th className="px-5 py-4">Operational Manager</th>
+                    <th className="px-5 py-4">Completion</th>
+                    <th className="px-5 py-4">Escalation</th>
+                    <th className="px-5 py-4">Status</th>
+                    <th className="px-5 py-4 text-right">Control</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {assignments.map((assign, index) => {
+                    const escalation = getEscalationConfig(
+                      Number(assign.escalation_level) || 0
+                    );
+
+                    const status = getStatusConfig(assign.status);
+
+                    return (
+                      <tr
+                        key={assign.id}
+                        className="
+                          group border-b border-border/70
+                          transition-colors duration-300
+                          last:border-b-0
+                          hover:bg-accent-gold/[0.018]
+                        "
                       >
-                        {assign.event_requests?.event_type || "Event"}
-                      </Link>
-                      <div className="text-[10px] text-muted-foreground mt-0.5 flex flex-col gap-0.5">
-                        <span>Client: {assign.event_requests?.profiles?.full_name}</span>
-                        <span>Date: {assign.event_requests?.event_date}</span>
+                        {/* ASSIGNMENT */}
+
+                        <td className="px-5 py-5 align-top">
+                          <div className="flex items-start gap-3">
+                            <span
+                              className="
+                                mt-0.5 flex h-8 w-8
+                                shrink-0 items-center
+                                justify-center
+                                border border-border
+                                bg-background/50
+                                text-[8px]
+                                font-semibold
+                                text-muted-foreground
+                              "
+                            >
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+
+                            <div className="min-w-0">
+                              <span
+                                className="
+                                  block text-[7px]
+                                  font-bold uppercase
+                                  tracking-[0.18em]
+                                  text-muted-foreground/50
+                                "
+                              >
+                                Assignment ID
+                              </span>
+
+                              <span
+                                className="
+                                  mt-1 block
+                                  font-mono text-[9px]
+                                  text-foreground
+                                "
+                              >
+                                {assign.id.substring(0, 8)}...
+                              </span>
+
+                              {assign.assignment_date && (
+                                <span
+                                  className="
+                                    mt-1 block text-[8px]
+                                    text-muted-foreground
+                                  "
+                                >
+                                  {formatDate(assign.assignment_date)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* EVENT */}
+
+                        <td className="px-5 py-5 align-top">
+                          <Link
+                            href={`/admin/bookings/${assign.event_id}`}
+                            className="
+                              group/link inline-flex
+                              items-center gap-1.5
+                              text-sm font-semibold
+                              text-foreground
+                              transition-colors
+                              hover:text-accent-gold
+                            "
+                          >
+                            {assign.event_requests?.event_type ||
+                              "Event"}
+
+                            <ArrowUpRight
+                              className="
+                                h-3 w-3
+                                text-muted-foreground
+                                transition-all
+                                group-hover/link:-translate-y-0.5
+                                group-hover/link:translate-x-0.5
+                                group-hover/link:text-accent-gold
+                              "
+                            />
+                          </Link>
+
+                          <div className="mt-2 space-y-1.5">
+                            <MetaRow
+                              icon={<UserRound />}
+                              value={
+                                assign.event_requests?.profiles
+                                  ?.full_name || "Client unavailable"
+                              }
+                            />
+
+                            <MetaRow
+                              icon={<CalendarDays />}
+                              value={
+                                assign.event_requests?.event_date ||
+                                "Date unavailable"
+                              }
+                            />
+
+                            {assign.event_requests?.location && (
+                              <MetaRow
+                                icon={<MapPin />}
+                                value={assign.event_requests.location}
+                              />
+                            )}
+                          </div>
+                        </td>
+
+                        {/* MANAGER */}
+
+                        <td className="px-5 py-5 align-top">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="
+                                flex h-9 w-9
+                                shrink-0 items-center
+                                justify-center
+                                border border-accent-gold/20
+                                bg-accent-gold/[0.04]
+                                text-accent-gold
+                              "
+                            >
+                              <UserRound className="h-3.5 w-3.5" />
+                            </div>
+
+                            <div>
+                              <span
+                                className="
+                                  block text-[7px]
+                                  font-bold uppercase
+                                  tracking-[0.17em]
+                                  text-muted-foreground/50
+                                "
+                              >
+                                Assigned OM
+                              </span>
+
+                              <span
+                                className="
+                                  mt-1 block text-[10px]
+                                  font-semibold text-foreground
+                                "
+                              >
+                                {assign.profiles?.full_name ||
+                                  "Unassigned"}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* COMPLETION */}
+
+                        <td className="px-5 py-5 align-top">
+                          <div className="flex items-start gap-2">
+                            <Clock3 className="mt-0.5 h-3.5 w-3.5 text-accent-gold" />
+
+                            <div>
+                              <span
+                                className="
+                                  block text-[7px]
+                                  font-bold uppercase
+                                  tracking-[0.17em]
+                                  text-muted-foreground/50
+                                "
+                              >
+                                Expected
+                              </span>
+
+                              <span
+                                className="
+                                  mt-1 block
+                                  font-mono text-[9px]
+                                  text-foreground
+                                "
+                              >
+                                {assign.expected_completion
+                                  ? formatDate(
+                                      assign.expected_completion
+                                    )
+                                  : "N/A"}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* ESCALATION */}
+
+                        <td className="px-5 py-5 align-top">
+                          <div>
+                            <span
+                              className={`
+                                inline-flex items-center gap-1.5
+                                border px-2.5 py-1.5
+                                text-[7px]
+                                font-bold uppercase
+                                tracking-[0.15em]
+                                ${escalation.className}
+                              `}
+                            >
+                              <span
+                                className={`h-1.5 w-1.5 rounded-full ${escalation.dot}`}
+                              />
+
+                              {escalation.label}
+                            </span>
+
+                            {assign.escalation_reason &&
+                              Number(assign.escalation_level) > 0 && (
+                                <p
+                                  className="
+                                    mt-2 max-w-[160px]
+                                    text-[8px] leading-4
+                                    text-muted-foreground
+                                  "
+                                >
+                                  {assign.escalation_reason}
+                                </p>
+                              )}
+                          </div>
+                        </td>
+
+                        {/* STATUS */}
+
+                        <td className="px-5 py-5 align-top">
+                          <span
+                            className={`
+                              inline-flex items-center gap-1.5
+                              border px-2.5 py-1.5
+                              text-[7px]
+                              font-bold uppercase
+                              tracking-[0.15em]
+                              ${status.className}
+                            `}
+                          >
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${status.dot}`}
+                            />
+
+                            {assign.status}
+                          </span>
+                        </td>
+
+                        {/* ACTION */}
+
+                        <td className="px-5 py-5 text-right align-top">
+                          <Link
+                            href={`/admin/bookings/${assign.event_id}`}
+                            className="
+                              inline-flex h-9
+                              items-center justify-center
+                              gap-2
+                              border border-border
+                              bg-background/50
+                              px-3
+                              text-[7px]
+                              font-bold uppercase
+                              tracking-[0.16em]
+                              text-muted-foreground
+                              transition-all duration-300
+
+                              hover:border-accent-gold/40
+                              hover:bg-accent-gold/[0.04]
+                              hover:text-accent-gold
+                            "
+                          >
+                            Manage
+                            <ArrowUpRight className="h-3 w-3" />
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ============================================================
+                MOBILE / TABLET CARDS
+            ============================================================ */}
+
+            <div className="grid grid-cols-1 gap-px bg-border lg:hidden">
+              {assignments.map((assign, index) => {
+                const escalation = getEscalationConfig(
+                  Number(assign.escalation_level) || 0
+                );
+
+                const status = getStatusConfig(assign.status);
+
+                return (
+                  <article
+                    key={assign.id}
+                    className="
+                      relative overflow-hidden
+                      bg-surface p-5
+                    "
+                  >
+                    <div
+                      className="
+                        absolute left-0 top-0
+                        h-[2px] w-10
+                        bg-accent-gold
+                      "
+                    />
+
+                    {/* CARD HEADER */}
+
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <span
+                          className="
+                            text-[7px] font-bold uppercase
+                            tracking-[0.22em]
+                            text-accent-gold
+                          "
+                        >
+                          Assignment {String(index + 1).padStart(2, "0")}
+                        </span>
+
+                        <Link
+                          href={`/admin/bookings/${assign.event_id}`}
+                          className="
+                            mt-1.5 block truncate
+                            text-xl font-normal
+                            text-foreground
+                            transition-colors
+                            hover:text-accent-gold
+                          "
+                          style={{
+                            fontFamily:
+                              '"Playfair Display", serif',
+                          }}
+                        >
+                          {assign.event_requests?.event_type ||
+                            "Event"}
+                        </Link>
+
+                        <span
+                          className="
+                            mt-1 block
+                            font-mono text-[8px]
+                            text-muted-foreground
+                          "
+                        >
+                          {assign.id.substring(0, 8)}...
+                        </span>
                       </div>
-                    </td>
-                    <td className="py-4 px-3 font-bold text-foreground">
-                      {assign.profiles?.full_name || "Unassigned"}
-                    </td>
-                    <td className="py-4 px-3 text-muted-foreground font-mono text-xs">
-                      {assign.expected_completion ? formatDate(assign.expected_completion) : "N/A"}
-                    </td>
-                    <td className="py-4 px-3">
-                      {getEscalationBadge(assign.escalation_level, assign.escalation_reason)}
-                    </td>
-                    <td className="py-4 px-3">
-                      <span className={`px-2.5 py-0.5 text-[9px] font-bold border rounded-md uppercase tracking-wider ${getStatusBadgeColor(assign.status)}`}>
+
+                      <span
+                        className={`
+                          shrink-0 border
+                          px-2 py-1
+                          text-[6px]
+                          font-bold uppercase
+                          tracking-[0.14em]
+                          ${status.className}
+                        `}
+                      >
                         {assign.status}
                       </span>
-                    </td>
-                    <td className="py-4 px-3 text-right">
-                      <Link
-                        href={`/admin/bookings/${assign.event_id}`}
-                        className="px-3 py-1.5 border border-border bg-background hover:bg-surface-raised rounded-xl text-xs font-bold text-foreground text-center transition cursor-pointer"
+                    </div>
+
+                    {/* EVENT INFORMATION */}
+
+                    <div
+                      className="
+                        mt-5 space-y-2.5
+                        border-y border-border/70
+                        py-4
+                      "
+                    >
+                      <MetaRow
+                        icon={<UserRound />}
+                        value={
+                          assign.event_requests?.profiles?.full_name ||
+                          "Client unavailable"
+                        }
+                      />
+
+                      <MetaRow
+                        icon={<CalendarDays />}
+                        value={
+                          assign.event_requests?.event_date ||
+                          "Date unavailable"
+                        }
+                      />
+
+                      {assign.event_requests?.location && (
+                        <MetaRow
+                          icon={<MapPin />}
+                          value={assign.event_requests.location}
+                        />
+                      )}
+                    </div>
+
+                    {/* MANAGER */}
+
+                    <div className="mt-4">
+                      <span
+                        className="
+                          text-[7px] font-bold uppercase
+                          tracking-[0.2em]
+                          text-muted-foreground/55
+                        "
                       >
-                        Manage Case
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        Operational Manager
+                      </span>
+
+                      <div className="mt-2 flex items-center gap-3">
+                        <div
+                          className="
+                            flex h-9 w-9
+                            items-center justify-center
+                            border border-accent-gold/20
+                            bg-accent-gold/[0.04]
+                            text-accent-gold
+                          "
+                        >
+                          <UserRound className="h-3.5 w-3.5" />
+                        </div>
+
+                        <span className="text-[10px] font-semibold text-foreground">
+                          {assign.profiles?.full_name || "Unassigned"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* DETAILS */}
+
+                    <div className="mt-5 grid grid-cols-2 gap-3">
+                      <div
+                        className="
+                          border border-border
+                          bg-background/30
+                          p-3
+                        "
+                      >
+                        <span
+                          className="
+                            block text-[6px]
+                            font-bold uppercase
+                            tracking-[0.18em]
+                            text-muted-foreground/50
+                          "
+                        >
+                          Completion
+                        </span>
+
+                        <span
+                          className="
+                            mt-1.5 block
+                            font-mono text-[9px]
+                            text-foreground
+                          "
+                        >
+                          {assign.expected_completion
+                            ? formatDate(assign.expected_completion)
+                            : "N/A"}
+                        </span>
+                      </div>
+
+                      <div
+                        className="
+                          border border-border
+                          bg-background/30
+                          p-3
+                        "
+                      >
+                        <span
+                          className="
+                            block text-[6px]
+                            font-bold uppercase
+                            tracking-[0.18em]
+                            text-muted-foreground/50
+                          "
+                        >
+                          Escalation
+                        </span>
+
+                        <span
+                          className={`
+                            mt-1.5 inline-flex
+                            items-center gap-1.5
+                            text-[8px] font-semibold
+                            ${escalation.className
+                              .split(" ")
+                              .find((item) =>
+                                item.startsWith("text-")
+                              ) || ""}
+                          `}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${escalation.dot}`}
+                          />
+
+                          {escalation.label}
+                        </span>
+                      </div>
+                    </div>
+
+                    {assign.escalation_reason &&
+                      Number(assign.escalation_level) > 0 && (
+                        <div
+                          className="
+                            mt-3 border-l-2
+                            border-amber-500/40
+                            bg-amber-500/[0.025]
+                            px-3 py-2
+                          "
+                        >
+                          <span
+                            className="
+                              block text-[6px]
+                              font-bold uppercase
+                              tracking-[0.18em]
+                              text-amber-500
+                            "
+                          >
+                            Escalation Note
+                          </span>
+
+                          <p
+                            className="
+                              mt-1 text-[9px]
+                              leading-4
+                              text-muted-foreground
+                            "
+                          >
+                            {assign.escalation_reason}
+                          </p>
+                        </div>
+                      )}
+
+                    {/* ACTION */}
+
+                    <Link
+                      href={`/admin/bookings/${assign.event_id}`}
+                      className="
+                        mt-5 flex h-10 w-full
+                        items-center justify-center
+                        gap-2
+                        bg-accent-gold
+                        text-[7px]
+                        font-bold uppercase
+                        tracking-[0.2em]
+                        text-black
+                        transition-all duration-300
+
+                        hover:brightness-105
+                        active:scale-[0.99]
+                      "
+                    >
+                      Manage Assignment
+                      <ArrowUpRight className="h-3 w-3" />
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          </>
         )}
+      </section>
+    </div>
+  );
+}
+
+/* ============================================================================
+   SUMMARY METRIC
+============================================================================ */
+
+function SummaryMetric({
+  icon,
+  label,
+  value,
+  description,
+  warning = false,
+  danger = false,
+}: {
+  icon: React.ReactElement;
+  label: string;
+  value: number;
+  description: string;
+  warning?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <div
+      className="
+        group relative
+        min-w-0
+        border-b border-r border-border
+        p-4
+        transition-colors duration-300
+        hover:bg-accent-gold/[0.018]
+
+        even:border-r-0
+        lg:border-b-0
+        lg:even:border-r
+        lg:last:border-r-0
+
+        sm:p-5
+      "
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div
+          className={`
+            flex h-8 w-8
+            items-center justify-center
+            border
+            [&>svg]:h-3.5
+            [&>svg]:w-3.5
+
+            ${
+              danger
+                ? "border-red-500/20 bg-red-500/[0.05] text-red-500"
+                : warning
+                  ? "border-amber-500/20 bg-amber-500/[0.05] text-amber-500"
+                  : "border-accent-gold/20 bg-accent-gold/[0.04] text-accent-gold"
+            }
+          `}
+        >
+          {icon}
+        </div>
+
+        {(warning || danger) && value > 0 && (
+          <span
+            className={`
+              h-1.5 w-1.5 rounded-full
+              ${danger ? "bg-red-500" : "bg-amber-500"}
+            `}
+          />
+        )}
+      </div>
+
+      <span
+        className="
+          mt-5 block text-[7px]
+          font-bold uppercase
+          tracking-[0.19em]
+          text-muted-foreground/55
+        "
+      >
+        {label}
+      </span>
+
+      <div className="mt-1 flex items-end gap-2">
+        <span
+          className={`
+            text-2xl font-normal
+            ${
+              danger && value > 0
+                ? "text-red-500"
+                : warning && value > 0
+                  ? "text-amber-500"
+                  : "text-foreground"
+            }
+          `}
+          style={{
+            fontFamily: '"Playfair Display", serif',
+          }}
+        >
+          {value}
+        </span>
+
+        <span className="pb-1 text-[7px] text-muted-foreground">
+          {description}
+        </span>
       </div>
     </div>
   );
 }
+
+/* ============================================================================
+   META ROW
+============================================================================ */
+
+function MetaRow({
+  icon,
+  value,
+}: {
+  icon: React.ReactElement;
+  value: string;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2">
+      <span
+        className="
+          flex h-5 w-5
+          shrink-0 items-center
+          justify-center
+          text-accent-gold
+          [&>svg]:h-3
+          [&>svg]:w-3
+        "
+      >
+        {icon}
+      </span>
+
+      <span
+        className="
+          min-w-0 truncate
+          text-[9px]
+          text-muted-foreground
+        "
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+

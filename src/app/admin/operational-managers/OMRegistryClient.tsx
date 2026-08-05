@@ -1,18 +1,44 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import { createPortal } from "react-dom";
-import { 
-  createOperationalManager, 
-  updateOperationalManager, 
-  updateOMEmploymentStatus, 
-  resetOMPassword 
-} from "./actions";
-import { 
-  Briefcase, Users, UserCheck, UserX, Trash2, Key, Edit, 
-  Plus, X, Mail, Phone, MapPin, Calendar, Award, Activity, AlertCircle 
+
+import {
+  Activity,
+  AlertCircle,
+  Award,
+  Briefcase,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  Edit3,
+  Filter,
+  KeyRound,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  Search,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+  UserCheck,
+  Users,
+  UserX,
+  X,
 } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+
+import {
+  createOperationalManager,
+  resetOMPassword,
+  updateOMEmploymentStatus,
+  updateOperationalManager,
+} from "./actions";
 
 interface OMProfile {
   id: string;
@@ -27,6 +53,7 @@ interface OMProfile {
   performance_score: number;
   completion_rate: number;
   profile_photo: string | null;
+
   profiles: {
     id: string;
     full_name: string;
@@ -41,21 +68,54 @@ interface OMRegistryClientProps {
   databasePending?: boolean;
 }
 
-export default function OMRegistryClient({ initialManagers, databasePending = false }: OMRegistryClientProps) {
-  const [managers, setManagers] = useState<OMProfile[]>(initialManagers);
+type FilterType =
+  | "All"
+  | "Active"
+  | "Available"
+  | "Busy"
+  | "Onboarding"
+  | "Suspended";
+
+const FILTERS: FilterType[] = [
+  "All",
+  "Active",
+  "Available",
+  "Busy",
+  "Onboarding",
+  "Suspended",
+];
+
+const REGIONS = ["North", "South", "East", "West", "Central"];
+
+const CITIES = [
+  "Hyderabad",
+  "Bangalore",
+  "Chennai",
+  "Mumbai",
+  "Delhi",
+];
+
+export default function OMRegistryClient({
+  initialManagers,
+  databasePending = false,
+}: OMRegistryClientProps) {
+  const [managers] = useState<OMProfile[]>(initialManagers);
   const [isPending, startTransition] = useTransition();
-  
-  // Drawer & Form states
-  const [selectedOM, setSelectedOM] = useState<OMProfile | null>(null);
+
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [editOM, setEditOM] = useState<OMProfile | null>(null);
 
-  // OM Form state
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] =
+    useState<FilterType>("All");
+
+  // ================================================================
+  // CREATE FORM
+  // ================================================================
+
   const [fullName, setFullName] = useState("");
   const [employeeId, setEmployeeId] = useState("");
   const [email, setEmail] = useState("");
@@ -64,11 +124,15 @@ export default function OMRegistryClient({ initialManagers, databasePending = fa
   const [regions, setRegions] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
   const [address, setAddress] = useState("");
-  const [joiningDate, setJoiningDate] = useState(new Date().toISOString().split("T")[0]);
-  const [tempPassword, setTempPassword] = useState("Test@123");
-  
-  // Edit Form state
-  const [editOM, setEditOM] = useState<OMProfile | null>(null);
+  const [joiningDate, setJoiningDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [tempPassword, setTempPassword] =
+    useState("Test@123");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const resetForm = () => {
     setFullName("");
@@ -79,12 +143,83 @@ export default function OMRegistryClient({ initialManagers, databasePending = fa
     setRegions([]);
     setCities([]);
     setAddress("");
-    setJoiningDate(new Date().toISOString().split("T")[0]);
+    setJoiningDate(
+      new Date().toISOString().split("T")[0]
+    );
     setTempPassword("Test@123");
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  // ================================================================
+  // FILTERING
+  // ================================================================
+
+  const filteredManagers = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return managers.filter((manager) => {
+      const profile = manager.profiles;
+
+      const searchable = [
+        profile?.full_name,
+        profile?.email,
+        profile?.phone_number,
+        manager.employee_id,
+        manager.designation,
+        ...(manager.assigned_regions || []),
+        ...(manager.assigned_cities || []),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch =
+        !query || searchable.includes(query);
+
+      let matchesFilter = true;
+
+      switch (activeFilter) {
+        case "Active":
+          matchesFilter =
+            manager.employment_status === "Active";
+          break;
+
+        case "Available":
+          matchesFilter =
+            manager.availability_status === "Available";
+          break;
+
+        case "Busy":
+          matchesFilter =
+            manager.availability_status === "Busy";
+          break;
+
+        case "Onboarding":
+          matchesFilter =
+            manager.employment_status === "Onboarding";
+          break;
+
+        case "Suspended":
+          matchesFilter =
+            manager.employment_status === "Suspended";
+          break;
+
+        default:
+          matchesFilter = true;
+      }
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [managers, search, activeFilter]);
+
+  // ================================================================
+  // EXISTING ACTIONS
+  // ================================================================
+
+  const handleCreate = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
+
     if (!fullName || !employeeId || !email || !phone) {
       alert("Please fill in all required fields.");
       return;
@@ -102,513 +237,1890 @@ export default function OMRegistryClient({ initialManagers, databasePending = fa
           cities,
           address,
           joiningDate,
-          temporaryPassword: tempPassword || undefined,
+          temporaryPassword:
+            tempPassword || undefined,
         });
 
         if (res.success) {
-          alert("Operational Manager account created! An activation notification has been generated.");
+          alert(
+            "Operational Manager account created! An activation notification has been generated."
+          );
+
           setIsAdding(false);
           resetForm();
           window.location.reload();
         }
       } catch (err: any) {
-        alert(err.message || "Failed to create manager.");
+        alert(
+          err.message ||
+          "Failed to create manager."
+        );
       }
     });
   };
 
-  const handleEditSubmit = async (e: React.FormEvent) => {
+  const handleEditSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
+
     if (!editOM) return;
 
     startTransition(async () => {
       try {
-        const res = await updateOperationalManager(editOM.id, {
-          fullName: editOM.profiles?.full_name || "",
-          phone: editOM.profiles?.phone_number || "",
-          address: editOM.profiles?.address || "",
-          designation: editOM.designation,
-          regions: editOM.assigned_regions,
-          cities: editOM.assigned_cities,
-          availabilityStatus: editOM.availability_status as any,
-          employmentStatus: editOM.employment_status as any,
-          profilePhoto: editOM.profile_photo || undefined,
-        });
+        const res =
+          await updateOperationalManager(
+            editOM.id,
+            {
+              fullName:
+                editOM.profiles?.full_name || "",
+              phone:
+                editOM.profiles?.phone_number || "",
+              address:
+                editOM.profiles?.address || "",
+              designation: editOM.designation,
+              regions: editOM.assigned_regions,
+              cities: editOM.assigned_cities,
+              availabilityStatus:
+                editOM.availability_status as any,
+              employmentStatus:
+                editOM.employment_status as any,
+              profilePhoto:
+                editOM.profile_photo || undefined,
+            }
+          );
 
         if (res.success) {
-          alert("Operational Manager profile updated.");
+          alert(
+            "Operational Manager profile updated."
+          );
+
           setIsEditing(false);
           setEditOM(null);
           window.location.reload();
         }
       } catch (err: any) {
-        alert(err.message || "Failed to update profile.");
+        alert(
+          err.message ||
+          "Failed to update profile."
+        );
       }
     });
   };
 
-  const handleStatusChange = async (omId: string, nextStatus: OMProfile["employment_status"]) => {
-    if (!confirm(`Are you sure you want to transition this manager's employment status to ${nextStatus}?`)) {
+  const handleStatusChange = async (
+    omId: string,
+    nextStatus: OMProfile["employment_status"]
+  ) => {
+    if (
+      !confirm(
+        `Are you sure you want to transition this manager's employment status to ${nextStatus}?`
+      )
+    ) {
       return;
     }
 
     startTransition(async () => {
       try {
-        await updateOMEmploymentStatus(omId, nextStatus as any);
+        await updateOMEmploymentStatus(
+          omId,
+          nextStatus as any
+        );
+
         alert(`Status updated to ${nextStatus}.`);
         window.location.reload();
       } catch (err: any) {
-        alert(err.message || "Failed to change status.");
+        alert(
+          err.message ||
+          "Failed to change status."
+        );
       }
     });
   };
 
-  const handlePasswordReset = async (om: OMProfile) => {
-    if (!confirm(`Trigger password reset request for ${om.profiles?.full_name}? This will send a reset password email link.`)) {
+  const handlePasswordReset = async (
+    om: OMProfile
+  ) => {
+    if (
+      !confirm(
+        `Trigger password reset request for ${om.profiles?.full_name}? This will send a reset password email link.`
+      )
+    ) {
       return;
     }
 
     startTransition(async () => {
       try {
-        await resetOMPassword(om.id, om.profiles?.email || "");
-        alert("Password reset request sent successfully.");
+        await resetOMPassword(
+          om.id,
+          om.profiles?.email || ""
+        );
+
+        alert(
+          "Password reset request sent successfully."
+        );
       } catch (err: any) {
-        alert(err.message || "Failed to request password reset.");
+        alert(
+          err.message ||
+          "Failed to request password reset."
+        );
       }
     });
   };
 
-  const toggleRegion = (reg: string) => {
-    setRegions((prev) => 
-      prev.includes(reg) ? prev.filter((r) => r !== reg) : [...prev, reg]
+  const toggleRegion = (region: string) => {
+    setRegions((previous) =>
+      previous.includes(region)
+        ? previous.filter(
+          (item) => item !== region
+        )
+        : [...previous, region]
     );
   };
 
   const toggleCity = (city: string) => {
-    setCities((prev) => 
-      prev.includes(city) ? prev.filter((c) => c !== city) : [...prev, city]
+    setCities((previous) =>
+      previous.includes(city)
+        ? previous.filter(
+          (item) => item !== city
+        )
+        : [...previous, city]
     );
   };
 
+  // ================================================================
+  // RENDER
+  // ================================================================
+
   return (
     <div className="space-y-6">
-      
-      {/* DB Migration Note */}
+
+      {/* ============================================================
+          DATABASE NOTICE
+      ============================================================ */}
+
       {databasePending && (
-        <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-400 text-xs rounded-2xl">
-          <strong>⚠️ Operations Team is running on mock data:</strong> Run the migration in `migration_milestone_2.sql` to connect and register real employees.
+        <div
+          className="
+            relative overflow-hidden
+            border border-amber-500/20
+            bg-amber-500/[0.05]
+            px-4 py-4
+            sm:px-5
+          "
+        >
+          <span className="absolute left-0 top-0 h-full w-[2px] bg-amber-500" />
+
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+
+            <div>
+              <span
+                className="
+                  text-[8px] font-bold uppercase
+                  tracking-[0.25em]
+                  text-amber-500
+                "
+              >
+                Database Migration Required
+              </span>
+
+              <p className="mt-1 text-[10px] leading-5 text-muted-foreground">
+                Operations Team is running on mock
+                data. Run{" "}
+                <code className="text-foreground">
+                  migration_milestone_2.sql
+                </code>{" "}
+                to connect and register real
+                employees.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Action Header */}
-      <div className="flex justify-between items-center bg-surface border border-border p-4 rounded-2xl shadow-sm hover:shadow transition duration-200">
-        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">
-          Total Employees: {managers.length}
-        </span>
-        <button
-          onClick={() => setIsAdding(true)}
-          className="px-4 py-2 bg-accent-gold text-black rounded-xl text-xs font-bold hover:scale-[1.01] transition flex items-center gap-1.5 cursor-pointer"
+      {/* ============================================================
+          REGISTRY CONTROL BAR
+      ============================================================ */}
+
+      <section
+        className="
+          border border-border
+          bg-surface/50
+        "
+      >
+        {/* top */}
+
+        <div
+          className="
+            flex flex-col gap-4
+            border-b border-border
+            p-4 sm:p-5
+            xl:flex-row
+            xl:items-center
+            xl:justify-between
+          "
         >
-          <Plus className="w-4 h-4" />
-          <span>Onboard Manager</span>
-        </button>
-      </div>
+          <div>
+            <div className="flex items-center gap-2.5">
+              <Users className="h-4 w-4 text-accent-gold" />
 
-      {/* Manager Registry Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {managers.length === 0 ? (
-          <div className="col-span-full text-center py-20 text-xs text-muted-foreground border border-dashed border-border bg-surface rounded-2xl">
-            No Operational Managers registered yet.
-          </div>
-        ) : (
-          managers.map((om) => {
-            const wlPct = Math.min(100, (om.current_workload / 5) * 100);
-            const workloadColor = om.current_workload >= 4 ? "bg-red-500" : om.current_workload >= 2 ? "bg-amber-500" : "bg-emerald-500";
-            return (
-              <div 
-                key={om.id} 
-                className="bg-surface border border-border rounded-2xl p-5 hover:border-accent-gold/25 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+              <span
+                className="
+                  text-[8px] font-bold uppercase
+                  tracking-[0.28em]
+                  text-accent-gold
+                "
               >
-                <div className="space-y-4">
-                  {/* Header */}
-                  <div className="flex justify-between items-start gap-2.5">
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground truncate">{om.profiles?.full_name}</h4>
-                      <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{om.designation} · ID: {om.employee_id}</p>
-                    </div>
-                    <span className={`px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold border rounded-md ${
-                      om.employment_status === "Active" 
-                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                        : om.employment_status === "Suspended"
-                        ? "bg-red-500/10 border-red-500/20 text-red-400"
-                        : "bg-zinc-500/10 border-zinc-500/20 text-zinc-400"
-                    }`}>
-                      {om.employment_status}
-                    </span>
-                  </div>
+                Manager Registry
+              </span>
+            </div>
 
-                  {/* OM Info */}
-                  <div className="space-y-2 text-[10px] text-muted-foreground pt-3.5 border-t border-border/40">
-                    <div className="flex items-center gap-2"><Mail className="w-3.5 h-3.5 text-accent-gold font-mono" /><span>{om.profiles?.email}</span></div>
-                    <div className="flex items-center gap-2"><Phone className="w-3.5 h-3.5 text-accent-gold" /><span>{om.profiles?.phone_number}</span></div>
-                    <div className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5 text-accent-gold" /><span>{om.profiles?.address || "No Address"}</span></div>
-                    {om.assigned_regions?.length > 0 && (
-                      <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-accent-gold" /><span className="truncate">Regions: {om.assigned_regions.join(", ")}</span></div>
-                    )}
-                  </div>
+            <p className="mt-1.5 text-[10px] text-muted-foreground">
+              {filteredManagers.length} of{" "}
+              {managers.length} operational managers
+            </p>
+          </div>
 
-                  {/* Workload Progress Bar */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[9px] uppercase font-bold text-muted-foreground tracking-wider">
-                      <span>Active Workload</span>
-                      <span>{om.current_workload}/5 Events ({wlPct}%)</span>
-                    </div>
-                    <div className="w-full bg-background rounded-full h-1.5 overflow-hidden">
-                      <div className={`${workloadColor} h-1.5 rounded-full transition-all duration-300`} style={{ width: `${wlPct}%` }} />
-                    </div>
-                  </div>
+          <div
+            className="
+              flex flex-col gap-2.5
+              sm:flex-row
+              sm:items-center
+            "
+          >
+            {/* SEARCH */}
 
-                  {/* Metrics Row */}
-                  <div className="grid grid-cols-3 gap-2.5 pt-3.5 border-t border-border/40 text-center text-[10px]">
-                    <div className="space-y-0.5">
-                      <span className="text-[8px] uppercase tracking-wider text-muted-foreground block font-bold">Rating</span>
-                      <span className="font-bold text-foreground flex items-center justify-center gap-0.5"><Award className="w-3 h-3 text-accent-gold" />{om.performance_score}/5.0</span>
-                    </div>
-                    <div className="space-y-0.5">
-                      <span className="text-[8px] uppercase tracking-wider text-muted-foreground block font-bold">Comp. Rate</span>
-                      <span className="font-bold text-foreground">{om.completion_rate}%</span>
-                    </div>
-                    <div className="space-y-0.5">
-                      <span className="text-[8px] uppercase tracking-wider text-muted-foreground block font-bold">Availability</span>
-                      <span className={`font-bold ${om.availability_status === "Available" ? "text-emerald-500" : "text-amber-500"}`}>{om.availability_status}</span>
-                    </div>
-                  </div>
-                </div>
+            <div
+              className="
+                relative
+                w-full
+                sm:w-[280px]
+              "
+            >
+              <Search
+                className="
+                  absolute left-3 top-1/2
+                  h-3.5 w-3.5
+                  -translate-y-1/2
+                  text-muted-foreground
+                "
+              />
 
-                {/* Actions row */}
-                <div className="grid grid-cols-3 gap-2.5 pt-5 border-t border-border/40 mt-5">
-                  <button
-                    onClick={() => { setEditOM(om); setIsEditing(true); }}
-                    className="w-full py-1.5 bg-background border border-border hover:border-accent-gold/40 hover:text-accent-gold text-foreground rounded-lg text-xxs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <Edit className="w-3 h-3" /> Edit
-                  </button>
-                  <button
-                    onClick={() => handlePasswordReset(om)}
-                    className="w-full py-1.5 bg-background border border-border hover:border-accent-gold/40 hover:text-accent-gold text-foreground rounded-lg text-xxs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <Key className="w-3 h-3" /> Reset PW
-                  </button>
-                  {om.employment_status === "Active" ? (
-                    <button
-                      onClick={() => handleStatusChange(om.id, "Suspended")}
-                      className="w-full py-1.5 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xxs font-bold hover:bg-red-500/20 transition flex items-center justify-center gap-1 cursor-pointer"
-                    >
-                      <UserX className="w-3 h-3" /> Suspend
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleStatusChange(om.id, "Active")}
-                      className="w-full py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xxs font-bold hover:bg-emerald-500/20 transition flex items-center justify-center gap-1 cursor-pointer"
-                    >
-                      <UserCheck className="w-3 h-3" /> Activate
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+              <input
+                value={search}
+                onChange={(e) =>
+                  setSearch(e.target.value)
+                }
+                placeholder="Search manager, city, ID..."
+                className="
+                  h-10 w-full
+                  border border-border
+                  bg-background/70
+                  pl-9 pr-9
+                  text-[10px]
+                  text-foreground
+                  outline-none
+                  transition-all
+                  placeholder:text-muted-foreground/50
 
-      {/* ── DRAWERS/MODALS ── */}
+                  focus:border-accent-gold/50
+                  focus:ring-2
+                  focus:ring-accent-gold/[0.06]
+                "
+              />
 
-      {/* A. Onboarding / Addition Modal */}
-      {isAdding && mounted && createPortal(
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] overflow-y-auto">
-          <div className="flex min-h-full items-start justify-center p-4 py-8 animate-fade-in">
-            <div className="bg-[#0d0b08] border border-border rounded-2xl w-full max-w-xl shadow-2xl flex flex-col animate-scale-in">
-              <div className="flex justify-between items-center p-5 border-b border-border">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Onboard Operational Manager</h3>
-                <button onClick={() => { setIsAdding(false); resetForm(); }} className="text-muted-foreground hover:text-foreground cursor-pointer">
-                  <X className="w-5 h-5" />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="
+                    absolute right-3 top-1/2
+                    -translate-y-1/2
+                    text-muted-foreground
+                    transition-colors
+                    hover:text-foreground
+                  "
+                >
+                  <X className="h-3.5 w-3.5" />
                 </button>
-              </div>
-              
-              <form onSubmit={handleCreate} className="p-5 space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Full Name *</label>
+              )}
+            </div>
+
+            {/* ONBOARD */}
+
+            <button
+              type="button"
+              onClick={() => setIsAdding(true)}
+              className="
+                group
+                flex h-10
+                items-center justify-center
+                gap-2.5
+                bg-accent-gold
+                px-4
+                text-[8px]
+                font-bold uppercase
+                tracking-[0.2em]
+                text-black
+                transition-all duration-300
+
+                hover:brightness-105
+                active:scale-[0.98]
+
+                sm:justify-start
+              "
+            >
+              <Plus
+                className="
+                  h-3.5 w-3.5
+                  transition-transform duration-300
+                  group-hover:rotate-90
+                "
+              />
+
+              Onboard Manager
+            </button>
+          </div>
+        </div>
+
+        {/* filters */}
+
+        <div
+          className="
+            flex items-center gap-2
+            overflow-x-auto
+            px-4 py-3
+            sm:px-5
+
+            [&::-webkit-scrollbar]:hidden
+          "
+        >
+          <SlidersHorizontal className="mr-1 h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
+
+          {FILTERS.map((filter) => {
+            const active =
+              activeFilter === filter;
+
+            return (
+              <button
+                key={filter}
+                type="button"
+                onClick={() =>
+                  setActiveFilter(filter)
+                }
+                className={`
+                  shrink-0
+                  border
+                  px-3 py-1.5
+                  text-[7px]
+                  font-bold uppercase
+                  tracking-[0.18em]
+                  transition-all duration-300
+
+                  ${active
+                    ? "border-accent-gold bg-accent-gold text-black"
+                    : "border-border bg-background/40 text-muted-foreground hover:border-accent-gold/30 hover:text-foreground"
+                  }
+                `}
+              >
+                {filter}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ============================================================
+          MANAGER CARDS
+      ============================================================ */}
+
+      {filteredManagers.length === 0 ? (
+        <EmptyState
+          hasManagers={managers.length > 0}
+          clearFilters={() => {
+            setSearch("");
+            setActiveFilter("All");
+          }}
+          addManager={() => setIsAdding(true)}
+        />
+      ) : (
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-4
+
+            md:grid-cols-2
+            2xl:grid-cols-3
+          "
+        >
+          {filteredManagers.map(
+            (om, index) => (
+              <ManagerCard
+                key={om.id}
+                manager={om}
+                index={index}
+                onEdit={() => {
+                  setEditOM(om);
+                  setIsEditing(true);
+                }}
+                onPasswordReset={() =>
+                  handlePasswordReset(om)
+                }
+                onStatusChange={(status) =>
+                  handleStatusChange(
+                    om.id,
+                    status
+                  )
+                }
+              />
+            )
+          )}
+        </div>
+      )}
+
+      {/* ============================================================
+          CREATE MODAL
+      ============================================================ */}
+
+      {isAdding &&
+        mounted &&
+        createPortal(
+          <ModalShell
+            title="Onboard Operational Manager"
+            eyebrow="New Workforce Record"
+            description="Create an internal Operational Manager account and define their initial operational coverage."
+            onClose={() => {
+              setIsAdding(false);
+              resetForm();
+            }}
+          >
+            <form
+              onSubmit={handleCreate}
+              className="space-y-6"
+            >
+              <FormSection
+                number="01"
+                title="Identity"
+                description="Basic employee information"
+              >
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field
+                    label="Full Name"
+                    required
+                  >
                     <input
-                      type="text"
                       required
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                      onChange={(e) =>
+                        setFullName(
+                          e.target.value
+                        )
+                      }
+                      className={inputClass}
+                      placeholder="Full employee name"
                     />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee ID *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="OM-2026-X"
-                      value={employeeId}
-                      onChange={(e) => setEmployeeId(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
-                    />
-                  </div>
-                </div>
+                  </Field>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Email Address *</label>
+                  <Field
+                    label="Employee ID"
+                    required
+                  >
+                    <input
+                      required
+                      value={employeeId}
+                      onChange={(e) =>
+                        setEmployeeId(
+                          e.target.value
+                        )
+                      }
+                      className={inputClass}
+                      placeholder="OM-2026-X"
+                    />
+                  </Field>
+
+                  <Field
+                    label="Email Address"
+                    required
+                  >
                     <input
                       type="email"
                       required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-mono transition-all duration-200"
+                      onChange={(e) =>
+                        setEmail(e.target.value)
+                      }
+                      className={inputClass}
+                      placeholder="manager@sai.events"
                     />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Phone Number *</label>
+                  </Field>
+
+                  <Field
+                    label="Phone Number"
+                    required
+                  >
                     <input
-                      type="text"
                       required
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-mono transition-all duration-200"
+                      onChange={(e) =>
+                        setPhone(e.target.value)
+                      }
+                      className={inputClass}
+                      placeholder="+91..."
                     />
-                  </div>
+                  </Field>
                 </div>
+              </FormSection>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label>
+              <FormSection
+                number="02"
+                title="Employment"
+                description="Role and joining information"
+              >
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field label="Designation">
                     <input
-                      type="text"
                       value={designation}
-                      onChange={(e) => setDesignation(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                      onChange={(e) =>
+                        setDesignation(
+                          e.target.value
+                        )
+                      }
+                      className={inputClass}
                     />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Joining Date</label>
+                  </Field>
+
+                  <Field label="Joining Date">
                     <input
                       type="date"
                       value={joiningDate}
-                      onChange={(e) => setJoiningDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                      onChange={(e) =>
+                        setJoiningDate(
+                          e.target.value
+                        )
+                      }
+                      className={inputClass}
                     />
-                  </div>
+                  </Field>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Temporary Password *</label>
+                <Field
+                  label="Temporary Password"
+                  required
+                >
                   <input
                     type="password"
                     required
-                    placeholder="Min 8 chars, 1 uppercase, 1 symbol"
                     value={tempPassword}
-                    onChange={(e) => setTempPassword(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-mono transition-all duration-200"
+                    onChange={(e) =>
+                      setTempPassword(
+                        e.target.value
+                      )
+                    }
+                    className={inputClass}
+                    placeholder="Minimum 8 characters"
                   />
-                </div>
+                </Field>
+              </FormSection>
 
-                {/* Assignment Regions & Cities checkboxes */}
-                <div className="space-y-2 pt-2 border-t border-border/40">
-                  <h5 className="text-[10px] font-bold uppercase text-muted-foreground">Assign Regional Coverage</h5>
-                  
-                  <div className="space-y-3">
-                    <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-muted-foreground">Regions</span>
-                      <div className="flex flex-wrap gap-2">
-                        {["North", "South", "East", "West", "Central"].map((reg) => (
-                          <button
-                            key={reg}
-                            type="button"
-                            onClick={() => toggleRegion(reg)}
-                            className={`px-3 py-1 border rounded-lg text-xxs font-semibold cursor-pointer transition ${
-                              regions.includes(reg) 
-                                ? "bg-accent-gold border-accent-gold text-black" 
-                                : "bg-surface border-border text-muted-foreground"
-                            }`}
-                          >
-                            {reg}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+              <FormSection
+                number="03"
+                title="Operational Coverage"
+                description="Assign regions and cities"
+              >
+                <SelectionGroup
+                  label="Regions"
+                  options={REGIONS}
+                  selected={regions}
+                  toggle={toggleRegion}
+                />
 
-                    <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-muted-foreground">Cities</span>
-                      <div className="flex flex-wrap gap-2">
-                        {["Hyderabad", "Bangalore", "Chennai", "Mumbai", "Delhi"].map((city) => (
-                          <button
-                            key={city}
-                            type="button"
-                            onClick={() => toggleCity(city)}
-                            className={`px-3 py-1 border rounded-lg text-xxs font-semibold cursor-pointer transition ${
-                              cities.includes(city) 
-                                ? "bg-accent-gold border-accent-gold text-black" 
-                                : "bg-surface border-border text-muted-foreground"
-                            }`}
-                          >
-                            {city}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <SelectionGroup
+                  label="Cities"
+                  options={CITIES}
+                  selected={cities}
+                  toggle={toggleCity}
+                />
+              </FormSection>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Address</label>
+              <FormSection
+                number="04"
+                title="Contact Location"
+                description="Employee address"
+              >
+                <Field label="Address">
                   <textarea
-                    placeholder="Employee home address..."
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full h-14 px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200 resize-none"
+                    onChange={(e) =>
+                      setAddress(e.target.value)
+                    }
+                    className={`${inputClass} min-h-[90px] resize-none py-3`}
+                    placeholder="Employee home address..."
                   />
-                </div>
+                </Field>
+              </FormSection>
 
+              <div
+                className="
+                  sticky bottom-0
+                  -mx-5 -mb-5
+                  border-t border-border
+                  bg-background/95
+                  p-4
+                  backdrop-blur-xl
+
+                  sm:-mx-7 sm:-mb-7 sm:p-5
+                "
+              >
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="w-full py-2.5 bg-accent-gold text-black rounded-xl text-xs font-bold hover:scale-[1.01] transition disabled:opacity-50 cursor-pointer shadow-md shadow-accent-gold/10"
-                >
-                  {isPending ? "Creating account..." : "Submit & Register Employee"}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+                  className="
+                    flex h-12 w-full
+                    items-center justify-center
+                    gap-2
+                    bg-accent-gold
+                    text-[8px]
+                    font-bold uppercase
+                    tracking-[0.22em]
+                    text-black
+                    transition-all
 
-      {/* B. Edit Modal */}
-      {isEditing && editOM && mounted && createPortal(
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] overflow-y-auto">
-          <div className="flex min-h-full items-start justify-center p-4 py-8 animate-fade-in">
-            <div className="bg-[#0d0b08] border border-border rounded-2xl w-full max-w-xl shadow-2xl flex flex-col animate-scale-in">
-              <div className="flex justify-between items-center p-5 border-b border-border">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Edit Manager Profile</h3>
-                <button onClick={() => { setIsEditing(false); setEditOM(null); }} className="text-muted-foreground hover:text-foreground cursor-pointer">
-                  <X className="w-5 h-5" />
+                    hover:brightness-105
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+                >
+                  {isPending ? (
+                    <>
+                      <Activity className="h-3.5 w-3.5 animate-pulse" />
+                      Creating Account
+                    </>
+                  ) : (
+                    <>
+                      <UserCheck className="h-3.5 w-3.5" />
+                      Register Operational Manager
+                    </>
+                  )}
                 </button>
               </div>
-              
-              <form onSubmit={handleEditSubmit} className="p-5 space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Full Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={editOM.profiles?.full_name || ""}
-                      onChange={(e) => setEditOM({
-                        ...editOM,
-                        profiles: editOM.profiles ? { ...editOM.profiles, full_name: e.target.value } : null
-                      })}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Phone Number</label>
-                    <input
-                      type="text"
-                      required
-                      value={editOM.profiles?.phone_number || ""}
-                      onChange={(e) => setEditOM({
-                        ...editOM,
-                        profiles: editOM.profiles ? { ...editOM.profiles, phone_number: e.target.value } : null
-                      })}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
-                    />
-                  </div>
-                </div>
+            </form>
+          </ModalShell>,
+          document.body
+        )}
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Designation</label>
+      {/* ============================================================
+          EDIT MODAL
+      ============================================================ */}
+
+      {isEditing &&
+        editOM &&
+        mounted &&
+        createPortal(
+          <ModalShell
+            title="Edit Manager Profile"
+            eyebrow={editOM.employee_id}
+            description="Update workforce information, coverage and current availability."
+            onClose={() => {
+              setIsEditing(false);
+              setEditOM(null);
+            }}
+          >
+            <form
+              onSubmit={handleEditSubmit}
+              className="space-y-6"
+            >
+              <FormSection
+                number="01"
+                title="Identity"
+                description="Manager profile information"
+              >
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field label="Full Name">
                     <input
-                      type="text"
+                      required
+                      value={
+                        editOM.profiles
+                          ?.full_name || ""
+                      }
+                      onChange={(e) =>
+                        setEditOM({
+                          ...editOM,
+                          profiles:
+                            editOM.profiles
+                              ? {
+                                ...editOM.profiles,
+                                full_name:
+                                  e.target
+                                    .value,
+                              }
+                              : null,
+                        })
+                      }
+                      className={inputClass}
+                    />
+                  </Field>
+
+                  <Field label="Phone Number">
+                    <input
+                      required
+                      value={
+                        editOM.profiles
+                          ?.phone_number || ""
+                      }
+                      onChange={(e) =>
+                        setEditOM({
+                          ...editOM,
+                          profiles:
+                            editOM.profiles
+                              ? {
+                                ...editOM.profiles,
+                                phone_number:
+                                  e.target
+                                    .value,
+                              }
+                              : null,
+                        })
+                      }
+                      className={inputClass}
+                    />
+                  </Field>
+                </div>
+              </FormSection>
+
+              <FormSection
+                number="02"
+                title="Operations"
+                description="Designation and availability"
+              >
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field label="Designation">
+                    <input
                       value={editOM.designation}
-                      onChange={(e) => setEditOM({ ...editOM, designation: e.target.value })}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200"
+                      onChange={(e) =>
+                        setEditOM({
+                          ...editOM,
+                          designation:
+                            e.target.value,
+                        })
+                      }
+                      className={inputClass}
                     />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Availability Status</label>
-                    <select
-                      value={editOM.availability_status}
-                      onChange={(e) => setEditOM({ ...editOM, availability_status: e.target.value })}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
-                    >
-                      <option value="Available">Available</option>
-                      <option value="Busy">Busy</option>
-                      <option value="On Leave">On Leave</option>
-                      <option value="Training">Training</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-                </div>
+                  </Field>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Regions (Comma separated)</label>
+                  <Field label="Availability">
+                    <div className="relative">
+                      <select
+                        value={
+                          editOM.availability_status
+                        }
+                        onChange={(e) =>
+                          setEditOM({
+                            ...editOM,
+                            availability_status:
+                              e.target.value,
+                          })
+                        }
+                        className={`${inputClass} appearance-none pr-10`}
+                      >
+                        <option value="Available">
+                          Available
+                        </option>
+                        <option value="Busy">
+                          Busy
+                        </option>
+                        <option value="On Leave">
+                          On Leave
+                        </option>
+                        <option value="Training">
+                          Training
+                        </option>
+                        <option value="Inactive">
+                          Inactive
+                        </option>
+                      </select>
+
+                      <ChevronDown
+                        className="
+                          pointer-events-none
+                          absolute right-3 top-1/2
+                          h-3.5 w-3.5
+                          -translate-y-1/2
+                          text-muted-foreground
+                        "
+                      />
+                    </div>
+                  </Field>
+                </div>
+              </FormSection>
+
+              <FormSection
+                number="03"
+                title="Coverage"
+                description="Regional responsibilities"
+              >
+                <Field label="Regions">
                   <input
-                    type="text"
-                    placeholder="e.g. South, North"
-                    value={editOM.assigned_regions.join(", ")}
-                    onChange={(e) => setEditOM({
-                      ...editOM,
-                      assigned_regions: e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
-                    })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
+                    value={editOM.assigned_regions.join(
+                      ", "
+                    )}
+                    onChange={(e) =>
+                      setEditOM({
+                        ...editOM,
+                        assigned_regions:
+                          e.target.value
+                            .split(",")
+                            .map((item) =>
+                              item.trim()
+                            )
+                            .filter(Boolean),
+                      })
+                    }
+                    className={inputClass}
+                    placeholder="South, North"
                   />
-                </div>
+                </Field>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Cities (Comma separated)</label>
+                <Field label="Cities">
                   <input
-                    type="text"
-                    placeholder="e.g. Bangalore, Hyderabad"
-                    value={editOM.assigned_cities.join(", ")}
-                    onChange={(e) => setEditOM({
-                      ...editOM,
-                      assigned_cities: e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
-                    })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground font-semibold transition-all duration-200"
+                    value={editOM.assigned_cities.join(
+                      ", "
+                    )}
+                    onChange={(e) =>
+                      setEditOM({
+                        ...editOM,
+                        assigned_cities:
+                          e.target.value
+                            .split(",")
+                            .map((item) =>
+                              item.trim()
+                            )
+                            .filter(Boolean),
+                      })
+                    }
+                    className={inputClass}
+                    placeholder="Hyderabad, Bangalore"
                   />
-                </div>
+                </Field>
+              </FormSection>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Address</label>
+              <FormSection
+                number="04"
+                title="Address"
+                description="Contact location"
+              >
+                <Field label="Address">
                   <textarea
-                    value={editOM.profiles?.address || ""}
-                    onChange={(e) => setEditOM({
-                      ...editOM,
-                      profiles: editOM.profiles ? { ...editOM.profiles, address: e.target.value } : null
-                    })}
-                    className="w-full h-14 px-3 py-2 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-gold/30 focus:border-accent-gold text-foreground transition-all duration-200 resize-none"
+                    value={
+                      editOM.profiles?.address || ""
+                    }
+                    onChange={(e) =>
+                      setEditOM({
+                        ...editOM,
+                        profiles:
+                          editOM.profiles
+                            ? {
+                              ...editOM.profiles,
+                              address:
+                                e.target.value,
+                            }
+                            : null,
+                      })
+                    }
+                    className={`${inputClass} min-h-[90px] resize-none py-3`}
                   />
-                </div>
+                </Field>
+              </FormSection>
 
+              <div
+                className="
+                  sticky bottom-0
+                  -mx-5 -mb-5
+                  border-t border-border
+                  bg-background/95
+                  p-4
+                  backdrop-blur-xl
+
+                  sm:-mx-7 sm:-mb-7 sm:p-5
+                "
+              >
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="w-full py-2.5 bg-accent-gold text-black rounded-xl text-xs font-bold hover:scale-[1.01] transition disabled:opacity-50 cursor-pointer shadow-md shadow-accent-gold/10"
-                >
-                  {isPending ? "Saving changes..." : "Save Profile Details"}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+                  className="
+                    flex h-12 w-full
+                    items-center justify-center
+                    gap-2
+                    bg-accent-gold
+                    text-[8px]
+                    font-bold uppercase
+                    tracking-[0.22em]
+                    text-black
 
+                    disabled:opacity-50
+                  "
+                >
+                  {isPending
+                    ? "Saving Changes..."
+                    : "Save Profile Details"}
+                </button>
+              </div>
+            </form>
+          </ModalShell>,
+          document.body
+        )}
     </div>
   );
 }
+
+// ============================================================================
+// MANAGER CARD
+// ============================================================================
+
+function ManagerCard({
+  manager,
+  index,
+  onEdit,
+  onPasswordReset,
+  onStatusChange,
+}: {
+  manager: OMProfile;
+  index: number;
+  onEdit: () => void;
+  onPasswordReset: () => void;
+  onStatusChange: (
+    status: OMProfile["employment_status"]
+  ) => void;
+}) {
+  const profile = manager.profiles;
+
+  const workload =
+    Number(manager.current_workload) || 0;
+
+  const workloadPercentage = Math.min(
+    100,
+    (workload / 5) * 100
+  );
+
+  const initials =
+    profile?.full_name
+      ?.split(" ")
+      .map((item) => item[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "OM";
+
+  const statusStyle =
+    manager.employment_status === "Active"
+      ? "border-emerald-500/20 bg-emerald-500/[0.07] text-emerald-500"
+      : manager.employment_status ===
+        "Suspended"
+        ? "border-red-500/20 bg-red-500/[0.07] text-red-500"
+        : manager.employment_status ===
+          "Onboarding"
+          ? "border-amber-500/20 bg-amber-500/[0.07] text-amber-500"
+          : "border-border bg-foreground/[0.03] text-muted-foreground";
+
+  return (
+    <article
+      className="
+        group relative
+        flex min-w-0 flex-col
+        overflow-hidden
+        border border-border
+        bg-surface/55
+        transition-all duration-500
+
+        hover:border-accent-gold/30
+        hover:shadow-[0_20px_55px_rgba(0,0,0,0.08)]
+      "
+    >
+      {/* top accent */}
+
+      <div
+        className="
+          absolute left-0 top-0
+          h-[2px] w-0
+          bg-accent-gold
+          transition-all duration-700
+          group-hover:w-full
+        "
+      />
+
+      {/* HEADER */}
+
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start gap-4">
+
+          {/* avatar */}
+
+          <div
+            className="
+              relative flex h-12 w-12
+              shrink-0 items-center justify-center
+              overflow-hidden
+              border border-accent-gold/20
+              bg-accent-gold/[0.05]
+            "
+          >
+            {manager.profile_photo ? (
+              <img
+                src={manager.profile_photo}
+                alt={profile?.full_name || "Manager"}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span
+                className="
+                  text-base font-normal
+                  text-accent-gold
+                "
+                style={{
+                  fontFamily:
+                    '"Playfair Display", serif',
+                }}
+              >
+                {initials}
+              </span>
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <span
+                  className="
+                    block text-[7px]
+                    font-bold uppercase
+                    tracking-[0.24em]
+                    text-accent-gold
+                  "
+                >
+                  {manager.employee_id}
+                </span>
+
+                <h3
+                  className="
+                    mt-1 truncate
+                    text-xl font-normal
+                    tracking-[-0.015em]
+                    text-foreground
+                  "
+                  style={{
+                    fontFamily:
+                      '"Playfair Display", serif',
+                  }}
+                >
+                  {profile?.full_name ||
+                    "Unnamed Manager"}
+                </h3>
+
+                <span className="mt-1 block truncate text-[9px] text-muted-foreground">
+                  {manager.designation}
+                </span>
+              </div>
+
+              <span
+                className={`
+                  shrink-0
+                  border
+                  px-2 py-1
+                  text-[6px]
+                  font-bold uppercase
+                  tracking-[0.18em]
+                  ${statusStyle}
+                `}
+              >
+                {manager.employment_status}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* CONTACT */}
+
+        <div
+          className="
+            mt-5 space-y-2.5
+            border-t border-border/70
+            pt-4
+          "
+        >
+          <InfoRow
+            icon={<Mail />}
+            value={
+              profile?.email ||
+              "Email unavailable"
+            }
+          />
+
+          <InfoRow
+            icon={<Phone />}
+            value={
+              profile?.phone_number ||
+              "Phone unavailable"
+            }
+          />
+
+          <InfoRow
+            icon={<MapPin />}
+            value={
+              manager.assigned_cities?.length
+                ? manager.assigned_cities.join(
+                  " · "
+                )
+                : profile?.address ||
+                "No location assigned"
+            }
+          />
+        </div>
+
+        {/* COVERAGE */}
+
+        <div className="mt-5">
+          <span
+            className="
+              text-[7px] font-bold uppercase
+              tracking-[0.22em]
+              text-muted-foreground/60
+            "
+          >
+            Operational Coverage
+          </span>
+
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {manager.assigned_regions?.length ? (
+              manager.assigned_regions.map(
+                (region) => (
+                  <span
+                    key={region}
+                    className="
+                      border border-border
+                      bg-background/50
+                      px-2 py-1
+                      text-[7px]
+                      font-semibold
+                      text-muted-foreground
+                    "
+                  >
+                    {region}
+                  </span>
+                )
+              )
+            ) : (
+              <span className="text-[9px] italic text-muted-foreground/50">
+                No regions assigned
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* WORKLOAD */}
+
+        <div
+          className="
+            mt-5
+            border-y border-border/70
+            py-4
+          "
+        >
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <span
+                className="
+                  text-[7px] font-bold uppercase
+                  tracking-[0.22em]
+                  text-muted-foreground/60
+                "
+              >
+                Active Workload
+              </span>
+
+              <div className="mt-1 flex items-baseline gap-1">
+                <span
+                  className="
+                    text-2xl font-normal
+                    text-foreground
+                  "
+                  style={{
+                    fontFamily:
+                      '"Playfair Display", serif',
+                  }}
+                >
+                  {workload}
+                </span>
+
+                <span className="text-[8px] text-muted-foreground">
+                  / 5 events
+                </span>
+              </div>
+            </div>
+
+            <span
+              className={`
+                text-[8px] font-bold uppercase
+                tracking-[0.16em]
+
+                ${workload >= 4
+                  ? "text-red-500"
+                  : workload >= 2
+                    ? "text-amber-500"
+                    : "text-emerald-500"
+                }
+              `}
+            >
+              {workload >= 4
+                ? "High Load"
+                : workload >= 2
+                  ? "Moderate"
+                  : "Capacity Open"}
+            </span>
+          </div>
+
+          <div className="mt-3 flex gap-1">
+            {Array.from({ length: 5 }).map(
+              (_, item) => (
+                <span
+                  key={item}
+                  className={`
+                    h-1.5 flex-1
+                    transition-colors
+
+                    ${item < workload
+                      ? workload >= 4
+                        ? "bg-red-500"
+                        : workload >= 2
+                          ? "bg-amber-500"
+                          : "bg-emerald-500"
+                      : "bg-foreground/[0.07]"
+                    }
+                  `}
+                />
+              )
+            )}
+          </div>
+
+          <span className="sr-only">
+            Workload {workloadPercentage} percent
+          </span>
+        </div>
+
+        {/* METRICS */}
+
+        <div className="mt-4 grid grid-cols-3">
+          <Metric
+            icon={<Award />}
+            label="Performance"
+            value={`${manager.performance_score || 0}/5`}
+          />
+
+          <Metric
+            icon={<Activity />}
+            label="Completion"
+            value={`${manager.completion_rate || 0}%`}
+          />
+
+          <Metric
+            icon={<ShieldCheck />}
+            label="Availability"
+            value={
+              manager.availability_status ||
+              "Unknown"
+            }
+            highlight={
+              manager.availability_status ===
+              "Available"
+            }
+          />
+        </div>
+      </div>
+
+      {/* ACTION BAR */}
+
+      <div
+        className="
+          mt-auto
+          grid grid-cols-3
+          border-t border-border
+          bg-background/30
+        "
+      >
+        <CardAction
+          icon={<Edit3 />}
+          label="Edit"
+          onClick={onEdit}
+        />
+
+        <CardAction
+          icon={<KeyRound />}
+          label="Reset"
+          onClick={onPasswordReset}
+        />
+
+        {manager.employment_status ===
+          "Active" ? (
+          <CardAction
+            icon={<UserX />}
+            label="Suspend"
+            danger
+            onClick={() =>
+              onStatusChange("Suspended")
+            }
+          />
+        ) : (
+          <CardAction
+            icon={<UserCheck />}
+            label="Activate"
+            success
+            onClick={() =>
+              onStatusChange("Active")
+            }
+          />
+        )}
+      </div>
+    </article>
+  );
+}
+
+// ============================================================================
+// SMALL COMPONENTS
+// ============================================================================
+
+function InfoRow({
+  icon,
+  value,
+}: {
+  icon: React.ReactElement;
+  value: string;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2.5">
+      <span
+        className="
+          flex h-6 w-6 shrink-0
+          items-center justify-center
+          text-accent-gold
+          [&>svg]:h-3
+          [&>svg]:w-3
+        "
+      >
+        {icon}
+      </span>
+
+      <span className="min-w-0 truncate text-[9px] text-muted-foreground">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function Metric({
+  icon,
+  label,
+  value,
+  highlight = false,
+}: {
+  icon: React.ReactElement;
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className="
+        min-w-0
+        border-r border-border/60
+        px-2
+        text-center
+        last:border-r-0
+        first:pl-0
+        last:pr-0
+      "
+    >
+      <div
+        className="
+          mb-1 flex items-center
+          justify-center
+          text-accent-gold
+          [&>svg]:h-3
+          [&>svg]:w-3
+        "
+      >
+        {icon}
+      </div>
+
+      <span
+        className="
+          block truncate
+          text-[6px]
+          font-bold uppercase
+          tracking-[0.16em]
+          text-muted-foreground/55
+        "
+      >
+        {label}
+      </span>
+
+      <span
+        className={`
+          mt-1 block truncate
+          text-[9px] font-semibold
+
+          ${highlight
+            ? "text-emerald-500"
+            : "text-foreground"
+          }
+        `}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function CardAction({
+  icon,
+  label,
+  onClick,
+  danger = false,
+  success = false,
+}: {
+  icon: React.ReactElement;
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
+  success?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        flex min-w-0
+        items-center justify-center
+        gap-1.5
+        border-r border-border
+        px-2 py-3.5
+        text-[7px]
+        font-bold uppercase
+        tracking-[0.12em]
+        transition-all duration-300
+        last:border-r-0
+
+        ${danger
+          ? "text-red-500 hover:bg-red-500/[0.06]"
+          : success
+            ? "text-emerald-500 hover:bg-emerald-500/[0.06]"
+            : "text-muted-foreground hover:bg-accent-gold/[0.05] hover:text-accent-gold"
+        }
+
+        [&>svg]:h-3
+        [&>svg]:w-3
+      `}
+    >
+      {icon}
+
+      <span className="truncate">
+        {label}
+      </span>
+    </button>
+  );
+}
+
+// ============================================================================
+// MODAL
+// ============================================================================
+
+function ModalShell({
+  title,
+  eyebrow,
+  description,
+  onClose,
+  children,
+}: {
+  title: string;
+  eyebrow: string;
+  description: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="
+        fixed inset-0
+        z-[9999]
+        overflow-y-auto
+        bg-black/65
+        backdrop-blur-md
+      "
+    >
+      <div
+        className="
+          flex min-h-full
+          items-start justify-center
+          p-3 py-5
+
+          sm:p-6 sm:py-8
+        "
+      >
+        <div
+          className="
+            relative
+            w-full max-w-2xl
+            overflow-hidden
+            border border-border
+            bg-background
+            shadow-[0_35px_100px_rgba(0,0,0,0.45)]
+          "
+        >
+          {/* gold top line */}
+
+          <div className="absolute left-0 top-0 h-[2px] w-full bg-gradient-to-r from-transparent via-accent-gold to-transparent" />
+
+          {/* header */}
+
+          <div
+            className="
+              flex items-start
+              justify-between gap-5
+              border-b border-border
+              p-5
+
+              sm:p-7
+            "
+          >
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5">
+                <span className="h-px w-6 bg-accent-gold" />
+
+                <span
+                  className="
+                    truncate
+                    text-[7px]
+                    font-bold uppercase
+                    tracking-[0.26em]
+                    text-accent-gold
+                  "
+                >
+                  {eyebrow}
+                </span>
+              </div>
+
+              <h2
+                className="
+                  mt-3
+                  text-2xl sm:text-3xl
+                  font-normal
+                  tracking-[-0.025em]
+                  text-foreground
+                "
+                style={{
+                  fontFamily:
+                    '"Playfair Display", serif',
+                }}
+              >
+                {title}
+              </h2>
+
+              <p
+                className="
+                  mt-2 max-w-lg
+                  text-[9px] sm:text-[10px]
+                  leading-5
+                  text-muted-foreground
+                "
+              >
+                {description}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="
+                flex h-9 w-9 shrink-0
+                items-center justify-center
+                border border-border
+                text-muted-foreground
+                transition-all duration-300
+
+                hover:border-accent-gold/40
+                hover:text-accent-gold
+              "
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="p-5 sm:p-7">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FormSection({
+  number,
+  title,
+  description,
+  children,
+}: {
+  number: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div
+        className="
+          mb-4 flex items-end
+          justify-between gap-4
+          border-b border-border/70
+          pb-3
+        "
+      >
+        <div className="flex items-center gap-3">
+          <span
+            className="
+              text-xl font-normal
+              text-accent-gold/35
+            "
+            style={{
+              fontFamily:
+                '"Playfair Display", serif',
+            }}
+          >
+            {number}
+          </span>
+
+          <div>
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground">
+              {title}
+            </h3>
+
+            <p className="mt-0.5 text-[8px] text-muted-foreground">
+              {description}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Field({
+  label,
+  required = false,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block space-y-1.5">
+      <span
+        className="
+          text-[7px]
+          font-bold uppercase
+          tracking-[0.2em]
+          text-muted-foreground
+        "
+      >
+        {label}
+
+        {required && (
+          <span className="ml-1 text-accent-gold">
+            *
+          </span>
+        )}
+      </span>
+
+      {children}
+    </label>
+  );
+}
+
+function SelectionGroup({
+  label,
+  options,
+  selected,
+  toggle,
+}: {
+  label: string;
+  options: string[];
+  selected: string[];
+  toggle: (value: string) => void;
+}) {
+  return (
+    <div>
+      <span
+        className="
+          text-[7px]
+          font-bold uppercase
+          tracking-[0.2em]
+          text-muted-foreground
+        "
+      >
+        {label}
+      </span>
+
+      <div className="mt-2 flex flex-wrap gap-2">
+        {options.map((option) => {
+          const active =
+            selected.includes(option);
+
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => toggle(option)}
+              className={`
+                flex items-center gap-1.5
+                border
+                px-3 py-2
+                text-[8px]
+                font-semibold
+                transition-all duration-300
+
+                ${active
+                  ? "border-accent-gold bg-accent-gold text-black"
+                  : "border-border bg-background text-muted-foreground hover:border-accent-gold/30 hover:text-foreground"
+                }
+              `}
+            >
+              {active && (
+                <Check className="h-3 w-3" />
+              )}
+
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({
+  hasManagers,
+  clearFilters,
+  addManager,
+}: {
+  hasManagers: boolean;
+  clearFilters: () => void;
+  addManager: () => void;
+}) {
+  return (
+    <div
+      className="
+        flex min-h-[320px]
+        flex-col items-center
+        justify-center
+        border border-dashed
+        border-border
+        bg-surface/25
+        px-6 py-16
+        text-center
+      "
+    >
+      <div
+        className="
+          flex h-14 w-14
+          items-center justify-center
+          border border-accent-gold/20
+          bg-accent-gold/[0.04]
+          text-accent-gold
+        "
+      >
+        {hasManagers ? (
+          <Filter className="h-5 w-5" />
+        ) : (
+          <Users className="h-5 w-5" />
+        )}
+      </div>
+
+      <span
+        className="
+          mt-5 text-[7px]
+          font-bold uppercase
+          tracking-[0.26em]
+          text-accent-gold
+        "
+      >
+        Operations Registry
+      </span>
+
+      <h3
+        className="
+          mt-2 text-2xl
+          font-normal
+          text-foreground
+        "
+        style={{
+          fontFamily:
+            '"Playfair Display", serif',
+        }}
+      >
+        {hasManagers
+          ? "No matching managers."
+          : "Build your operations team."}
+      </h3>
+
+      <p className="mt-2 max-w-sm text-[10px] leading-5 text-muted-foreground">
+        {hasManagers
+          ? "No operational managers match the current search or filters."
+          : "No Operational Managers have been registered yet."}
+      </p>
+
+      <button
+        type="button"
+        onClick={
+          hasManagers
+            ? clearFilters
+            : addManager
+        }
+        className="
+          mt-6
+          bg-accent-gold
+          px-5 py-2.5
+          text-[7px]
+          font-bold uppercase
+          tracking-[0.2em]
+          text-black
+        "
+      >
+        {hasManagers
+          ? "Clear Filters"
+          : "Onboard First Manager"}
+      </button>
+    </div>
+  );
+}
+
+const inputClass = `
+  h-11
+  w-full
+  border
+  border-border
+  bg-background
+  px-3
+  text-[10px]
+  text-foreground
+  outline-none
+  transition-all
+  duration-300
+  placeholder:text-muted-foreground/40
+
+  focus:border-accent-gold/50
+  focus:ring-2
+  focus:ring-accent-gold/[0.06]
+`;

@@ -240,11 +240,10 @@ export default function MeetingsClient({ initialMeetings, tableMissing }: Meetin
               <button
                 key={tab}
                 onClick={() => setStatusFilter(tab)}
-                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
-                  statusFilter === tab
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${statusFilter === tab
                     ? "bg-accent-gold text-black shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 {tab === "all" ? "All" : tab}
               </button>
@@ -360,11 +359,10 @@ export default function MeetingsClient({ initialMeetings, tableMissing }: Meetin
             <div className="p-4 sm:p-6 space-y-6 flex-1">
               {actionMessage && (
                 <div
-                  className={`p-3.5 rounded-xl text-xs font-semibold border ${
-                    actionMessage.type === "success"
+                  className={`p-3.5 rounded-xl text-xs font-semibold border ${actionMessage.type === "success"
                       ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                       : "bg-red-500/10 border-red-500/30 text-red-400"
-                  }`}
+                    }`}
                 >
                   {actionMessage.text}
                 </div>

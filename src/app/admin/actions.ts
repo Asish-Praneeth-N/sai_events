@@ -307,6 +307,11 @@ export async function scheduleEventMeeting(
 
   if (fetchErr || !meeting) throw new Error("Meeting request not found.");
 
+  const todayStr = new Date().toLocaleDateString("en-CA");
+  if (confirmedDate < todayStr) {
+    throw new Error("Cannot schedule a meeting for a past date. Please select today or a future date.");
+  }
+
   const { error } = await supabase
     .from("event_meetings")
     .update({

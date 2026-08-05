@@ -42,7 +42,10 @@ export default async function AdminEnquiriesPage() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      if (error.code === "42P01" || error.message.includes("does not exist")) {
+      if (
+        error.code === "42P01" ||
+        error.message.includes("does not exist")
+      ) {
         tableMissing = true;
       } else {
         throw error;

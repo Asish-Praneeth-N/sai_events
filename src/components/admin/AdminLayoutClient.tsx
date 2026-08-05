@@ -39,7 +39,7 @@ export default function AdminLayoutClient({
 
   return (
     <div className="flex min-h-screen bg-background text-foreground font-sans relative overflow-x-hidden">
-      
+
       {/* ── Desktop Sidebar ── */}
       <div className="hidden md:flex flex-shrink-0">
         <AdminSidebar adminName={adminName} adminEmail={adminEmail} />
@@ -49,16 +49,16 @@ export default function AdminLayoutClient({
       {mobileMenuOpen && (
         <>
           {/* Backdrop */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden animate-fade-in"
             onClick={() => setMobileMenuOpen(false)}
           />
           {/* Drawer container */}
           <div className="fixed inset-y-0 left-0 w-64 bg-surface z-55 md:hidden animate-scale-in origin-left flex shadow-2xl">
-            <AdminSidebar 
-              adminName={adminName} 
-              adminEmail={adminEmail} 
-              onClose={() => setMobileMenuOpen(false)} 
+            <AdminSidebar
+              adminName={adminName}
+              adminEmail={adminEmail}
+              onClose={() => setMobileMenuOpen(false)}
             />
           </div>
         </>
@@ -66,12 +66,12 @@ export default function AdminLayoutClient({
 
       {/* ── Main Work Area ── */}
       <div className="flex-1 flex flex-col min-w-0 w-full">
-        
+
         {/* ── Top Header ── */}
-        <AdminHeader 
-          adminName={adminName} 
-          onSearchClick={() => setSearchOpen(true)} 
-          onMenuClick={() => setMobileMenuOpen(true)} 
+        <AdminHeader
+          adminName={adminName}
+          onSearchClick={() => setSearchOpen(true)}
+          onMenuClick={() => setMobileMenuOpen(true)}
         />
 
         {/* ── Page Content Container ── */}
