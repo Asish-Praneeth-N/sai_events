@@ -53,9 +53,14 @@ function getLowPowerDevice() {
     }).connection?.saveData
   );
 
-  // Screen width is not a performance signal. Modern phones should retain
-  // the full visual treatment; only genuinely constrained devices simplify it.
-  return lowCPU || saveData;
+  /* Touch / small-screen mobile: always use the lighter animation path.
+     Even flagship phones (8-core) cannot maintain 60 fps when compositing
+     multiple blurred + transformed layers simultaneously. */
+  const isTouchMobile =
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0) &&
+    window.innerWidth < 768;
+
+  return lowCPU || saveData || isTouchMobile;
 }
 
 /* ==========================================================================
@@ -283,9 +288,11 @@ export default function CinematicDoors({
             key="invitation-stage"
             initial={{
               opacity: 0,
-              y: quick ? 28 : 60,
-              scale: 0.94,
-              rotateX: quick ? 0 : 7,
+              y: quick ? 20 : 50,
+              scale: 0.96,
+              /* NO rotateX — 3-D perspective forces all children onto
+                 separate compositor layers, causing GPU over-allocation
+                 and jank on every mobile device. */
             }}
             animate={
               invitationVisible
@@ -293,17 +300,16 @@ export default function CinematicDoors({
                   opacity: 1,
                   y: 0,
                   scale: 1,
-                  rotateX: 0,
                 }
                 : {}
             }
             exit={{
               opacity: 0,
-              scale: 1.025,
-              y: -8,
+              scale: 1.02,
+              y: -6,
             }}
             transition={{
-              duration: quick ? 0.55 : 1.05,
+              duration: quick ? 0.45 : 0.95,
               ease: CINEMATIC_EASE,
             }}
             className="
@@ -317,38 +323,45 @@ export default function CinematicDoors({
               py-[max(8px,env(safe-area-inset-top))]
               sm:px-[clamp(12px,4vw,32px)]
               sm:py-[max(12px,env(safe-area-inset-top))]
-              [perspective:1600px]
             "
+            /* NO [perspective:1600px] — perspective on a parent forces
+               EVERY child into its own composite layer, multiplying
+               GPU memory usage and causing constant re-compositing. */
+            style={{
+              willChange: "opacity, transform",
+              backfaceVisibility: "hidden",
+            }}
           >
             {/* ==========================================================
                 PAPER
             =========================================================== */}
 
             <motion.div
+              /* Single 'scale' property — one compositor pass instead of two.
+                 scaleX + scaleY separately = 2 independent compositor updates. */
               animate={{
-                scaleX: unfolded ? 1 : 0.72,
-                scaleY: unfolded ? 1 : 0.62,
+                scale: unfolded ? 1 : 0.68,
               }}
               transition={{
-                duration: quick ? 0.55 : 1,
+                duration: quick ? 0.45 : 0.95,
                 ease: CINEMATIC_EASE,
               }}
               className="
                 relative
                 w-[min(92vw,920px)]
                 overflow-hidden
-                shadow-[0_20px_70px_rgba(0,0,0,0.55)]
+                shadow-[0_16px_56px_rgba(0,0,0,0.52)]
               "
               style={{
-                /* Height: fills ~82% of the viewport height, capped at 640px.
-                   On small phones (667px tall) this gives ~547px.
-                   safe-area offset keeps it off the home indicator. */
                 height: "min(82svh, 640px)",
                 maxHeight: "calc(100svh - 16px)",
                 background:
                   "linear-gradient(135deg,#f8f1e2 0%,#eee0c5 47%,#faf4e8 100%)",
                 transformOrigin: "center",
                 willChange: "transform",
+                /* Force GPU rasterisation of the paper interior */
+                transform: "translateZ(0)",
+                backfaceVisibility: "hidden",
               }}
             >
               <PaperTexture />
@@ -566,73 +579,44 @@ export default function CinematicDoors({
         {opening && (
           <>
             <motion.div
-              initial={{
-                opacity: 0,
-                scaleY: 0.2,
-              }}
+              initial={{ opacity: 0, scaleY: 0.2 }}
               animate={{
-                opacity: [
-                  0,
-                  0.85,
-                  0.25,
-                  0,
-                ],
-
-                scaleY: [
-                  0.2,
-                  1,
-                  1,
-                  1,
-                ],
+                opacity: [0, 0.85, 0.25, 0],
+                scaleY: [0.2, 1, 1, 1],
               }}
               transition={{
-                duration: quick
-                  ? 0.8
-                  : 1.3,
-
+                duration: quick ? 0.7 : 1.2,
                 ease: "easeOut",
               }}
               className="
                 pointer-events-none
-                absolute
-                inset-y-0
-                left-1/2
-                z-50
-                w-px
-                -translate-x-1/2
+                absolute inset-y-0
+                left-1/2 z-50
+                w-px -translate-x-1/2
                 bg-[#f0d790]
-                shadow-[0_0_50px_12px_rgba(240,215,144,0.28)]
+                shadow-[0_0_40px_8px_rgba(240,215,144,0.25)]
               "
+              style={{ willChange: "opacity, transform", backfaceVisibility: "hidden" }}
             />
 
+            {/* Blur glow: skip entirely on quick/mobile to avoid expensive
+                GPU compositing of a large blurred element during slide */}
             {!quick && (
               <motion.div
-                initial={{
-                  opacity: 0,
-                  scale: 0.4,
-                }}
-                animate={{
-                  opacity: [0, 0.16, 0],
-                  scale: [0.4, 1.2, 1.6],
-                }}
-                transition={{
-                  duration: 1.45,
-                  ease: "easeOut",
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.14, 0] }}
+                transition={{ duration: 1.35, ease: "easeOut" }}
                 className="
                   pointer-events-none
-                  absolute
-                  left-1/2
-                  top-1/2
+                  absolute left-1/2 top-1/2
                   z-40
-                  h-[70vh]
-                  w-[28vw]
-                  -translate-x-1/2
-                  -translate-y-1/2
+                  h-[60vh] w-[24vw]
+                  -translate-x-1/2 -translate-y-1/2
                   rounded-full
                   bg-[#efd48a]
-                  blur-[100px]
+                  blur-[80px]
                 "
+                style={{ willChange: "opacity", backfaceVisibility: "hidden" }}
               />
             )}
           </>
@@ -755,6 +739,7 @@ function InvitationContent({
       {!lowPower && (
         <>
           <BotanicalCorner
+            lowPower={lowPower}
             className="
               absolute
               -left-4
@@ -770,6 +755,7 @@ function InvitationContent({
 
           <BotanicalCorner
             flip
+            lowPower={lowPower}
             className="
               absolute
               -bottom-4
@@ -914,20 +900,14 @@ function InvitationContent({
         {/* BRAND */}
 
         <motion.span
-          initial={{
-            opacity: 0,
-            letterSpacing: "0.32em",
-          }}
+          initial={{ opacity: 0, y: 6 }}
           animate={
             visible
-              ? {
-                opacity: 1,
-                letterSpacing: "0.16em",
-              }
+              ? { opacity: 1, y: 0 }
               : {}
           }
           transition={{
-            duration: 1,
+            duration: 0.7,
             delay: 0.14,
             ease: CINEMATIC_EASE,
           }}
@@ -935,8 +915,10 @@ function InvitationContent({
             text-[clamp(0.6rem,2.2vw,1.05rem)]
             font-semibold
             uppercase
+            tracking-[0.16em]
             text-[#173d2a]
           "
+          style={{ willChange: "opacity, transform", backfaceVisibility: "hidden" }}
         >
           SAI EVENTS
         </motion.span>
@@ -1302,10 +1284,46 @@ function WaxSeal({
 function BotanicalCorner({
   className,
   flip = false,
+  lowPower = false,
 }: {
   className?: string;
   flip?: boolean;
+  lowPower?: boolean;
 }) {
+  /* On mobile/low-power, skip pathLength animation (runs on main thread,
+     triggers stroke-dashoffset recalc every frame). Simple opacity fade instead. */
+  if (lowPower) {
+    return (
+      <svg
+        viewBox="0 0 240 240"
+        fill="none"
+        className={className}
+        style={{
+          transform: flip ? "scaleX(-1)" : undefined,
+          opacity: 0.45,
+        }}
+      >
+        <path
+          d="M15 215 C52 188 61 142 49 106 C41 79 50 52 80 25"
+          stroke="#234c35" strokeWidth="1" opacity="0.55"
+        />
+        <path
+          d="M48 151 C77 145 91 127 93 104"
+          stroke="#234c35" strokeWidth="0.8" opacity="0.45"
+        />
+        <path
+          d="M52 118 C25 107 19 88 26 69 C49 75 60 91 52 118Z"
+          stroke="#9b742f" strokeWidth="0.8" opacity="0.5"
+        />
+        <path
+          d="M66 78 C90 70 101 51 96 32 C74 37 61 53 66 78Z"
+          stroke="#9b742f" strokeWidth="0.8" opacity="0.5"
+        />
+        <circle cx="48" cy="150" r="3" fill="#9b742f" opacity="0.4" />
+      </svg>
+    );
+  }
+
   return (
     <svg
       viewBox="0 0 240 240"
@@ -1325,102 +1343,43 @@ function BotanicalCorner({
         "
         stroke="#234c35"
         strokeWidth="1"
-        initial={{
-          pathLength: 0,
-          opacity: 0,
-        }}
-        animate={{
-          pathLength: 1,
-          opacity: 0.55,
-        }}
-        transition={{
-          duration: 1.65,
-          delay: 0.1,
-          ease: "easeInOut",
-        }}
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.55 }}
+        transition={{ duration: 1.65, delay: 0.1, ease: "easeInOut" }}
       />
 
       <motion.path
-        d="
-          M48 151
-          C77 145 91 127 93 104
-        "
+        d="M48 151 C77 145 91 127 93 104"
         stroke="#234c35"
         strokeWidth="0.8"
-        initial={{
-          pathLength: 0,
-          opacity: 0,
-        }}
-        animate={{
-          pathLength: 1,
-          opacity: 0.45,
-        }}
-        transition={{
-          duration: 1.2,
-          delay: 0.35,
-        }}
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.45 }}
+        transition={{ duration: 1.2, delay: 0.35 }}
       />
 
       <motion.path
-        d="
-          M52 118
-          C25 107 19 88 26 69
-          C49 75 60 91 52 118Z
-        "
+        d="M52 118 C25 107 19 88 26 69 C49 75 60 91 52 118Z"
         stroke="#9b742f"
         strokeWidth="0.8"
-        initial={{
-          pathLength: 0,
-          opacity: 0,
-        }}
-        animate={{
-          pathLength: 1,
-          opacity: 0.5,
-        }}
-        transition={{
-          duration: 1,
-          delay: 0.55,
-        }}
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.5 }}
+        transition={{ duration: 1, delay: 0.55 }}
       />
 
       <motion.path
-        d="
-          M66 78
-          C90 70 101 51 96 32
-          C74 37 61 53 66 78Z
-        "
+        d="M66 78 C90 70 101 51 96 32 C74 37 61 53 66 78Z"
         stroke="#9b742f"
         strokeWidth="0.8"
-        initial={{
-          pathLength: 0,
-          opacity: 0,
-        }}
-        animate={{
-          pathLength: 1,
-          opacity: 0.5,
-        }}
-        transition={{
-          duration: 1,
-          delay: 0.72,
-        }}
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.5 }}
+        transition={{ duration: 1, delay: 0.72 }}
       />
 
       <motion.circle
-        cx="48"
-        cy="150"
-        r="3"
-        fill="#9b742f"
-        initial={{
-          opacity: 0,
-          scale: 0,
-        }}
-        animate={{
-          opacity: 0.4,
-          scale: 1,
-        }}
-        transition={{
-          delay: 0.95,
-        }}
+        cx="48" cy="150" r="3" fill="#9b742f"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 0.4, scale: 1 }}
+        transition={{ delay: 0.95 }}
       />
     </svg>
   );
