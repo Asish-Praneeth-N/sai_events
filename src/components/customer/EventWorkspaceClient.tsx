@@ -202,61 +202,61 @@ export default function EventWorkspaceClient({
     <div className="space-y-8 max-w-6xl mx-auto pb-12 animate-fade-in-up">
       
       {/* ── Top Header Navigation Bar ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
         <div>
           <button
             onClick={() => router.push("/customer/dashboard?tab=events")}
-            className="text-[10px] uppercase font-bold text-accent-gold hover:underline flex items-center gap-1 mb-1.5 cursor-pointer"
+            className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
           >
             ← Back to My Events
           </button>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-foreground tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-normal font-heading text-[#173d2c] dark:text-[#f0e8db] tracking-tight" style={{ fontFamily: '"Playfair Display", serif' }}>
               {event.celebrant_name ? `${event.celebrant_name} (${event.event_type})` : `${event.event_type} Workspace`}
             </h1>
-            <span className="text-[10px] px-2.5 py-1 rounded-full bg-accent-gold/10 text-accent-gold border border-accent-gold/20 font-bold uppercase tracking-wider">
+            <span className="text-[7.5px] px-2.5 py-1 bg-[#a17a34]/10 text-[#9a742e] dark:bg-[#d2b56b]/10 dark:text-[#d2b56b] border border-[#a17a34]/20 dark:border-[#d2b56b]/20 font-bold uppercase tracking-[0.2em]">
               {event.status}
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1 font-light flex items-center gap-2">
-            <span>Reference: <strong className="text-foreground font-mono">{event.reference_number || event.id.substring(0, 8)}</strong></span>
+          <p className="text-xs text-[#173d2c]/55 dark:text-[#eee5d7]/45 mt-1 font-light flex items-center gap-2">
+            <span>Reference: <strong className="text-[#173d2c] dark:text-[#f0e8db] font-mono">{event.reference_number || event.id.substring(0, 8)}</strong></span>
             <span>·</span>
-            <span>Date: <strong className="text-foreground font-mono">{event.event_date}</strong></span>
+            <span>Date: <strong className="text-[#173d2c] dark:text-[#f0e8db] font-mono">{event.event_date}</strong></span>
           </p>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
           <div className="text-right hidden sm:block">
-            <span className="text-[9px] uppercase font-bold text-muted-foreground block">Countdown</span>
-            <span className="text-sm font-bold font-mono text-accent-gold">{getCountdown(event.event_date)}</span>
+            <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-[#173d2c]/40 dark:text-white/30 block">Countdown</span>
+            <span className="text-sm font-bold font-mono text-[#a17a34] dark:text-[#d2b56b]">{getCountdown(event.event_date)}</span>
           </div>
           <button
             type="button"
             onClick={() => setShowMeetingModal(true)}
-            className="px-4 py-2.5 bg-accent-gold hover:brightness-110 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition shadow cursor-pointer flex items-center gap-1.5"
+            className="px-4 py-2.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition shadow-md hover:brightness-110 cursor-pointer flex items-center gap-2"
           >
-            <Video className="w-4 h-4" /> Request Sync
+            <Video className="w-3.5 h-3.5" /> Request Sync
           </button>
         </div>
       </div>
 
       {/* ── Alerts ── */}
       {error && (
-        <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs rounded-2xl flex items-center gap-2.5 animate-fade-in">
+        <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs flex items-center gap-2.5 animate-fade-in">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs rounded-2xl flex items-center gap-2.5 animate-fade-in">
+        <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs flex items-center gap-2.5 animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
           <span>{success}</span>
         </div>
       )}
 
       {/* ── Workspace Sub-Tabs Navigation ── */}
-      <div className="flex items-center gap-2 border-b border-border/50 pb-2 overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-2 border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-2 overflow-x-auto scrollbar-none">
         {[
           { id: "overview", label: "Overview", icon: Info },
           { id: "journey", label: "Event Journey", icon: Compass },
@@ -269,13 +269,13 @@ export default function EventWorkspaceClient({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              className={`px-4 py-2.5 text-[8px] font-bold uppercase tracking-[0.2em] transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-accent-gold text-black shadow-sm"
-                  : "bg-surface border border-border/60 text-muted-foreground hover:text-foreground"
+                  ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] shadow-sm"
+                  : "bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] text-[#173d2c]/60 dark:text-[#eee5d7]/50 hover:text-[#173d2c] dark:hover:text-[#f0e8db]"
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5" />
               <span>{tab.label}</span>
             </button>
           );
@@ -291,58 +291,63 @@ export default function EventWorkspaceClient({
           <div className="lg:col-span-8 space-y-6">
             
             {/* Event Specification Card */}
-            <div className="p-6.5 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-6">
-              <div className="flex items-center justify-between border-b border-border/40 pb-4">
+            <div className="p-6 sm:p-7 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-6">
+              <div className="flex items-center justify-between border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
                 <div>
-                  <span className="text-[9px] uppercase font-bold tracking-widest text-accent-gold">Specification Matrix</span>
-                  <h3 className="text-lg font-light font-heading text-foreground mt-0.5">Event Parameters</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                    <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Specification Matrix</span>
+                  </div>
+                  <h3 className="text-xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-1" style={{ fontFamily: '"Playfair Display", serif' }}>
+                    Event Parameters
+                  </h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-accent-gold px-3 py-1 rounded-xl bg-accent-gold/10 border border-accent-gold/20">
+                <span className="text-xs font-mono font-bold text-[#a17a34] dark:text-[#d2b56b] px-3.5 py-1 bg-[#f3eadf]/60 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08]">
                   ₹{Number(event.total_budget || 0).toLocaleString("en-IN")} INR
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Event Type</span>
-                  <span className="font-bold text-foreground mt-0.5 block">{event.event_type}</span>
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Event Type</span>
+                  <span className="font-normal font-heading text-base text-[#143d2b] dark:text-[#f0e8db] mt-0.5 block" style={{ fontFamily: '"Playfair Display", serif' }}>{event.event_type}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Event For</span>
-                  <span className="font-bold text-foreground mt-0.5 block">{event.event_for || "Self"}</span>
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Event For</span>
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] mt-0.5 block">{event.event_for || "Self"}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Celebrant / Couple</span>
-                  <span className="font-bold text-foreground mt-0.5 block">{event.celebrant_name || "N/A"}</span>
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Celebrant / Couple</span>
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] mt-0.5 block">{event.celebrant_name || "N/A"}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Event Date & Time</span>
-                  <span className="font-semibold text-foreground font-mono mt-0.5 block">
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Event Date & Time</span>
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] font-mono mt-0.5 block">
                     {event.event_date} {event.event_time && `at ${event.event_time}`} ({event.duration_hours || 4} Hrs)
                   </span>
                 </div>
                 <div className="sm:col-span-2">
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Venue & Address</span>
-                  <span className="font-semibold text-foreground mt-0.5 block leading-relaxed">{event.venue_address || event.location}</span>
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Venue & Address</span>
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] mt-0.5 block leading-relaxed">{event.venue_address || event.location}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Guest Range</span>
-                  <span className="font-semibold text-foreground font-mono mt-0.5 block">
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Guest Range</span>
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] font-mono mt-0.5 block">
                     {event.min_guest_count || event.guest_count} – {event.max_guest_count || event.guest_count} Expected Guests
                   </span>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Budget Range</span>
-                  <span className="font-semibold text-foreground font-mono mt-0.5 block">
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Budget Range</span>
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] font-mono mt-0.5 block">
                     {event.budget_range || `₹${Number(event.total_budget || 0).toLocaleString("en-IN")}`}
                   </span>
                 </div>
               </div>
 
               {event.special_requirements && (
-                <div className="space-y-1 pt-3 border-t border-border/40 text-xs">
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 block">Special Requirements / Notes</span>
-                  <p className="p-3 bg-background/50 border border-border/60 rounded-xl text-muted-foreground font-light leading-relaxed">
+                <div className="space-y-1.5 pt-3 border-t border-[#173d2c]/10 dark:border-white/[0.08] text-xs">
+                  <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Special Requirements / Notes</span>
+                  <p className="p-3.5 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] text-[#173d2c]/75 dark:text-[#eee5d7]/70 font-light leading-relaxed">
                     {event.special_requirements}
                   </p>
                 </div>
@@ -354,9 +359,9 @@ export default function EventWorkspaceClient({
                     href={event.reference_video_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-accent-gold hover:underline"
+                    className="inline-flex items-center gap-2 text-xs font-bold text-[#a17a34] dark:text-[#d2b56b] hover:underline"
                   >
-                    <Video className="w-4 h-4 text-accent-gold" />
+                    <Video className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
                     <span>View Reference Video Link</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
@@ -365,18 +370,18 @@ export default function EventWorkspaceClient({
             </div>
 
             {/* Managed Items List */}
-            <div className="p-6.5 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="p-6 sm:p-7 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-4">
+              <h3 className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">
                 Selected Services & Packages ({event.request_items?.length || 0})
               </h3>
-              <div className="divide-y divide-border/40 text-xs">
+              <div className="divide-y divide-[#173d2c]/10 dark:divide-white/[0.08] text-xs">
                 {event.request_items?.map((item: any) => (
                   <div key={item.id} className="py-3 flex justify-between items-center">
                     <div>
-                      <span className="font-bold text-foreground block">{item.service_items?.name || "Service Item"}</span>
-                      <span className="text-[10px] text-muted-foreground font-mono">Qty: {item.quantity} · {item.pricing_unit || item.pricing_type}</span>
+                      <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] block">{item.service_items?.name || "Service Item"}</span>
+                      <span className="text-[10px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 font-mono">Qty: {item.quantity} · {item.pricing_unit || item.pricing_type}</span>
                     </div>
-                    <span className="font-mono font-bold text-accent-gold">
+                    <span className="font-mono font-bold text-[#a17a34] dark:text-[#d2b56b]">
                       ₹{(Number(item.unit_price) * item.quantity).toLocaleString("en-IN")}
                     </span>
                   </div>
@@ -390,66 +395,66 @@ export default function EventWorkspaceClient({
           <div className="lg:col-span-4 space-y-6">
             
             {/* Event Coordinator Card */}
-            <div className="p-6 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-4">
-              <span className="text-[9px] uppercase font-bold tracking-widest text-accent-gold block">SAI EVENTS Operations</span>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground -mt-2">
+            <div className="p-6 sm:p-7 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-4">
+              <span className="text-[8px] uppercase font-bold tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b] block">SAI EVENTS Operations</span>
+              <h3 className="text-base font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
                 Event Coordinator
               </h3>
 
               {coordinator ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-background border border-border flex items-center justify-center text-accent-gold font-bold text-sm uppercase shrink-0">
+                    <div className="w-12 h-12 bg-[#f3eadf] dark:bg-white/[0.03] border border-[#173d2c]/15 dark:border-white/[0.10] flex items-center justify-center text-[#9a742e] dark:text-[#d2b56b] font-bold text-sm uppercase shrink-0">
                       {coordinator.full_name.substring(0, 2)}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-foreground">{coordinator.full_name}</h4>
-                      <span className="text-[9px] font-bold text-accent-gold uppercase tracking-wider">Assigned Coordinator</span>
+                      <h4 className="text-sm font-semibold text-[#143d2b] dark:text-[#f0e8db]">{coordinator.full_name}</h4>
+                      <span className="text-[8px] font-bold text-[#9a742e] dark:text-[#d2b56b] uppercase tracking-[0.2em]">Assigned Coordinator</span>
                     </div>
                   </div>
-                  <div className="space-y-2 text-xs font-mono text-muted-foreground border-t border-border/40 pt-3">
+                  <div className="space-y-2 text-xs font-mono text-[#173d2c]/60 dark:text-[#eee5d7]/50 border-t border-[#173d2c]/10 dark:border-white/[0.08] pt-3">
                     <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-accent-gold" />
+                      <Phone className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" />
                       <span>{coordinator.phone_number}</span>
                     </div>
                     <div className="flex items-center gap-2 truncate">
-                      <Mail className="w-3.5 h-3.5 text-accent-gold" />
+                      <Mail className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" />
                       <span className="truncate">{coordinator.email}</span>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-background/50 rounded-2xl border border-dashed border-border text-center text-xs text-muted-foreground space-y-2 font-light">
-                  <UserCheck className="w-6 h-6 text-muted-foreground mx-auto animate-pulse" />
-                  <p>Pending Coordinator allocation. Our team is assigning your event manager.</p>
+                <div className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-dashed border-[#173d2c]/15 dark:border-white/[0.08] text-center text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 space-y-2 font-light">
+                  <UserCheck className="w-6 h-6 text-[#a17a34] dark:text-[#d2b56b] mx-auto animate-pulse" />
+                  <p className="text-[11px]">Pending Coordinator allocation. Our team is assigning your event manager.</p>
                 </div>
               )}
             </div>
 
             {/* Quick Actions Panel */}
-            <div className="p-6 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="p-6 sm:p-7 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-4">
+              <h3 className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">
                 Workspace Shortcuts
               </h3>
               <div className="space-y-2 text-xs">
                 <button
                   type="button"
                   onClick={() => setActiveTab("edits")}
-                  className="w-full p-3 bg-surface-raised border border-border hover:border-accent-gold/40 rounded-xl text-left font-semibold text-foreground flex items-center justify-between transition cursor-pointer"
+                  className="w-full p-3.5 bg-[#f3eadf]/40 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 text-left font-semibold text-[#143d2b] dark:text-[#f0e8db] flex items-center justify-between transition cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
-                    <Edit className="w-4 h-4 text-accent-gold" />
+                    <Edit className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
                     <span>Request Edit Access</span>
                   </span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  <ChevronRight className="w-4 h-4 text-[#173d2c]/40 dark:text-white/30" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("meetings")}
-                  className="w-full p-3 bg-surface-raised border border-border hover:border-accent-gold/40 rounded-xl text-left font-semibold text-foreground flex items-center justify-between transition cursor-pointer"
+                  className="w-full p-3.5 bg-[#f3eadf]/40 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 text-left font-semibold text-[#143d2b] dark:text-[#f0e8db] flex items-center justify-between transition cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
-                    <Video className="w-4 h-4 text-accent-gold" />
+                    <Video className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
                     <span>Request Event Meeting</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -466,12 +471,17 @@ export default function EventWorkspaceClient({
       ──────────────────────────────────────────────────────── */}
       {activeTab === "journey" && (
         <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
-          <div className="p-6 sm:p-8 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-6">
+          <div className="p-6 sm:p-8 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-6">
             <div>
-              <span className="text-[9px] uppercase font-bold tracking-widest text-accent-gold">Automated Case Journey</span>
-              <h2 className="text-2xl font-light font-heading text-foreground mt-0.5">Event Milestone Timeline</h2>
-              <p className="text-xs text-muted-foreground font-light">
-                Track execution milestones for your <strong className="text-foreground">{event.event_type}</strong> celebration.
+              <div className="flex items-center gap-2 mb-2">
+                <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Automated Case Journey</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-normal font-heading tracking-[-0.03em] text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
+                Event Milestone Timeline
+              </h2>
+              <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light mt-1">
+                Track execution milestones for your <strong className="text-[#143d2b] dark:text-[#f0e8db]">{event.event_type}</strong> celebration.
               </p>
             </div>
 
@@ -486,26 +496,26 @@ export default function EventWorkspaceClient({
                     <div key={m.key} className="flex items-start gap-4">
                       <div className="flex flex-col items-center">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold font-mono transition-all ${
+                          className={`w-8 h-8 flex items-center justify-center text-xs font-bold font-mono transition-all ${
                             isCurrent
-                              ? "bg-accent-gold text-black shadow-lg shadow-accent-gold/20 ring-4 ring-accent-gold/20"
+                              ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] shadow-md"
                               : isCompleted
-                              ? "bg-emerald-500 text-black"
-                              : "bg-surface border border-border text-muted-foreground"
+                              ? "bg-emerald-600 text-white"
+                              : "bg-[#f3eadf]/60 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] text-[#173d2c]/40 dark:text-white/30"
                           }`}
                         >
                           {isCompleted ? <Check className="w-4 h-4" /> : idx + 1}
                         </div>
                         {idx < MILESTONES.length - 1 && (
-                          <div className={`w-[2px] h-10 my-1 ${isCompleted ? "bg-emerald-500" : "bg-border/60"}`} />
+                          <div className={`w-[1px] h-10 my-1 ${isCompleted ? "bg-emerald-600" : "bg-[#173d2c]/15 dark:bg-white/10"}`} />
                         )}
                       </div>
 
                       <div className="pt-1 space-y-0.5">
-                        <h4 className={`text-sm font-bold ${isCurrent ? "text-accent-gold" : isCompleted ? "text-foreground" : "text-muted-foreground"}`}>
+                        <h4 className={`text-sm font-semibold ${isCurrent ? "text-[#a17a34] dark:text-[#d2b56b]" : isCompleted ? "text-[#143d2b] dark:text-[#f0e8db]" : "text-[#173d2c]/40 dark:text-white/30"}`}>
                           {m.label}
                         </h4>
-                        <p className="text-xs text-muted-foreground font-light leading-relaxed">{m.desc}</p>
+                        <p className="text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 font-light leading-relaxed">{m.desc}</p>
                       </div>
                     </div>
                   );
@@ -521,61 +531,67 @@ export default function EventWorkspaceClient({
       ──────────────────────────────────────────────────────── */}
       {activeTab === "meetings" && (
         <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-surface border border-border/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm">
             <div>
-              <h3 className="text-lg font-bold font-heading text-foreground">Event Consultation Meetings</h3>
-              <p className="text-xs text-muted-foreground font-light">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Staging Consultations</span>
+              </div>
+              <h3 className="text-xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
+                Event Consultation Meetings
+              </h3>
+              <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light">
                 Schedule video calls or staging discussions for this event with your Coordinator.
               </p>
             </div>
             <button
               type="button"
               onClick={() => setShowMeetingModal(true)}
-              className="px-5 py-2.5 bg-accent-gold hover:brightness-110 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition shadow cursor-pointer flex items-center gap-1.5 shrink-0"
+              className="px-5 py-3 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer flex items-center gap-1.5 shrink-0 shadow-md"
             >
-              <Plus className="w-4 h-4" /> Request Meeting
+              <Plus className="w-3.5 h-3.5" /> Request Meeting
             </button>
           </div>
 
           {meetings.length === 0 ? (
-            <div className="p-12 border border-dashed border-border rounded-3xl text-center space-y-3 bg-surface/50">
-              <Video className="w-8 h-8 text-muted-foreground mx-auto" />
-              <h4 className="text-sm font-bold text-foreground">No Meetings Requested Yet</h4>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto font-light leading-relaxed">
+            <div className="p-12 border border-dashed border-[#173d2c]/15 dark:border-white/[0.08] bg-[#fbf7f0] dark:bg-[#161813] text-center space-y-3">
+              <Video className="w-8 h-8 text-[#a17a34] dark:text-[#d2b56b] mx-auto" />
+              <h4 className="text-sm font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>No Meetings Requested Yet</h4>
+              <p className="text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 max-w-sm mx-auto font-light leading-relaxed">
                 Click "Request Meeting" to schedule a sync with your SAI EVENTS Operational Manager.
               </p>
             </div>
           ) : (
             <div className="space-y-4">
               {meetings.map((m) => (
-                <div key={m.id} className="p-5 rounded-2xl bg-surface border border-border space-y-3">
+                <div key={m.id} className="p-5 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] space-y-3 shadow-sm">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-accent-gold block">Meeting Purpose</span>
-                      <h4 className="text-sm font-bold text-foreground mt-0.5">{m.purpose}</h4>
+                      <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b] block">Meeting Purpose</span>
+                      <h4 className="text-base font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-1" style={{ fontFamily: '"Playfair Display", serif' }}>{m.purpose}</h4>
                     </div>
                     <div>
-                      <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${
+                      <span className={`px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.18em] border ${
                         m.status === "Scheduled"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
                           : m.status === "Rejected"
-                          ? "bg-red-500/10 text-red-400 border-red-500/25"
-                          : "bg-amber-500/10 text-amber-400 border-amber-500/25"
+                          ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30"
+                          : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
                       }`}>
                         {m.status}
                       </span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-border/40 font-mono">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-[#173d2c]/10 dark:border-white/[0.08] font-mono">
                     <div>
-                      <span className="text-muted-foreground block text-[9px] uppercase font-bold">Preferred Window</span>
-                      <span className="text-foreground">{m.preferred_date} ({m.preferred_time_window})</span>
+                      <span className="text-[#173d2c]/40 dark:text-white/30 block text-[8px] uppercase font-bold tracking-[0.18em]">Preferred Window</span>
+                      <span className="text-[#143d2b] dark:text-[#f0e8db] font-semibold">{m.preferred_date} ({m.preferred_time_window})</span>
                     </div>
                     {m.confirmed_date && (
                       <div>
-                        <span className="text-muted-foreground block text-[9px] uppercase font-bold">Confirmed Time</span>
-                        <span className="text-emerald-400 font-bold">{m.confirmed_date} at {m.confirmed_time}</span>
+                        <span className="text-[#173d2c]/40 dark:text-white/30 block text-[8px] uppercase font-bold tracking-[0.18em]">Confirmed Time</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">{m.confirmed_date} at {m.confirmed_time}</span>
                       </div>
                     )}
                   </div>
@@ -586,9 +602,9 @@ export default function EventWorkspaceClient({
                         href={m.meeting_link}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-4 py-2 bg-emerald-500 text-black font-bold text-xs rounded-xl shadow inline-flex items-center gap-1.5 hover:brightness-110 cursor-pointer"
+                        className="px-5 py-2.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer shadow inline-flex items-center gap-1.5"
                       >
-                        <Video className="w-4 h-4" /> Join Meeting Link
+                        <Video className="w-3.5 h-3.5" /> Join Meeting Link
                       </a>
                     </div>
                   )}
@@ -605,24 +621,27 @@ export default function EventWorkspaceClient({
       {activeTab === "edits" && (
         <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
           {/* Status Explanation Card */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-surface border border-border/80 space-y-4">
-            <div className="flex items-center justify-between border-b border-border/40 pb-4">
+          <div className="p-6 sm:p-8 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
               <div>
-                <span className="text-[9px] uppercase font-bold tracking-widest text-accent-gold">Event Security Policy</span>
-                <h3 className="text-lg font-bold font-heading text-foreground mt-0.5">Edit Access Status</h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                  <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Event Security Policy</span>
+                </div>
+                <h3 className="text-xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>Edit Access Status</h3>
               </div>
               {isEditingAllowed ? (
-                <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold rounded-xl flex items-center gap-1.5 uppercase">
-                  <Unlock className="w-4 h-4" /> Editing Unlocked
+                <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[8px] font-bold uppercase tracking-[0.18em] flex items-center gap-1.5">
+                  <Unlock className="w-3.5 h-3.5" /> Editing Unlocked
                 </span>
               ) : (
-                <span className="px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-bold rounded-xl flex items-center gap-1.5 uppercase">
-                  <Lock className="w-4 h-4" /> Editing Locked
+                <span className="px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[8px] font-bold uppercase tracking-[0.18em] flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5" /> Editing Locked
                 </span>
               )}
             </div>
 
-            <p className="text-xs text-muted-foreground font-light leading-relaxed">
+            <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light leading-relaxed">
               {isPreAcceptance ? (
                 "This event is currently in pending review status. You may directly modify permitted event specifications."
               ) : activeApprovedEdit ? (
@@ -639,9 +658,9 @@ export default function EventWorkspaceClient({
                 <button
                   type="button"
                   onClick={() => router.push(`/customer/request`)}
-                  className="px-6 py-3 bg-accent-gold text-black font-bold text-xs uppercase tracking-wider rounded-xl transition shadow cursor-pointer flex items-center gap-2"
+                  className="px-6 py-3 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer flex items-center gap-2 shadow-md"
                 >
-                  <Edit className="w-4 h-4" /> Modify Event Parameters Now
+                  <Edit className="w-3.5 h-3.5" /> Modify Event Parameters Now
                 </button>
               ) : activePendingEdit ? (
                 <button

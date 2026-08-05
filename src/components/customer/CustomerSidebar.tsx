@@ -4,9 +4,9 @@ import React, { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { 
-  Sparkles, LayoutDashboard, Calendar, Compass, FileText, 
-  Video, Bell, User, HeartHandshake, LogOut, X, HelpCircle 
+import {
+  Sparkles, LayoutDashboard, Calendar, FileText,
+  Video, Bell, User, HeartHandshake, LogOut, X, HelpCircle
 } from "lucide-react";
 
 interface CustomerSidebarProps {
@@ -46,56 +46,77 @@ function CustomerSidebarInner({ customerName, customerEmail, onClose }: Customer
   ];
 
   return (
-    <aside className="w-64 bg-surface border-r border-border flex flex-col justify-between select-none h-full relative z-30 transition-all duration-300 shrink-0">
+    <aside className="relative z-30 flex h-full w-64 shrink-0 select-none flex-col justify-between border-r border-[#173d2c]/10 bg-[#f2e9dc] transition-all duration-300 dark:border-white/[0.08] dark:bg-[#141612]">
       <div>
-        {/* ── Brand Header ── */}
-        <div className="h-16 border-b border-border flex items-center justify-between px-6">
-          <Link href="/customer/dashboard" className="flex items-center gap-3 group overflow-hidden">
-            <div className="w-8.5 h-8.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#f5db91] flex items-center justify-center shadow-lg shadow-[#D4AF37]/15 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-              <Sparkles className="w-4 h-4 text-black" />
+        <div className="flex h-16 items-center justify-between border-b border-[#173d2c]/10 px-5 dark:border-white/[0.08]">
+          <Link href="/customer/dashboard" className="group flex items-center gap-3 overflow-hidden">
+            <div className="relative flex h-8 w-8 flex-shrink-0 items-center justify-center border border-[#a17a34]/30 bg-transparent transition-transform duration-300 group-hover:rotate-3 dark:border-[#d2b56b]/30">
+              <span className="absolute inset-[3px] border border-[#173d2c]/10 dark:border-white/[0.08]" />
+              <Sparkles className="relative z-10 h-3.5 w-3.5 text-[#9a742e] dark:text-[#d2b56b]" />
             </div>
+
             <div className="flex flex-col whitespace-nowrap animate-fade-in">
-              <span className="text-xs font-black text-foreground tracking-[0.18em] uppercase font-heading">
+              <span className="font-heading text-[11px] font-semibold uppercase tracking-[0.2em] text-[#173d2c] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
                 Sai Events
               </span>
-              <span className="text-[7.5px] uppercase tracking-[0.25em] text-accent-gold font-light -mt-0.5">
+              <span className="mt-0.5 text-[6.5px] font-bold uppercase tracking-[0.28em] text-[#9a742e] dark:text-[#d2b56b]">
                 Planning Studio
               </span>
             </div>
           </Link>
+
           {onClose && (
-            <button 
+            <button
               onClick={onClose}
-              className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-surface-raised cursor-pointer md:hidden"
+              className="cursor-pointer p-1.5 text-[#173d2c]/40 transition hover:bg-[#173d2c]/[0.035] hover:text-[#173d2c] dark:text-white/35 dark:hover:bg-white/[0.035] dark:hover:text-[#f0e8db] md:hidden"
               aria-label="Close sidebar"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        {/* ── Navigation Items ── */}
-        <nav className="px-4 py-8 space-y-2">
-          <div className="text-[8.5px] uppercase font-bold tracking-[0.25em] text-muted-foreground/60 px-4 mb-4">
-            Concierge Services
+        <nav className="px-3 py-7">
+          <div className="mb-4 flex items-center gap-3 px-3">
+            <span className="text-[6.5px] font-bold uppercase tracking-[0.25em] text-[#173d2c]/35 dark:text-[#eee5d7]/30">
+              Concierge Services
+            </span>
+            <span className="h-px flex-1 bg-[#173d2c]/10 dark:bg-white/[0.08]" />
           </div>
-          <div className="space-y-1.5">
+
+          <div className="space-y-1">
             {navItems.map((item, idx) => {
               const active = isActive(item.href, item.tab);
               const linkUrl = item.tab ? `${item.href}?tab=${item.tab}` : item.href;
+
               return (
                 <Link
                   key={idx}
                   href={linkUrl}
                   onClick={onClose}
-                  className={`flex items-center gap-3.5 px-4.5 py-3 rounded-2xl text-xs font-medium tracking-wide transition-all duration-200 group ${
+                  className={`group relative flex items-center gap-3 px-3 py-2.5 text-[10px] font-medium tracking-wide transition-all duration-200 ${
                     active
-                      ? "text-accent-gold bg-accent-gold/[0.04] border border-accent-gold/20 font-bold shadow-[0_0_12px_rgba(212,175,55,0.03)]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-surface-raised border border-transparent"
+                      ? "bg-[#173d2c]/[0.06] font-semibold text-[#173d2c] dark:bg-white/[0.05] dark:text-[#f0e8db]"
+                      : "border border-transparent text-[#173d2c]/55 hover:bg-[#173d2c]/[0.03] hover:text-[#173d2c] dark:text-[#eee5d7]/45 dark:hover:bg-white/[0.03] dark:hover:text-[#f0e8db]"
                   }`}
                 >
-                  <item.icon className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${active ? "text-accent-gold" : ""}`} />
+                  {active && (
+                    <span className="absolute bottom-2 left-0 top-2 w-[2px] bg-[#a17a34] dark:bg-[#d2b56b]" />
+                  )}
+
+                  <item.icon
+                    className={`h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+                      active
+                        ? "text-[#9a742e] dark:text-[#d2b56b]"
+                        : "text-[#173d2c]/40 dark:text-[#eee5d7]/38"
+                    }`}
+                  />
+
                   <span className="animate-fade-in">{item.label}</span>
+
+                  {active && (
+                    <span className="ml-auto h-1 w-1 rotate-45 bg-[#a17a34]/80 dark:bg-[#d2b56b]/80" />
+                  )}
                 </Link>
               );
             })}
@@ -103,26 +124,37 @@ function CustomerSidebarInner({ customerName, customerEmail, onClose }: Customer
         </nav>
       </div>
 
-      {/* ── User Footer Profile Pin ── */}
-      <div className="border-t border-border p-4 space-y-3">
-        <Link 
-          href="/customer/profile" 
+      <div className="border-t border-[#173d2c]/10 p-3 dark:border-white/[0.08]">
+        <div className="mb-2 px-3 pt-1">
+          <span className="text-[6px] font-bold uppercase tracking-[0.24em] text-[#a17a34]/70 dark:text-[#d2b56b]/65">
+            Private Client
+          </span>
+        </div>
+
+        <Link
+          href="/customer/profile"
           onClick={onClose}
-          className="flex items-center gap-3 p-2 rounded-2xl hover:bg-surface-raised transition-all duration-250 border border-transparent hover:border-border/40 group overflow-hidden"
+          className="group flex items-center gap-3 border border-transparent p-2.5 transition-all duration-200 hover:border-[#173d2c]/10 hover:bg-[#173d2c]/[0.025] dark:hover:border-white/[0.08] dark:hover:bg-white/[0.025]"
         >
-          <div className="w-8.5 h-8.5 rounded-xl bg-surface border border-border flex items-center justify-center text-accent-gold font-bold text-xs uppercase flex-shrink-0 group-hover:border-accent-gold/30 transition-colors">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-[#173d2c]/15 bg-transparent text-[9px] font-bold uppercase tracking-wider text-[#8b6a2e] transition-colors group-hover:border-[#a17a34]/35 dark:border-white/[0.10] dark:text-[#d2b56b]">
             {customerName ? customerName.substring(0, 2) : "CU"}
           </div>
-          <div className="text-left min-w-0 flex-1 animate-fade-in">
-            <div className="text-xs font-bold text-foreground truncate">{customerName || "Customer Partner"}</div>
-            <div className="text-[8.5px] text-muted-foreground truncate mt-0.5">{customerEmail}</div>
+
+          <div className="min-w-0 flex-1 text-left animate-fade-in">
+            <div className="truncate font-heading text-[11px] font-semibold text-[#173d2c] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
+              {customerName || "Customer Partner"}
+            </div>
+            <div className="mt-0.5 truncate text-[7.5px] text-[#173d2c]/40 dark:text-[#eee5d7]/35">
+              {customerEmail}
+            </div>
           </div>
         </Link>
+
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4.5 py-3 rounded-2xl text-xs font-semibold text-red-500 hover:text-red-400 hover:bg-red-500/[0.03] border border-transparent hover:border-red-500/10 transition-all duration-200 cursor-pointer"
+          className="mt-1 flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-[9px] font-semibold text-red-600/80 transition-all duration-200 hover:bg-red-500/[0.035] hover:text-red-600 dark:text-red-400/80 dark:hover:text-red-400"
         >
-          <LogOut className="w-4 h-4 flex-shrink-0" />
+          <LogOut className="h-3.5 w-3.5 flex-shrink-0" />
           <span className="animate-fade-in">Logout</span>
         </button>
       </div>

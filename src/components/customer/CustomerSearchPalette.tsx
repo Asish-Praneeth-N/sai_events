@@ -181,22 +181,22 @@ export default function CustomerSearchPalette({ isOpen, onClose }: CustomerSearc
     <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[9999] flex justify-center items-start pt-[12vh] px-4">
       <div 
         ref={containerRef}
-        className="w-full max-w-2xl bg-surface border border-border/80 rounded-3xl shadow-2xl overflow-hidden animate-scale-in"
+        className="w-full max-w-2xl bg-[#f8f2e9] border border-[#173d2c]/15 shadow-[0_24px_80px_rgba(70,45,22,0.15)] overflow-hidden animate-scale-in dark:border-white/[0.10] dark:bg-[#171914] dark:shadow-[0_24px_80px_rgba(0,0,0,0.4)]"
       >
         {/* Search Input Area */}
-        <div className="p-4 border-b border-border/60 flex items-center gap-3 bg-background/50">
-          <Search className="w-5 h-5 text-muted-foreground" />
+        <div className="p-4 border-b border-[#173d2c]/10 flex items-center gap-3 bg-[#f3eadf]/60 dark:border-white/[0.08] dark:bg-white/[0.02]">
+          <Search className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
           <input
             ref={inputRef}
             type="text"
             placeholder="Search events, documents, activities..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent border-none text-foreground text-sm focus:outline-none placeholder-muted-foreground font-light"
+            className="flex-1 bg-transparent border-none text-[#173d2c] text-sm focus:outline-none placeholder-[#173d2c]/40 font-light dark:text-[#f0e8db] dark:placeholder-[#eee5d7]/35"
           />
           <button 
             onClick={onClose}
-            className="p-1.5 hover:bg-surface-raised rounded-xl text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+            className="p-1.5 hover:bg-[#173d2c]/[0.05] text-[#173d2c]/50 hover:text-[#173d2c] cursor-pointer transition-colors dark:text-white/40 dark:hover:bg-white/[0.05] dark:hover:text-[#f0e8db]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -205,33 +205,33 @@ export default function CustomerSearchPalette({ isOpen, onClose }: CustomerSearc
         {/* Results / Help Body */}
         <div className="max-h-[380px] overflow-y-auto p-4 space-y-4">
           {loading ? (
-            <div className="py-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
-              <span className="w-5 h-5 rounded-full border-2 border-accent-gold border-t-transparent animate-spin" />
-              <span>Indexing planning workspace...</span>
+            <div className="py-8 text-center text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/40 flex flex-col items-center justify-center gap-2">
+              <span className="w-5 h-5 rounded-full border-2 border-[#a17a34] border-t-transparent animate-spin dark:border-[#d2b56b]" />
+              <span className="text-[9px] font-bold uppercase tracking-[0.22em]">Indexing planning workspace...</span>
             </div>
           ) : query.trim() === "" ? (
             // Default Welcome view
             <div className="space-y-4">
               {recentSearches.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-[9px] uppercase font-bold text-muted-foreground/60 tracking-wider">Recent Searches</span>
+                  <span className="text-[7.5px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.22em]">Recent Searches</span>
                   <div className="flex flex-col gap-1">
                     {recentSearches.map((search, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleRecentClick(search)}
-                        className="flex items-center gap-2.5 px-3 py-2 hover:bg-surface-raised rounded-xl text-left text-xs text-foreground cursor-pointer group"
+                        className="flex items-center gap-2.5 px-3 py-2 hover:bg-[#173d2c]/[0.035] text-left text-xs text-[#173d2c] cursor-pointer group dark:text-[#f0e8db] dark:hover:bg-white/[0.035]"
                       >
-                        <Clock className="w-3.5 h-3.5 text-muted-foreground group-hover:text-accent-gold transition-colors" />
+                        <Clock className="w-3.5 h-3.5 text-[#a17a34]/70 group-hover:text-[#a17a34] transition-colors dark:text-[#d2b56b]/70 dark:group-hover:text-[#d2b56b]" />
                         <span>{search}</span>
                       </button>
                     ))}
                   </div>
                 </div>
               )}
-              <div className="p-4 bg-background/30 border border-border/40 rounded-2xl">
-                <span className="text-[9px] uppercase font-bold text-[#D4AF37] tracking-wider block mb-1">Search Shortcuts</span>
-                <p className="text-[10px] text-muted-foreground leading-relaxed font-light">
+              <div className="p-4 bg-[#f3eadf]/40 border border-[#173d2c]/10 dark:border-white/[0.06] dark:bg-white/[0.015]">
+                <span className="text-[8px] uppercase font-bold text-[#a17a34] tracking-[0.25em] block mb-1 dark:text-[#d2b56b]">Search Studio Shortcuts</span>
+                <p className="text-[11px] text-[#173d2c]/60 leading-relaxed font-light dark:text-[#eee5d7]/50">
                   Type name of any service checklist (e.g. Catering, Decor), uploaded reference doc name, status update, or date parameters to retrieve match sets instantly.
                 </p>
               </div>
@@ -239,33 +239,33 @@ export default function CustomerSearchPalette({ isOpen, onClose }: CustomerSearc
           ) : results.length > 0 ? (
             // Results list
             <div className="space-y-1">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground/60 tracking-wider px-2 block mb-2">Search Results ({results.length})</span>
+              <span className="text-[7.5px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.22em] px-2 block mb-2">Search Results ({results.length})</span>
               <div className="space-y-1">
                 {results.map((res) => {
                   return (
                     <div
                       key={res.id}
                       onClick={() => handleSelectResult(res)}
-                      className="flex items-center justify-between p-3 hover:bg-surface-raised border border-transparent hover:border-border/30 rounded-2xl cursor-pointer group transition-all duration-150"
+                      className="flex items-center justify-between p-3 hover:bg-[#173d2c]/[0.035] border border-transparent hover:border-[#173d2c]/10 cursor-pointer group transition-all duration-150 dark:hover:bg-white/[0.035] dark:hover:border-white/[0.08]"
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
-                        <div className="w-9 h-9 rounded-xl bg-background border border-border flex items-center justify-center text-accent-gold shrink-0">
+                        <div className="w-9 h-9 border border-[#173d2c]/10 bg-[#f3eadf]/70 flex items-center justify-center text-[#a17a34] shrink-0 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-[#d2b56b]">
                           {res.type === "event" && <Calendar className="w-4 h-4" />}
                           {res.type === "document" && <FileText className="w-4 h-4" />}
                           {res.type === "notification" && <Bell className="w-4 h-4" />}
                         </div>
                         <div className="min-w-0">
-                          <span className="text-xs font-bold text-foreground block truncate group-hover:text-accent-gold transition-colors">
+                          <span className="text-xs font-semibold text-[#173d2c] block truncate group-hover:text-[#9a742e] transition-colors dark:text-[#f0e8db] dark:group-hover:text-[#d2b56b]">
                             {res.title}
                           </span>
-                          <span className="text-[9.5px] text-muted-foreground block truncate mt-0.5 font-light">
+                          <span className="text-[9.5px] text-[#173d2c]/50 block truncate mt-0.5 font-light dark:text-[#eee5d7]/40">
                             {res.subtitle}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pr-2 text-muted-foreground">
-                        <span className="text-[9px] uppercase tracking-wider">Open</span>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pr-2 text-[#a17a34] dark:text-[#d2b56b]">
+                        <span className="text-[8px] uppercase tracking-wider font-bold">Open</span>
                         <CornerDownLeft className="w-3 h-3" />
                       </div>
                     </div>
@@ -275,8 +275,8 @@ export default function CustomerSearchPalette({ isOpen, onClose }: CustomerSearc
             </div>
           ) : (
             // No Results
-            <div className="py-12 text-center text-xs text-muted-foreground font-light">
-              No results matching "<span className="font-semibold text-foreground">{query}</span>" in your planning studio.
+            <div className="py-12 text-center text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/40 font-light">
+              No results matching "<span className="font-semibold text-[#173d2c] dark:text-[#f0e8db]">{query}</span>" in your planning studio.
             </div>
           )}
         </div>

@@ -39,7 +39,7 @@ export default function CustomerLayoutClient({
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground font-sans relative overflow-x-hidden transition-colors duration-300">
+    <div className="flex min-h-screen bg-[#f7f0e6] text-[#173d2c] dark:bg-[#191b17] dark:text-[#f0e8db] font-sans relative overflow-x-hidden transition-colors duration-300">
       
       {/* ── Desktop Sidebar ── */}
       <div className="hidden md:flex flex-shrink-0 h-screen sticky top-0 z-30">
@@ -55,7 +55,7 @@ export default function CustomerLayoutClient({
             onClick={() => setMobileMenuOpen(false)}
           />
           {/* Drawer container */}
-          <div className="fixed inset-y-0 left-0 w-64 bg-surface z-55 md:hidden animate-scale-in origin-left flex shadow-2xl">
+          <div className="fixed inset-y-0 left-0 w-64 bg-[#f2e9dc] dark:bg-[#141612] z-55 md:hidden animate-scale-in origin-left flex shadow-2xl border-r border-[#173d2c]/10 dark:border-white/[0.08]">
             <CustomerSidebar 
               customerName={customerName} 
               customerEmail={customerEmail} 
@@ -76,7 +76,7 @@ export default function CustomerLayoutClient({
         />
 
         {/* ── Page Content Container ── */}
-        <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 md:py-10 max-w-7xl w-full mx-auto animate-fade-in-up">
+        <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 md:py-8 max-w-[1480px] w-full mx-auto animate-fade-in-up">
           {children}
         </main>
       </div>

@@ -93,11 +93,42 @@ export default async function EventWorkspacePage({
   } catch (_) {}
 
   return (
-    <EventWorkspaceClient
-      event={event}
-      editRequests={editRequests}
-      meetings={meetings}
-      initialTab={initialTab}
-    />
+    <div className="relative mx-auto w-full max-w-[1480px] animate-fade-in-up space-y-8">
+      {/* Decorative background watermark */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-8 top-4 hidden select-none font-heading text-[clamp(7rem,14vw,13rem)] italic leading-none tracking-[-0.08em] text-[#173d2c]/[0.022] xl:block dark:text-white/[0.015]"
+        style={{ fontFamily: '"Playfair Display", serif' }}
+      >
+        Event
+      </span>
+
+      {/* Main Content Workspace */}
+      <main className="relative z-10">
+        <EventWorkspaceClient
+          event={event}
+          editRequests={editRequests}
+          meetings={meetings}
+          initialTab={initialTab}
+        />
+      </main>
+
+      {/* Footer Editorial Strip */}
+      <footer className="relative z-10 flex flex-col gap-3 border-t border-[#173d2c]/10 pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-white/[0.06]">
+        <div className="flex items-center gap-3">
+          <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+          <span className="text-[7px] font-semibold uppercase tracking-[0.24em] text-[#173d2c]/40 sm:text-[8px] dark:text-white/30">
+            Your Vision · Our Craft · One Celebration
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="hidden h-px w-8 bg-[#173d2c]/15 sm:block dark:bg-white/10" />
+          <span className="font-heading text-sm italic text-[#173d2c]/60 dark:text-[#d2b56b]/75" style={{ fontFamily: '"Playfair Display", serif' }}>
+            SAI Events
+          </span>
+        </div>
+      </footer>
+    </div>
   );
 }

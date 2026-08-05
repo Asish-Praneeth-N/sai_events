@@ -402,32 +402,32 @@ export default function EventRequestForm({
   // If Success Screen (Step 6)
   if (step === 6 && submittedRefNumber) {
     return (
-      <div className="max-w-2xl mx-auto bg-surface border border-accent-gold/40 rounded-3xl p-8 sm:p-10 space-y-6 text-center animate-scale-in shadow-2xl relative overflow-hidden select-none">
-        <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-accent-gold via-amber-400 to-accent-gold" />
+      <div className="max-w-2xl mx-auto border border-[#a17a34]/35 bg-[#f7f0e6] dark:border-[#d2b56b]/25 dark:bg-[#191b17] p-8 sm:p-10 space-y-6 text-center animate-scale-in shadow-2xl relative overflow-hidden select-none">
+        <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#143d2b] via-[#a17a34] to-[#143d2b] dark:from-[#d2b56b] dark:via-[#8f7338] dark:to-[#d2b56b]" />
 
-        <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
+        <div className="w-16 h-16 rounded-none bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
           <CheckCircle2 className="w-10 h-10 stroke-[2]" />
         </div>
 
         <div className="space-y-2">
-          <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-accent-gold">Request Successfully Registered</span>
-          <h2 className="text-3xl font-light font-heading text-foreground">Namaste, {fullName}!</h2>
-          <p className="text-xs text-muted-foreground leading-relaxed max-w-lg mx-auto font-light">
+          <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-[#a17a34] dark:text-[#d2b56b]">Request Successfully Registered</span>
+          <h2 className="text-3xl font-light font-heading text-[#143d2b] dark:text-[#f0e8db]">Namaste, {fullName}!</h2>
+          <p className="text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/45 leading-relaxed max-w-lg mx-auto font-light">
             Your event request for <strong className="text-foreground font-semibold">{eventType}</strong> has been submitted to SAI EVENTS.
           </p>
         </div>
 
         {/* Reference & SLA Box */}
-        <div className="p-6 rounded-2xl bg-background border border-border space-y-4 text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/50 pb-4">
+        <div className="p-6 rounded-none bg-background border border-[#173d2c]/10 dark:border-white/[0.08] space-y-4 text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#173d2c]/10 dark:border-white/[0.08]/50 pb-4">
             <div>
-              <span className="text-[10px] uppercase font-semibold text-muted-foreground">Reference Booking Number</span>
-              <div className="text-xl font-bold font-mono text-accent-gold">{submittedRefNumber}</div>
+              <span className="text-[10px] uppercase font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45">Reference Booking Number</span>
+              <div className="text-xl font-bold font-mono text-[#a17a34] dark:text-[#d2b56b]">{submittedRefNumber}</div>
             </div>
             <div className="text-left sm:text-right">
-              <span className="text-[10px] uppercase font-semibold text-muted-foreground">Estimated Response Time</span>
-              <div className="text-xs font-bold text-foreground flex items-center gap-1.5 mt-0.5">
-                <Clock className="w-3.5 h-3.5 text-accent-gold" /> Within 2 Business Hours
+              <span className="text-[10px] uppercase font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45">Estimated Response Time</span>
+              <div className="text-xs font-bold text-[#143d2b] dark:text-[#f0e8db] flex items-center gap-1.5 mt-0.5">
+                <Clock className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" /> Within 2 Business Hours
               </div>
             </div>
           </div>
@@ -435,22 +435,22 @@ export default function EventRequestForm({
           <div className="space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Event Date & Time:</span>
-              <span className="font-semibold text-foreground">{eventDate} {eventTime && `at ${eventTime}`} ({durationHours} Hrs)</span>
+              <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db]">{eventDate} {eventTime && `at ${eventTime}`} ({durationHours} Hrs)</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Venue:</span>
-              <span className="font-semibold text-foreground truncate max-w-[220px]">{venueAddress}</span>
+              <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] truncate max-w-[220px]">{venueAddress}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Guests Range & Total:</span>
-              <span className="font-semibold text-foreground">{minGuestCount}–{maxGuestCount} Guests · <span className="text-accent-gold font-mono">₹{grandTotal.toLocaleString("en-IN")}</span></span>
+              <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db]">{minGuestCount}–{maxGuestCount} Guests · <span className="text-accent-gold font-mono">₹{grandTotal.toLocaleString("en-IN")}</span></span>
             </div>
           </div>
         </div>
 
-        <div className="p-4 bg-accent-gold/5 border border-accent-gold/20 rounded-2xl flex items-start gap-3 text-left">
-          <ShieldCheck className="w-5 h-5 text-accent-gold shrink-0 mt-0.5" />
-          <p className="text-xs text-muted-foreground leading-relaxed font-light">
+        <div className="p-4 bg-[#a17a34]/[0.06] border border-[#a17a34] dark:border-[#d2b56b]/20 rounded-none flex items-start gap-3 text-left">
+          <ShieldCheck className="w-5 h-5 text-[#a17a34] dark:text-[#d2b56b] shrink-0 mt-0.5" />
+          <p className="text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/45 leading-relaxed font-light">
             Our Senior Event Coordinator will contact you on <strong className="text-foreground">{phoneCountryCode} {phoneNumber}</strong> to review your planning parameters and assign execution teams.
           </p>
         </div>
@@ -458,7 +458,7 @@ export default function EventRequestForm({
         <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => router.push("/customer/dashboard")}
-            className="px-6 py-3.5 bg-accent-gold hover:brightness-110 text-black font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-md shadow-accent-gold/15 cursor-pointer"
+            className="px-6 py-3.5 bg-accent-gold hover:brightness-110 text-black font-bold rounded-none text-xs uppercase tracking-wider transition shadow-md shadow-[#a17a34]/10 cursor-pointer"
           >
             Go to My Events Dashboard
           </button>
@@ -468,21 +468,21 @@ export default function EventRequestForm({
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
+    <div className="mx-auto max-w-6xl space-y-8 px-1 sm:px-2">
       
       {/* ── Active Draft Resumption Banner ── */}
       {activeDraft && step === 1 && (
-        <div className="p-5 rounded-3xl bg-surface border border-accent-gold/40 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+        <div className="p-5 bg-[#fbf7f0] dark:bg-[#161813] border border-[#a17a34]/40 dark:border-[#d2b56b]/40 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-accent-gold/10 border border-accent-gold/30 flex items-center justify-center text-accent-gold shrink-0 mt-0.5">
+            <div className="w-10 h-10 bg-[#a17a34]/10 border border-[#a17a34]/30 flex items-center justify-center text-[#a17a34] dark:text-[#d2b56b] shrink-0 mt-0.5">
               <RefreshCw className="w-5 h-5 animate-spin-slow" />
             </div>
             <div>
-              <span className="text-[9.5px] uppercase font-bold text-accent-gold tracking-widest block">Unfinished Draft Found</span>
-              <h4 className="text-sm font-bold text-foreground mt-0.5">
+              <span className="text-[8px] uppercase font-bold text-[#a17a34] dark:text-[#d2b56b] tracking-[0.24em] block">Unfinished Draft Found</span>
+              <h4 className="text-base font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-0.5" style={{ fontFamily: '"Playfair Display", serif' }}>
                 Continue Planning Your {activeDraft.event_type} Event?
               </h4>
-              <p className="text-xs text-muted-foreground font-light mt-0.5">
+              <p className="text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 font-light mt-0.5">
                 Last updated on {formatDate(activeDraft.updated_at || activeDraft.created_at)} · Progress: Step 1 of 5
               </p>
             </div>
@@ -491,14 +491,14 @@ export default function EventRequestForm({
             <button
               type="button"
               onClick={handleDiscardDraft}
-              className="px-4 py-2 bg-surface-raised border border-border text-muted-foreground hover:text-red-400 hover:border-red-500/30 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2.5 border border-[#173d2c]/15 text-[#173d2c]/60 hover:text-red-500 hover:border-red-500/30 text-[8px] font-bold uppercase tracking-[0.2em] transition cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5" /> Discard
+              <Trash2 className="w-3.5 h-3.5 inline mr-1" /> Discard
             </button>
             <button
               type="button"
               onClick={handleResumeDraft}
-              className="px-5 py-2 bg-accent-gold text-black font-bold text-xs rounded-xl shadow transition hover:brightness-110 cursor-pointer"
+              className="px-5 py-2.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] shadow transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer"
             >
               Continue Draft
             </button>
@@ -507,7 +507,7 @@ export default function EventRequestForm({
       )}
 
       {/* Step Tracker Header */}
-      <div className="flex items-center justify-between max-w-2xl mx-auto border-b border-border/40 pb-5 overflow-x-auto scrollbar-none">
+      <div className="flex items-center justify-between max-w-2xl mx-auto border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-5 overflow-x-auto scrollbar-none">
         {[
           { num: 1, label: "Event Details" },
           { num: 2, label: "Sub-Events" },
@@ -517,26 +517,26 @@ export default function EventRequestForm({
         ].map((s) => (
           <div key={s.num} className="flex items-center gap-2 shrink-0">
             <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold transition-all ${
+              className={`w-7 h-7 flex items-center justify-center text-[10px] font-mono font-bold transition-all ${
                 step === s.num
-                  ? "bg-accent-gold text-black shadow-md shadow-accent-gold/20"
+                  ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] shadow-sm"
                   : step > s.num
-                  ? "bg-accent-gold/20 text-accent-gold"
-                  : "bg-surface border border-border text-muted-foreground"
+                  ? "bg-[#a17a34]/20 text-[#a17a34] dark:text-[#d2b56b]"
+                  : "border border-[#173d2c]/10 bg-[#f3eadf]/40 dark:border-white/[0.08] dark:bg-white/[0.02] text-[#173d2c]/40 dark:text-white/30"
               }`}
             >
               {s.num}
             </div>
-            <span className={`text-[10px] uppercase font-bold tracking-wider hidden sm:inline ${step === s.num ? "text-foreground" : "text-muted-foreground/60"}`}>
+            <span className={`text-[8px] uppercase font-bold tracking-[0.2em] hidden sm:inline ${step === s.num ? "text-[#143d2b] dark:text-[#f0e8db]" : "text-[#173d2c]/40 dark:text-white/30"}`}>
               {s.label}
             </span>
-            {s.num < 5 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 ml-1 hidden sm:block" />}
+            {s.num < 5 && <ChevronRight className="w-3.5 h-3.5 text-[#173d2c]/30 dark:text-white/20 ml-1 hidden sm:block" />}
           </div>
         ))}
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl flex items-center gap-2.5 max-w-2xl mx-auto animate-fade-in">
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 text-xs flex items-center gap-2.5 max-w-2xl mx-auto animate-fade-in font-light">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -544,11 +544,16 @@ export default function EventRequestForm({
 
       {/* ── STEP 1: EVENT & CONTACT DETAILS FORM ── */}
       {step === 1 && (
-        <div className="max-w-3xl mx-auto bg-surface border border-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm animate-fade-in-up">
+        <div className="max-w-3xl mx-auto bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] p-6 sm:p-8 lg:p-10 space-y-7 shadow-sm animate-fade-in-up">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-accent-gold">Stage One</span>
-            <h2 className="text-2xl font-light font-heading text-foreground">Stage 1: Event & Contact Details</h2>
-            <p className="text-xs text-muted-foreground font-light">
+            <div className="flex items-center gap-2">
+              <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+              <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Stage One</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-normal font-heading tracking-[-0.03em] text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
+              Stage 1: Event & Contact Details
+            </h2>
+            <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light">
               Contact credentials are pre-filled from your profile. Specify your event parameters below.
             </p>
           </div>
@@ -556,49 +561,49 @@ export default function EventRequestForm({
           <div className="space-y-6 text-xs">
 
             {/* Section A: Contact Details (Prefilled from Profile) */}
-            <div className="p-4 rounded-2xl bg-surface-raised border border-border/80 space-y-4">
-              <h3 className="text-[10.5px] uppercase tracking-wider font-extrabold text-accent-gold flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-accent-gold" /> Contact Details (Profile Prefill)
+            <div className="p-4 rounded-none border border-[#173d2c]/10 bg-[#fffaf3]/60 dark:border-white/[0.08] dark:bg-white/[0.025] space-y-4">
+              <h3 className="text-[10.5px] uppercase tracking-wider font-extrabold text-[#a17a34] dark:text-[#d2b56b] flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" /> Contact Details (Profile Prefill)
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Full Name</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Full Name</label>
                   <input
                     type="text"
                     disabled
                     value={fullName}
-                    className="w-full px-3.5 py-2.5 bg-background/50 border border-border/60 rounded-xl text-muted-foreground opacity-80 cursor-not-allowed text-xs font-light"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/10 bg-[#efe8dd]/70 dark:border-white/[0.06] dark:bg-black/10 text-[#173d2c]/50 dark:text-[#eee5d7]/45 opacity-80 cursor-not-allowed text-xs font-light"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Email Address</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Email Address</label>
                   <input
                     type="email"
                     disabled
                     value={email}
-                    className="w-full px-3.5 py-2.5 bg-background/50 border border-border/60 rounded-xl text-muted-foreground opacity-80 cursor-not-allowed text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/10 bg-[#efe8dd]/70 dark:border-white/[0.06] dark:bg-black/10 text-[#173d2c]/50 dark:text-[#eee5d7]/45 opacity-80 cursor-not-allowed text-xs font-mono"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Phone Number</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Phone Number</label>
                   <input
                     type="text"
                     disabled
                     value={`${phoneCountryCode} ${phoneNumber}`}
-                    className="w-full px-3.5 py-2.5 bg-background/50 border border-border/60 rounded-xl text-muted-foreground opacity-80 cursor-not-allowed text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/10 bg-[#efe8dd]/70 dark:border-white/[0.06] dark:bg-black/10 text-[#173d2c]/50 dark:text-[#eee5d7]/45 opacity-80 cursor-not-allowed text-xs font-mono"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">WhatsApp Number</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">WhatsApp Number</label>
                   <input
                     type="text"
                     disabled
                     value={`${whatsappCountryCode} ${whatsappNumber}`}
-                    className="w-full px-3.5 py-2.5 bg-background/50 border border-border/60 rounded-xl text-muted-foreground opacity-80 cursor-not-allowed text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/10 bg-[#efe8dd]/70 dark:border-white/[0.06] dark:bg-black/10 text-[#173d2c]/50 dark:text-[#eee5d7]/45 opacity-80 cursor-not-allowed text-xs font-mono"
                   />
                 </div>
               </div>
@@ -606,81 +611,81 @@ export default function EventRequestForm({
 
             {/* Section B: Event Information */}
             <div className="space-y-4">
-              <h3 className="text-[10.5px] uppercase tracking-wider font-extrabold text-foreground flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-accent-gold" /> Event Parameters
+              <h3 className="text-[10.5px] uppercase tracking-wider font-extrabold text-[#143d2b] dark:text-[#f0e8db] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" /> Event Parameters
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 
                 {/* Event Type */}
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Event Type *</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Event Type *</label>
                   <select
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground cursor-pointer text-xs"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] cursor-pointer text-xs"
                   >
                     {EVENT_TYPES.map((t) => (
-                      <option key={t.id} value={t.id} className="bg-surface text-foreground">{t.label}</option>
+                      <option key={t.id} value={t.id} className="bg-surface text-[#143d2b] dark:text-[#f0e8db]">{t.label}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Event For */}
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Event For *</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Event For *</label>
                   <select
                     value={eventFor}
                     onChange={(e) => setEventFor(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground cursor-pointer text-xs"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] cursor-pointer text-xs"
                   >
                     {EVENT_FOR_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt} className="bg-surface text-foreground">{opt}</option>
+                      <option key={opt} value={opt} className="bg-surface text-[#143d2b] dark:text-[#f0e8db]">{opt}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Celebrant / Event Name */}
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Celebrant / Couple / Event Name *</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Celebrant / Couple / Event Name *</label>
                   <input
                     type="text"
                     required
                     value={celebrantName}
                     onChange={(e) => setCelebrantName(e.target.value)}
                     placeholder="e.g. Rahul & Sneha's Wedding / Aarav's 1st Birthday"
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground placeholder:text-muted-foreground/60 text-xs font-light"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] placeholder:text-muted-foreground/60 text-xs font-light"
                   />
                 </div>
 
                 {/* Event Date (min = today) */}
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Event Date * (Today or Future)</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Event Date * (Today or Future)</label>
                   <input
                     type="date"
                     required
                     min={todayDate}
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground text-xs [color-scheme:dark]"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs [color-scheme:dark]"
                   />
                 </div>
 
                 {/* Start Time & Duration */}
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Start Time & Duration *</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Start Time & Duration *</label>
                   <div className="flex gap-2">
                     <input
                       type="time"
                       required
                       value={eventTime}
                       onChange={(e) => setEventTime(e.target.value)}
-                      className="w-1/2 px-3 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground text-xs [color-scheme:dark]"
+                      className="w-1/2 px-3 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs [color-scheme:dark]"
                     />
                     <select
                       value={durationHours}
                       onChange={(e) => setDurationHours(Number(e.target.value))}
-                      className="w-1/2 px-3 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground text-xs cursor-pointer"
+                      className="w-1/2 px-3 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs cursor-pointer"
                     >
                       <option value={2} className="bg-surface">2 Hours</option>
                       <option value={4} className="bg-surface">4 Hours</option>
@@ -694,7 +699,7 @@ export default function EventRequestForm({
                 {/* Venue Name & Address with Map Action Buttons */}
                 <div className="space-y-1.5 sm:col-span-2">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                    <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">
+                    <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">
                       Venue Name & Full Address *
                     </label>
                     <div className="flex items-center gap-2">
@@ -702,9 +707,9 @@ export default function EventRequestForm({
                         type="button"
                         onClick={handleDetectVenueLocation}
                         disabled={mapLocating}
-                        className="text-[10px] text-accent-gold hover:underline flex items-center gap-1 font-bold cursor-pointer disabled:opacity-50"
+                        className="text-[10px] text-[#a17a34] dark:text-[#d2b56b] hover:underline flex items-center gap-1 font-bold cursor-pointer disabled:opacity-50"
                       >
-                        <Navigation className="w-3 h-3 text-accent-gold" />
+                        <Navigation className="w-3 h-3 text-[#a17a34] dark:text-[#d2b56b]" />
                         {mapLocating ? "Detecting..." : "Use Current GPS"}
                       </button>
                       <span className="text-muted-foreground/40 text-xs">·</span>
@@ -714,9 +719,9 @@ export default function EventRequestForm({
                           if (venueAddress) setSelectedMapAddress(venueAddress);
                           setShowMapModal(true);
                         }}
-                        className="text-[10px] text-accent-gold hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                        className="text-[10px] text-[#a17a34] dark:text-[#d2b56b] hover:underline flex items-center gap-1 font-bold cursor-pointer"
                       >
-                        <MapPin className="w-3 h-3 text-accent-gold" />
+                        <MapPin className="w-3 h-3 text-[#a17a34] dark:text-[#d2b56b]" />
                         Select on Map
                       </button>
                     </div>
@@ -728,85 +733,85 @@ export default function EventRequestForm({
                     value={venueAddress}
                     onChange={(e) => setVenueAddress(e.target.value)}
                     placeholder="e.g. Taj Krishna Banquets, Road No 1, Banjara Hills, Hyderabad"
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground placeholder:text-muted-foreground/60 text-xs font-light resize-none leading-relaxed"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] placeholder:text-muted-foreground/60 text-xs font-light resize-none leading-relaxed"
                   />
                 </div>
 
                 {/* Guest Count Range */}
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Minimum Guests *</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Minimum Guests *</label>
                   <input
                     type="number"
                     min={10}
                     required
                     value={minGuestCount}
                     onChange={(e) => setMinGuestCount(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Maximum Guests *</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Maximum Guests *</label>
                   <input
                     type="number"
                     min={minGuestCount}
                     required
                     value={maxGuestCount}
                     onChange={(e) => setMaxGuestCount(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono"
                   />
                 </div>
 
                 {/* Target Budget Range */}
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Target Budget Range (INR) *</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Target Budget Range (INR) *</label>
                   <select
                     value={budgetRange}
                     onChange={(e) => setBudgetRange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground cursor-pointer text-xs"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] cursor-pointer text-xs"
                   >
                     {BUDGET_RANGES.map((b) => (
-                      <option key={b} value={b} className="bg-surface text-foreground">{b}</option>
+                      <option key={b} value={b} className="bg-surface text-[#143d2b] dark:text-[#f0e8db]">{b}</option>
                     ))}
                   </select>
                 </div>
 
                 {budgetRange === "Custom Budget" && (
                   <div className="space-y-1.5 sm:col-span-2 animate-fade-in">
-                    <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Custom Budget Amount (INR) *</label>
+                    <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Custom Budget Amount (INR) *</label>
                     <input
                       type="number"
                       value={customBudget || ""}
                       onChange={(e) => setCustomBudget(Number(e.target.value) || undefined)}
                       placeholder="e.g. 1500000"
-                      className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground text-xs font-mono"
+                      className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono"
                     />
                   </div>
                 )}
 
                 {/* Special Requirements */}
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px]">Special Requirements / Notes (Optional)</label>
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Special Requirements / Notes (Optional)</label>
                   <textarea
                     rows={3}
                     value={specialRequirements}
                     onChange={(e) => setSpecialRequirements(e.target.value)}
                     placeholder="Describe theme expectations, VIP arrangements, accessibility requirements, etc."
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground placeholder:text-muted-foreground/60 text-xs font-light resize-none leading-relaxed"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] placeholder:text-muted-foreground/60 text-xs font-light resize-none leading-relaxed"
                   />
                 </div>
 
                 {/* Reference Video Link */}
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="block font-semibold text-muted-foreground uppercase text-[9.5px] flex items-center gap-1">
-                    <Video className="w-3.5 h-3.5 text-accent-gold" /> Reference Video Link (YouTube / Vimeo / Web URL)
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px] flex items-center gap-1">
+                    <Video className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" /> Reference Video Link (YouTube / Vimeo / Web URL)
                   </label>
                   <input
                     type="url"
                     value={referenceVideoUrl}
                     onChange={(e) => setReferenceVideoUrl(e.target.value)}
                     placeholder="https://www.youtube.com/watch?v=example"
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-accent-gold/30 text-foreground placeholder:text-muted-foreground/60 text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] placeholder:text-muted-foreground/60 text-xs font-mono"
                   />
                 </div>
 
@@ -820,7 +825,7 @@ export default function EventRequestForm({
               type="button"
               disabled={savingDraft}
               onClick={handleStage1SaveAndNext}
-              className="px-7 py-3 bg-gradient-to-r from-accent-gold to-amber-500 hover:brightness-110 disabled:opacity-50 text-black font-bold rounded-xl transition shadow text-xs uppercase tracking-wider flex items-center gap-2 cursor-pointer"
+              className="px-7 py-3.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-md"
             >
               <span>{savingDraft ? "Saving Draft..." : "Save & Next"}</span>
               <ArrowRight className="w-4 h-4" />
@@ -843,14 +848,14 @@ export default function EventRequestForm({
             <button
               type="button"
               onClick={prevStep}
-              className="px-5 py-2.5 bg-surface border border-border hover:bg-surface-raised text-foreground font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2 cursor-pointer"
+              className="px-5 py-3 border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035] text-[8px] font-bold uppercase tracking-[0.2em] transition flex items-center gap-2 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Details
             </button>
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="px-7 py-3 bg-accent-gold hover:brightness-110 text-black font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2 cursor-pointer"
+              className="px-7 py-3.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] flex items-center gap-2 cursor-pointer shadow-md"
             >
               <span>Continue to Recommendations</span>
               <ArrowRight className="w-4 h-4" />
@@ -874,14 +879,14 @@ export default function EventRequestForm({
             <button
               type="button"
               onClick={prevStep}
-              className="px-5 py-2.5 bg-surface border border-border hover:bg-surface-raised text-foreground font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2 cursor-pointer"
+              className="px-5 py-3 border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035] text-[8px] font-bold uppercase tracking-[0.2em] transition flex items-center gap-2 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Sub-Events
             </button>
             <button
               type="button"
               onClick={() => setStep(4)}
-              className="px-7 py-3 bg-accent-gold hover:brightness-110 text-black font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2 cursor-pointer"
+              className="px-7 py-3.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] flex items-center gap-2 cursor-pointer shadow-md"
             >
               <span>Continue to Services</span>
               <ArrowRight className="w-4 h-4" />
@@ -893,14 +898,18 @@ export default function EventRequestForm({
       {/* ── STEP 4: NON-FOOD SERVICES SELECTION ── */}
       {step === 4 && (
         <div className="space-y-6 animate-fade-in-up max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-surface border border-border rounded-2xl p-4.5">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] p-5 shadow-sm">
             <div>
-              <h3 className="text-base font-bold text-foreground font-heading">Design, Decor & Execution Services</h3>
-              <p className="text-xs text-muted-foreground font-light">Select Verified Services for your {eventType}.</p>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Service Catalog</span>
+              </div>
+              <h3 className="text-xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>Design, Decor & Execution Services</h3>
+              <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light">Select Verified Services for your {eventType}.</p>
             </div>
             <div className="text-right">
-              <span className="text-[10px] uppercase font-bold text-muted-foreground block">Estimated Services Total</span>
-              <span className="text-lg font-bold font-mono text-accent-gold">₹{grandTotal.toLocaleString("en-IN")}</span>
+              <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Estimated Services Total</span>
+              <span className="text-xl font-bold font-mono text-[#a17a34] dark:text-[#d2b56b]">₹{grandTotal.toLocaleString("en-IN")}</span>
             </div>
           </div>
 
@@ -913,43 +922,43 @@ export default function EventRequestForm({
               return (
                 <div
                   key={item.id}
-                  className={`p-4 rounded-2xl border transition flex flex-col justify-between gap-3 ${
-                    isSelected ? "bg-accent-gold/10 border-accent-gold" : "bg-surface border-border hover:border-border/80"
+                  className={`p-5 border transition flex flex-col justify-between gap-3 shadow-sm ${
+                    isSelected ? "bg-[#fbf7f0] dark:bg-[#161813] border-[#a17a34] dark:border-[#d2b56b]" : "bg-[#fbf7f0] dark:bg-[#161813] border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3.5">
                     {mediaUrl ? (
-                      <img src={mediaUrl} alt={item.name} className="w-14 h-14 rounded-xl object-cover border border-border shrink-0" />
+                      <img src={mediaUrl} alt={item.name} className="w-14 h-14 object-cover border border-[#173d2c]/10 dark:border-white/[0.08] shrink-0" />
                     ) : (
-                      <div className="w-14 h-14 rounded-xl bg-surface-raised border border-border flex items-center justify-center text-accent-gold shrink-0">
+                      <div className="w-14 h-14 border border-[#173d2c]/15 bg-[#f3eadf]/50 dark:border-white/[0.10] dark:bg-white/[0.02] flex items-center justify-center text-[#a17a34] dark:text-[#d2b56b] shrink-0">
                         <Sparkles className="w-6 h-6" />
                       </div>
                     )}
                     <div className="space-y-1">
-                      <h4 className="font-bold text-sm text-foreground">{item.name}</h4>
-                      <p className="text-xs text-muted-foreground line-clamp-2 font-light">{item.description}</p>
-                      <div className="text-xs font-mono font-bold text-accent-gold pt-0.5">
-                        ₹{Number(item.price).toLocaleString("en-IN")} <span className="text-[10px] text-muted-foreground font-normal">/ {item.pricing_unit || item.pricing_type}</span>
+                      <h4 className="font-normal font-heading text-base text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>{item.name}</h4>
+                      <p className="text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 line-clamp-2 font-light">{item.description}</p>
+                      <div className="text-xs font-mono font-bold text-[#a17a34] dark:text-[#d2b56b] pt-0.5">
+                        ₹{Number(item.price).toLocaleString("en-IN")} <span className="text-[10px] text-[#173d2c]/40 dark:text-white/30 font-normal">/ {item.pricing_unit || item.pricing_type}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                  <div className="flex items-center justify-between pt-3 border-t border-[#173d2c]/10 dark:border-white/[0.08]">
                     <button
                       type="button"
                       onClick={() => handleToggleItem(item.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
-                        isSelected ? "bg-accent-gold text-black" : "bg-surface-raised border border-border text-foreground hover:border-accent-gold/40"
+                      className={`px-3.5 py-2 text-[8px] font-bold uppercase tracking-[0.18em] transition cursor-pointer ${
+                        isSelected ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812]" : "border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] hover:border-[#a17a34]/40"
                       }`}
                     >
                       {isSelected ? "Selected" : "Select Service"}
                     </button>
                     {isSelected && (
-                      <div className="flex items-center gap-2 bg-background border border-border rounded-lg px-2 py-1">
+                      <div className="flex items-center gap-2 border border-[#173d2c]/15 dark:border-white/[0.10] bg-[#f3eadf]/40 dark:bg-white/[0.02] px-2 py-1">
                         <button
                           type="button"
                           onClick={() => handleQuantityChange(item.id, -1)}
-                          className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground text-xs font-bold"
+                          className="w-5 h-5 flex items-center justify-center text-[#173d2c]/60 dark:text-[#eee5d7]/50 hover:text-[#143d2b] text-xs font-bold"
                         >
                           -
                         </button>
@@ -957,7 +966,7 @@ export default function EventRequestForm({
                         <button
                           type="button"
                           onClick={() => handleQuantityChange(item.id, 1)}
-                          className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground text-xs font-bold"
+                          className="w-5 h-5 flex items-center justify-center text-[#173d2c]/60 dark:text-[#eee5d7]/50 hover:text-[#143d2b] text-xs font-bold"
                         >
                           +
                         </button>
@@ -973,14 +982,14 @@ export default function EventRequestForm({
             <button
               type="button"
               onClick={prevStep}
-              className="px-5 py-2.5 bg-surface border border-border hover:bg-surface-raised text-foreground font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2 cursor-pointer"
+              className="px-5 py-3 border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035] text-[8px] font-bold uppercase tracking-[0.2em] transition flex items-center gap-2 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
             <button
               type="button"
               onClick={() => setStep(5)}
-              className="px-7 py-3 bg-accent-gold hover:brightness-110 text-black font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2 cursor-pointer"
+              className="px-7 py-3.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] flex items-center gap-2 cursor-pointer shadow-md"
             >
               <span>Continue to Food Engine</span>
               <ArrowRight className="w-4 h-4" />
@@ -1006,13 +1015,13 @@ export default function EventRequestForm({
             }}
           />
 
-          <div className="p-6 rounded-3xl bg-surface border border-accent-gold/40 shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="p-6 sm:p-8 bg-[#fbf7f0] dark:bg-[#161813] border border-[#a17a34]/40 dark:border-[#d2b56b]/40 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
-              <span className="text-[10px] uppercase font-bold text-accent-gold tracking-widest block">Final Estimated Investment</span>
-              <div className="text-3xl font-light font-heading text-foreground mt-0.5">
-                ₹{grandTotal.toLocaleString("en-IN")} <span className="text-xs text-muted-foreground font-normal">INR</span>
+              <span className="text-[8px] uppercase font-bold text-[#9a742e] dark:text-[#d2b56b] tracking-[0.24em] block">Final Estimated Investment</span>
+              <div className="text-3xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-1" style={{ fontFamily: '"Playfair Display", serif' }}>
+                ₹{grandTotal.toLocaleString("en-IN")} <span className="text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/40 font-mono font-normal">INR</span>
               </div>
-              <p className="text-xs text-muted-foreground font-light mt-1">
+              <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light mt-1">
                 Includes verified service items, catering estimates, and operational coordination.
               </p>
             </div>
@@ -1021,7 +1030,7 @@ export default function EventRequestForm({
               <button
                 type="button"
                 onClick={prevStep}
-                className="px-5 py-3 bg-surface-raised border border-border hover:border-border/80 text-foreground font-bold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer"
+                className="px-5 py-3 border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035] cursor-pointer"
               >
                 Back
               </button>
@@ -1029,7 +1038,7 @@ export default function EventRequestForm({
                 type="button"
                 disabled={loading}
                 onClick={handleSubmit}
-                className="px-8 py-3.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:brightness-110 text-black font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-accent-gold/20 cursor-pointer disabled:opacity-50"
+                className="px-8 py-3.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer shadow-md disabled:opacity-50"
               >
                 {loading ? "Submitting Request..." : "Submit Event Request"}
               </button>
@@ -1040,17 +1049,17 @@ export default function EventRequestForm({
 
       {/* ── INTERACTIVE MAP VENUE SELECTION MODAL ── */}
       {showMapModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-surface border border-border rounded-3xl max-w-2xl w-full p-6 space-y-5 shadow-2xl relative overflow-hidden">
-            <div className="flex justify-between items-center border-b border-border/40 pb-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/15 dark:border-white/[0.10] max-w-2xl w-full p-6 sm:p-7 space-y-5 shadow-2xl relative overflow-hidden">
+            <div className="flex justify-between items-center border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
               <div>
-                <span className="text-[9.5px] uppercase font-bold text-accent-gold tracking-widest block">Interactive Venue Locator</span>
-                <h3 className="text-lg font-bold text-foreground font-heading mt-0.5">Select Event Location on Map</h3>
+                <span className="text-[8px] uppercase font-bold text-[#9a742e] dark:text-[#d2b56b] tracking-[0.2em] block">Interactive Venue Locator</span>
+                <h3 className="text-lg font-normal text-[#143d2b] dark:text-[#f0e8db] font-heading mt-0.5" style={{ fontFamily: '"Playfair Display", serif' }}>Select Event Location on Map</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowMapModal(false)}
-                className="text-muted-foreground hover:text-foreground text-xs font-mono font-bold cursor-pointer"
+                className="text-[#173d2c]/50 dark:text-[#eee5d7]/40 hover:text-[#143d2b] dark:hover:text-[#f0e8db] transition cursor-pointer p-1"
               >
                 ✕
               </button>
@@ -1063,12 +1072,12 @@ export default function EventRequestForm({
                 value={mapSearchQuery}
                 onChange={(e) => setMapSearchQuery(e.target.value)}
                 placeholder="Search venue name, landmark, street, or city (e.g. Banjara Hills)..."
-                className="flex-1 px-4 py-2.5 bg-background border border-border rounded-xl text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-accent-gold/40"
+                className="flex-1 px-4 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] text-xs font-light"
               />
               <button
                 type="submit"
                 disabled={mapSearching}
-                className="px-5 py-2.5 bg-accent-gold hover:brightness-110 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition cursor-pointer disabled:opacity-50"
+                className="px-5 py-2.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer disabled:opacity-50"
               >
                 {mapSearching ? "Searching..." : "Search"}
               </button>
@@ -1076,15 +1085,15 @@ export default function EventRequestForm({
 
             {/* Search Results Dropdown */}
             {mapSearchResults.length > 0 && (
-              <div className="max-h-40 overflow-y-auto border border-border rounded-xl bg-background divide-y divide-border/40 text-xs">
+              <div className="max-h-40 overflow-y-auto border border-[#173d2c]/15 dark:border-white/[0.10] bg-[#fbf7f0] dark:bg-[#161813] divide-y divide-[#173d2c]/10 dark:divide-white/[0.08] text-xs">
                 {mapSearchResults.map((res, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleSelectMapSearchResult(res)}
-                    className="w-full text-left p-3 hover:bg-surface-raised transition text-foreground font-light flex items-center gap-2 cursor-pointer"
+                    className="w-full text-left p-3 hover:bg-[#f3eadf]/60 dark:hover:bg-white/[0.03] transition text-[#143d2b] dark:text-[#f0e8db] font-light flex items-center gap-2 cursor-pointer"
                   >
-                    <MapPin className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
                     <span className="truncate">{res.display_name}</span>
                   </button>
                 ))}
@@ -1092,7 +1101,7 @@ export default function EventRequestForm({
             )}
 
             {/* Embedded OpenStreetMap Preview */}
-            <div className="relative rounded-2xl overflow-hidden border border-border bg-background h-64 w-full">
+            <div className="relative border border-[#173d2c]/15 dark:border-white/[0.10] bg-black/10 h-64 w-full">
               <iframe
                 title="Venue Map Preview"
                 width="100%"
@@ -1109,27 +1118,27 @@ export default function EventRequestForm({
               <button
                 type="button"
                 onClick={handleDetectVenueLocation}
-                className="absolute bottom-3 right-3 bg-surface/90 backdrop-blur-md border border-border text-foreground hover:text-accent-gold px-3.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider shadow flex items-center gap-1.5 cursor-pointer"
+                className="absolute bottom-3 right-3 bg-[#fbf7f0]/90 dark:bg-[#161813]/90 backdrop-blur-md border border-[#173d2c]/15 dark:border-white/[0.10] text-[#143d2b] dark:text-[#f0e8db] hover:text-[#a17a34] px-3.5 py-2 text-[8px] font-bold uppercase tracking-[0.18em] shadow flex items-center gap-1.5 cursor-pointer"
               >
-                <Navigation className="w-3.5 h-3.5 text-accent-gold" /> Use My Location
+                <Navigation className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" /> Use My Location
               </button>
             </div>
 
             {/* Selected Location Text Area */}
             <div className="space-y-1.5">
-              <label className="text-[9.5px] uppercase font-bold text-accent-gold tracking-wider block">Selected Venue Address:</label>
+              <label className="text-[8px] uppercase font-bold text-[#a17a34] dark:text-[#d2b56b] tracking-[0.2em] block">Selected Venue Address:</label>
               <textarea
                 rows={2}
                 value={selectedMapAddress || venueAddress}
                 onChange={(e) => setSelectedMapAddress(e.target.value)}
                 placeholder="Selected location address will appear here..."
-                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-xs text-foreground font-light resize-none focus:outline-none"
+                className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] font-light text-xs resize-none"
               />
             </div>
 
             {/* Popular Fast Suggestions */}
             <div className="space-y-1.5">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">Popular Venue Areas:</span>
+              <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Popular Venue Areas:</span>
               <div className="flex flex-wrap gap-1.5">
                 {[
                   "Banjara Hills, Hyderabad",
@@ -1145,7 +1154,7 @@ export default function EventRequestForm({
                       setSelectedMapAddress(loc);
                       setVenueAddress(loc);
                     }}
-                    className="px-2.5 py-1 bg-background border border-border hover:border-accent-gold/40 text-muted-foreground hover:text-foreground text-[10px] rounded-lg transition cursor-pointer"
+                    className="px-2.5 py-1 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 text-[#173d2c]/60 dark:text-[#eee5d7]/50 text-[10px] transition cursor-pointer"
                   >
                     + {loc}
                   </button>
@@ -1154,18 +1163,18 @@ export default function EventRequestForm({
             </div>
 
             {/* Modal Action Buttons */}
-            <div className="flex justify-end gap-3 pt-2 border-t border-border/40">
+            <div className="flex justify-end gap-3 pt-2 border-t border-[#173d2c]/10 dark:border-white/[0.08]">
               <button
                 type="button"
                 onClick={() => setShowMapModal(false)}
-                className="px-5 py-2.5 bg-surface-raised border border-border text-muted-foreground font-bold text-xs rounded-xl hover:text-foreground transition cursor-pointer"
+                className="px-5 py-2.5 border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] text-[8px] font-bold uppercase tracking-[0.2em] transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirmMapLocation}
-                className="px-6 py-2.5 bg-accent-gold hover:brightness-110 text-black font-bold text-xs uppercase tracking-wider rounded-xl shadow transition cursor-pointer"
+                className="px-6 py-2.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer shadow-md"
               >
                 Confirm Venue Location
               </button>

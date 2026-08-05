@@ -154,49 +154,49 @@ export default function CustomerProfileForm({
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       
       {/* ── Left Column: VIP Portfolio Summary Card ── */}
-      <div className="lg:col-span-4 bg-surface border border-border/80 rounded-3xl p-6 text-center flex flex-col justify-between gap-6 relative overflow-hidden shadow-sm">
-        <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent-gold/45 to-transparent" />
+      <div className="lg:col-span-4 bg-[#fbf7f0] dark:bg-[#1f221c] border border-[#173d2c]/10 dark:border-white/[0.08] p-6 text-center flex flex-col justify-between gap-6 relative overflow-hidden shadow-sm">
+        <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#a17a34]/50 to-transparent dark:via-[#d2b56b]/50" />
         
         <div className="space-y-4 pt-4">
-          <div className="relative w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-background border border-border/80 shadow-inner group">
-            <div className="absolute inset-0 rounded-full border border-accent-gold/30 scale-105 opacity-60 pointer-events-none group-hover:scale-110 transition duration-300" />
-            <span className="text-2xl font-light font-heading text-accent-gold uppercase tracking-wider">
+          <div className="relative w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-[#f3eadf]/60 dark:bg-white/[0.02] border border-[#173d2c]/15 dark:border-white/[0.08] shadow-inner group">
+            <div className="absolute inset-0 rounded-full border border-[#a17a34]/30 dark:border-[#d2b56b]/30 scale-105 opacity-60 pointer-events-none group-hover:scale-110 transition duration-300" />
+            <span className="text-2xl font-normal font-heading text-[#9a742e] dark:text-[#d2b56b] uppercase tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
               {initials}
             </span>
           </div>
 
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-foreground font-heading truncate px-2">
+            <h3 className="text-base font-normal text-[#173d2c] dark:text-[#f0e8db] font-heading truncate px-2" style={{ fontFamily: '"Playfair Display", serif' }}>
               {fullName || "Private Client"}
             </h3>
-            <span className="text-[8.5px] uppercase tracking-wider text-accent-gold font-bold font-sans flex items-center justify-center gap-1">
+            <span className="text-[7.5px] uppercase tracking-[0.22em] text-[#9a742e] dark:text-[#d2b56b] font-bold flex items-center justify-center gap-1">
               <Award className="w-3 h-3" /> VIP Planning Portfolio
             </span>
-            <span className="text-[10px] text-muted-foreground font-mono block select-all opacity-80 pt-1">
+            <span className="text-[10px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 font-mono block select-all opacity-80 pt-1">
               {initialProfile.email}
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 border-t border-b border-border/45 py-5 my-1">
-          <div className="text-center space-y-1 border-r border-border/45">
-            <span className="text-[8.5px] uppercase font-bold text-muted-foreground/60 tracking-wider block">Active Cases</span>
-            <span className="text-xl font-bold font-mono text-accent-gold block">
+        <div className="grid grid-cols-2 gap-4 border-t border-b border-[#173d2c]/10 dark:border-white/[0.08] py-5 my-1">
+          <div className="text-center space-y-1 border-r border-[#173d2c]/10 dark:border-white/[0.08]">
+            <span className="text-[7.5px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.22em] block">Active Cases</span>
+            <span className="text-xl font-bold font-mono text-[#a17a34] dark:text-[#d2b56b] block">
               {initialProfile.activeCasesCount}
             </span>
           </div>
           <div className="text-center space-y-1">
-            <span className="text-[8.5px] uppercase font-bold text-muted-foreground/60 tracking-wider block">Total Booked</span>
-            <span className="text-xl font-bold font-mono text-foreground block">
+            <span className="text-[7.5px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.22em] block">Total Booked</span>
+            <span className="text-xl font-bold font-mono text-[#173d2c] dark:text-[#f0e8db] block">
               {initialProfile.totalCasesCount}
             </span>
           </div>
         </div>
 
-        <div className="p-3 bg-background/40 border border-border/50 rounded-xl flex gap-2 items-center justify-center text-left">
-          <ShieldCheck className="w-4 h-4 text-accent-gold shrink-0" />
-          <span className="text-[9px] text-muted-foreground font-light leading-normal">
-            Verified SAI EVENTS customer profile.
+        <div className="p-3 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] flex gap-2.5 items-center justify-center text-left">
+          <ShieldCheck className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
+          <span className="text-[9.5px] text-[#173d2c]/60 dark:text-[#eee5d7]/50 font-light leading-normal">
+            Verified SAI EVENTS private client profile.
           </span>
         </div>
       </div>
@@ -205,7 +205,7 @@ export default function CustomerProfileForm({
       <form onSubmit={handleSubmit} className="lg:col-span-8 space-y-6 w-full min-w-0">
         
         {isCompletionRequired && (
-          <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs rounded-2xl flex items-center gap-3 animate-fade-in">
+          <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs flex items-center gap-3 animate-fade-in">
             <AlertCircle className="w-5 h-5 shrink-0 text-amber-400" />
             <div>
               <strong className="block font-bold">Profile Completion Required:</strong>
@@ -215,23 +215,25 @@ export default function CustomerProfileForm({
         )}
 
         {error && (
-          <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs rounded-2xl flex items-center gap-2.5 animate-fade-in">
+          <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs flex items-center gap-2.5 animate-fade-in">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {message && (
-          <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs rounded-2xl flex items-center gap-2.5 animate-fade-in">
+          <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs flex items-center gap-2.5 animate-fade-in">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
             <span>{message}</span>
           </div>
         )}
 
-        <div className="p-4 sm:p-6.5 rounded-3xl bg-surface border border-border/80 shadow-sm space-y-6 w-full min-w-0">
-          <div className="space-y-1 border-b border-border/40 pb-4">
-            <h2 className="text-base sm:text-lg font-light font-heading text-foreground">Contact & Coordination Profile</h2>
-            <p className="text-[10.5px] text-muted-foreground mt-1 leading-relaxed font-light">
+        <div className="p-4 sm:p-6.5 bg-[#fbf7f0] dark:bg-[#1f221c] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-6 w-full min-w-0">
+          <div className="space-y-1 border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
+            <h2 className="text-base sm:text-lg font-normal font-heading text-[#173d2c] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
+              Contact & Coordination Profile
+            </h2>
+            <p className="text-[11px] text-[#173d2c]/60 dark:text-[#eee5d7]/50 mt-1 leading-relaxed font-light">
               Your contact details are used to coordinate event planning schedules, layout syncs, and event manager communications.
             </p>
           </div>
@@ -240,22 +242,22 @@ export default function CustomerProfileForm({
             
             {/* Authenticated Email (Readonly) */}
             <div className="space-y-2">
-              <label className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                <Mail className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+              <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em] flex items-center gap-1.5 pl-0.5">
+                <Mail className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
                 <span>Verified Account Email (Supabase Auth)</span>
               </label>
               <input
                 type="email"
                 disabled
                 value={initialProfile.email}
-                className="w-full px-4 py-3 bg-surface-raised border border-border/50 rounded-xl text-muted-foreground font-mono text-xs opacity-80 cursor-not-allowed truncate"
+                className="w-full px-4 py-3 bg-[#f3eadf]/40 dark:bg-white/[0.015] border border-[#173d2c]/10 dark:border-white/[0.08] text-[#173d2c]/60 dark:text-[#eee5d7]/40 font-mono text-xs opacity-80 cursor-not-allowed truncate"
               />
             </div>
 
             {/* Full Name field */}
             <div className="space-y-2">
-              <label htmlFor="fullName" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                <User className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+              <label htmlFor="fullName" className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em] flex items-center gap-1.5 pl-0.5">
+                <User className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
                 <span>Full Name *</span>
               </label>
               <input
@@ -265,24 +267,24 @@ export default function CustomerProfileForm({
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. John Doe"
-                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-sm font-light hover:border-border/60"
+                className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] dark:focus:border-[#d2b56b] transition duration-200 text-sm font-light"
               />
             </div>
 
             {/* Phone field with Country Code */}
             <div className="space-y-2 w-full">
-              <label htmlFor="phoneNumber" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                <Phone className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+              <label htmlFor="phoneNumber" className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em] flex items-center gap-1.5 pl-0.5">
+                <Phone className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
                 <span>Primary Phone Number *</span>
               </label>
               <div className="flex flex-row gap-2 w-full min-w-0">
                 <select
                   value={phoneCountryCode}
                   onChange={(e) => setPhoneCountryCode(e.target.value)}
-                  className="w-28 sm:w-44 px-2.5 sm:px-3 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground text-xs font-mono shrink-0 cursor-pointer text-ellipsis overflow-hidden"
+                  className="w-28 sm:w-44 px-2.5 sm:px-3 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-[#171914] dark:text-[#f0e8db] dark:focus:border-[#d2b56b] text-xs font-mono shrink-0 cursor-pointer text-ellipsis overflow-hidden"
                 >
                   {ALL_COUNTRY_CODES.map((c, idx) => (
-                    <option key={`${c.code}-${idx}`} value={c.code} className="bg-surface text-foreground">
+                    <option key={`${c.code}-${idx}`} value={c.code} className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">
                       {c.country}
                     </option>
                   ))}
@@ -294,19 +296,19 @@ export default function CustomerProfileForm({
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="e.g. 9876543210"
-                  className="flex-1 min-w-0 w-full px-3.5 sm:px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-xs sm:text-sm font-mono hover:border-border/60"
+                  className="flex-1 min-w-0 w-full px-3.5 sm:px-4 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] dark:focus:border-[#d2b56b] transition duration-200 text-xs sm:text-sm font-mono"
                 />
               </div>
             </div>
 
             {/* WhatsApp Same As Phone Checkbox */}
             <div className="pt-1">
-              <label className="flex items-center gap-2.5 cursor-pointer text-xs text-foreground font-medium select-none">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs text-[#173d2c] dark:text-[#f0e8db] font-medium select-none">
                 <input
                   type="checkbox"
                   checked={whatsappSameAsPhone}
                   onChange={(e) => setWhatsappSameAsPhone(e.target.checked)}
-                  className="w-4 h-4 rounded border-border text-accent-gold focus:ring-accent-gold/30 accent-[#D4AF37] cursor-pointer shrink-0"
+                  className="w-4 h-4 border-[#173d2c]/20 text-[#a17a34] focus:ring-[#a17a34]/30 accent-[#a17a34] dark:accent-[#d2b56b] cursor-pointer shrink-0"
                 />
                 <span className="leading-snug">WhatsApp number is same as primary phone number</span>
               </label>
@@ -315,18 +317,18 @@ export default function CustomerProfileForm({
             {/* Separate WhatsApp Field if disabled */}
             {!whatsappSameAsPhone && (
               <div className="space-y-2 pt-2 animate-fade-in w-full">
-                <label htmlFor="whatsappNumber" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                <label htmlFor="whatsappNumber" className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em] flex items-center gap-1.5 pl-0.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
                   <span>WhatsApp Number *</span>
                 </label>
                 <div className="flex flex-row gap-2 w-full min-w-0">
                   <select
                     value={whatsappCountryCode}
                     onChange={(e) => setWhatsappCountryCode(e.target.value)}
-                    className="w-28 sm:w-44 px-2.5 sm:px-3 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground text-xs font-mono shrink-0 cursor-pointer text-ellipsis overflow-hidden"
+                    className="w-28 sm:w-44 px-2.5 sm:px-3 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-[#171914] dark:text-[#f0e8db] dark:focus:border-[#d2b56b] text-xs font-mono shrink-0 cursor-pointer text-ellipsis overflow-hidden"
                   >
                     {ALL_COUNTRY_CODES.map((c, idx) => (
-                      <option key={`${c.code}-${idx}`} value={c.code} className="bg-surface text-foreground">
+                      <option key={`${c.code}-${idx}`} value={c.code} className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">
                         {c.country}
                       </option>
                     ))}
@@ -338,7 +340,7 @@ export default function CustomerProfileForm({
                     value={whatsappNumber}
                     onChange={(e) => setWhatsappNumber(e.target.value)}
                     placeholder="e.g. 9876543210"
-                    className="flex-1 min-w-0 w-full px-3.5 sm:px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-xs sm:text-sm font-mono hover:border-border/60"
+                    className="flex-1 min-w-0 w-full px-3.5 sm:px-4 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] dark:focus:border-[#d2b56b] transition duration-200 text-xs sm:text-sm font-mono"
                   />
                 </div>
               </div>
@@ -347,17 +349,17 @@ export default function CustomerProfileForm({
             {/* Address field & Geolocation */}
             <div className="space-y-2 w-full">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <label htmlFor="address" className="text-[9.5px] uppercase font-bold text-muted-foreground/60 tracking-wider flex items-center gap-1.5 pl-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-accent-gold shrink-0" />
+                <label htmlFor="address" className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em] flex items-center gap-1.5 pl-0.5">
+                  <MapPin className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
                   <span>Customer Address & Location *</span>
                 </label>
                 <button
                   type="button"
                   onClick={handleGetCurrentLocation}
                   disabled={locating}
-                  className="text-[10px] text-accent-gold hover:underline flex items-center gap-1 font-bold cursor-pointer disabled:opacity-50 shrink-0 ml-auto"
+                  className="text-[9.5px] uppercase font-bold tracking-[0.18em] text-[#a17a34] dark:text-[#d2b56b] hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50 shrink-0 ml-auto"
                 >
-                  <Navigation className="w-3 h-3 text-accent-gold shrink-0" />
+                  <Navigation className="w-3 h-3 text-[#a17a34] dark:text-[#d2b56b] shrink-0" />
                   <span>{locating ? "Locating..." : "Use Current Location"}</span>
                 </button>
               </div>
@@ -368,11 +370,11 @@ export default function CustomerProfileForm({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Enter street address, city, state, and pincode..."
-                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:border-accent-gold/45 text-foreground placeholder-muted-foreground transition duration-200 text-sm resize-none font-light leading-relaxed hover:border-border/60"
+                className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] dark:focus:border-[#d2b56b] transition duration-200 text-sm resize-none font-light leading-relaxed"
               />
               {locationLat && locationLng && (
-                <div className="text-[10px] text-muted-foreground font-mono flex items-center gap-1.5 pt-0.5">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                <div className="text-[10px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 font-mono flex items-center gap-1.5 pt-0.5">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
                   Coordinates captured: {locationLat.toFixed(5)}, {locationLng.toFixed(5)}
                 </div>
               )}
@@ -385,7 +387,7 @@ export default function CustomerProfileForm({
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold disabled:opacity-50 text-black font-bold rounded-xl transition text-xs uppercase tracking-[0.15em] cursor-pointer shadow-md shadow-[#D4AF37]/10"
+            className="w-full sm:w-auto px-8 py-3.5 bg-[#143d2b] text-[#fffaf1] font-bold text-[8.5px] uppercase tracking-[0.2em] transition shadow-md hover:bg-[#174631] cursor-pointer disabled:opacity-50 dark:bg-[#d2b56b] dark:text-[#161812] dark:hover:bg-[#dfc580]"
           >
             {loading ? "Saving Profile..." : "Save Profile Details"}
           </button>
