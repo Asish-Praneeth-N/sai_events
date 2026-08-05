@@ -313,8 +313,10 @@ export default function CinematicDoors({
               flex
               items-center
               justify-center
-              px-[clamp(12px,4vw,32px)]
-              py-[max(12px,env(safe-area-inset-top))]
+              px-3
+              py-[max(8px,env(safe-area-inset-top))]
+              sm:px-[clamp(12px,4vw,32px)]
+              sm:py-[max(12px,env(safe-area-inset-top))]
               [perspective:1600px]
             "
           >
@@ -324,13 +326,8 @@ export default function CinematicDoors({
 
             <motion.div
               animate={{
-                scaleX: unfolded
-                  ? 1
-                  : 0.72,
-
-                scaleY: unfolded
-                  ? 1
-                  : 0.62,
+                scaleX: unfolded ? 1 : 0.72,
+                scaleY: unfolded ? 1 : 0.62,
               }}
               transition={{
                 duration: quick ? 0.55 : 1,
@@ -338,20 +335,18 @@ export default function CinematicDoors({
               }}
               className="
                 relative
-                h-[clamp(420px,76svh,640px)]
-                w-[min(94vw,920px)]
-                max-h-[calc(100svh-24px)]
-
-                sm:h-[min(76dvh,640px)]
-                sm:min-h-[440px]
-                sm:w-[min(88vw,920px)]
+                w-[min(92vw,920px)]
                 overflow-hidden
-                shadow-[0_35px_100px_rgba(0,0,0,0.58)]
+                shadow-[0_20px_70px_rgba(0,0,0,0.55)]
               "
               style={{
+                /* Height: fills ~82% of the viewport height, capped at 640px.
+                   On small phones (667px tall) this gives ~547px.
+                   safe-area offset keeps it off the home indicator. */
+                height: "min(82svh, 640px)",
+                maxHeight: "calc(100svh - 16px)",
                 background:
                   "linear-gradient(135deg,#f8f1e2 0%,#eee0c5 47%,#faf4e8 100%)",
-
                 transformOrigin: "center",
                 willChange: "transform",
               }}
@@ -533,9 +528,7 @@ export default function CinematicDoors({
                       active={
                         phase === "sealed"
                       }
-                      releasing={
-                        phase === "unfold"
-                      }
+                      releasing={false}
                     />
                   </motion.div>
                 )}
@@ -747,12 +740,12 @@ function InvitationContent({
         items-center
         justify-center
         overflow-hidden
-        px-[clamp(24px,8vw,64px)]
-        py-[clamp(28px,7svh,48px)]
-
-        sm:px-16
-        sm:py-12
+        px-[clamp(16px,5vw,64px)]
+        py-[clamp(12px,3.5svh,48px)]
+        sm:px-12
+        sm:py-8
         lg:px-20
+        lg:py-12
       "
     >
       {/* ================================================================
@@ -764,13 +757,14 @@ function InvitationContent({
           <BotanicalCorner
             className="
               absolute
-              -left-5
-              -top-5
-              h-[190px]
-              w-[190px]
-
-              sm:h-[290px]
-              sm:w-[290px]
+              -left-4
+              -top-4
+              h-[120px]
+              w-[120px]
+              sm:h-[200px]
+              sm:w-[200px]
+              lg:h-[280px]
+              lg:w-[280px]
             "
           />
 
@@ -778,14 +772,15 @@ function InvitationContent({
             flip
             className="
               absolute
-              -bottom-5
-              -right-5
-              h-[190px]
-              w-[190px]
+              -bottom-4
+              -right-4
+              h-[120px]
+              w-[120px]
               rotate-180
-
-              sm:h-[290px]
-              sm:w-[290px]
+              sm:h-[200px]
+              sm:w-[200px]
+              lg:h-[280px]
+              lg:w-[280px]
             "
           />
         </>
@@ -861,10 +856,12 @@ function InvitationContent({
           relative
           z-10
           flex
+          w-full
           max-w-[min(660px,100%)]
           flex-col
           items-center
           text-center
+          gap-0
         "
       >
         {/* EYEBROW */}
@@ -887,32 +884,31 @@ function InvitationContent({
             delay: 0.08,
           }}
           className="
-            mb-5
+            mb-2
             flex
             items-center
-            gap-3
-
-            sm:mb-7
+            gap-2
+            sm:mb-5
+            sm:gap-3
           "
         >
-          <span className="h-px w-8 bg-[#a47d32]/35 sm:w-14" />
+          <span className="h-px w-5 bg-[#a47d32]/35 sm:w-10" />
 
           <span
             className="
               whitespace-nowrap
-              text-[6px]
+              text-[5.5px]
               font-bold
               uppercase
-              tracking-[0.42em]
+              tracking-[0.38em]
               text-[#8d6a2c]
-
-              sm:text-[8px]
+              sm:text-[7px]
             "
           >
             The Art of Celebration
           </span>
 
-          <span className="h-px w-8 bg-[#a47d32]/35 sm:w-14" />
+          <span className="h-px w-5 bg-[#a47d32]/35 sm:w-10" />
         </motion.div>
 
         {/* BRAND */}
@@ -936,7 +932,7 @@ function InvitationContent({
             ease: CINEMATIC_EASE,
           }}
           className="
-            text-[clamp(0.75rem,1.5vw,1.05rem)]
+            text-[clamp(0.6rem,2.2vw,1.05rem)]
             font-semibold
             uppercase
             text-[#173d2a]
@@ -966,13 +962,12 @@ function InvitationContent({
             ease: CINEMATIC_EASE,
           }}
           className="
-            mt-3
-            text-[clamp(1.75rem,10vw,5.5rem)]
-
-            sm:mt-4
-            sm:text-[clamp(2.1rem,6vw,5.5rem)]
+            mt-1
+            text-[clamp(1.5rem,7.5vw,5.5rem)]
+            sm:mt-3
+            sm:text-[clamp(2.1rem,5.5vw,5.5rem)]
             font-normal
-            leading-[0.94]
+            leading-[0.92]
             tracking-[-0.045em]
             text-[#123823]
           "
@@ -1014,12 +1009,11 @@ function InvitationContent({
             delay: 0.46,
           }}
           className="
-            my-5
+            my-2
             flex
             items-center
             gap-3
-
-            sm:my-7
+            sm:my-5
           "
         >
           <span className="h-px w-10 bg-[#9b742f]/30" />
@@ -1058,13 +1052,13 @@ function InvitationContent({
           }}
           className="
             max-w-md
-            text-[8px]
+            text-[7px]
             font-light
-            leading-[1.9]
-            tracking-[0.055em]
+            leading-[1.75]
+            tracking-[0.05em]
             text-[#173d2a]/55
-
             sm:text-[10px]
+            sm:leading-[1.9]
           "
           style={{
             fontFamily:
@@ -1092,14 +1086,13 @@ function InvitationContent({
             delay: 0.72,
           }}
           className="
-            mt-5
-            text-[6px]
+            mt-2
+            text-[5.5px]
             font-semibold
             uppercase
-            tracking-[0.34em]
+            tracking-[0.3em]
             text-[#9b742f]/60
-
-            sm:mt-7
+            sm:mt-5
             sm:text-[7px]
           "
         >
@@ -1172,14 +1165,16 @@ function WaxSeal({
         relative
         z-10
         flex
-        h-[78px]
-        w-[78px]
+        h-[60px]
+        w-[60px]
         items-center
         justify-center
         rounded-full
 
-        sm:h-[106px]
-        sm:w-[106px]
+        sm:h-[80px]
+        sm:w-[80px]
+        lg:h-[106px]
+        lg:w-[106px]
       "
       style={{
         background:
@@ -1485,78 +1480,51 @@ function Atmosphere({
   lowPower: boolean;
 }) {
   return (
+    /* Outer div is static — only opacity fades, no scale, so no full-page repaint */
     <motion.div
-      initial={{ opacity: 1, scale: 1 }}
-      animate={{
-        opacity: opening ? 0 : 1,
-        scale: opening ? 1.08 : 1,
-      }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: opening ? 0 : 1 }}
       transition={{
         duration: lowPower ? 0.9 : 1.55,
         ease: DOOR_EASE,
       }}
       className="absolute inset-0 z-0 bg-[#07120c]"
-      style={{ willChange: "transform, opacity" }}
+      style={{
+        willChange: "opacity",
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
+      }}
     >
       {/* FOUNDATION */}
 
       <div
-        className="
-          absolute
-          inset-0
-        "
+        className="absolute inset-0"
         style={{
           background:
             "radial-gradient(circle at 50% 45%,#183d2a 0%,#0d2519 43%,#050e09 100%)",
         }}
       />
 
-      {/* GOLD AMBIENCE */}
-
-      <motion.div
-        animate={{
-          opacity: opening
-            ? 0.32
-            : 0.11,
-
-          scale: opening
-            ? 1.2
-            : 1,
-        }}
-        transition={{
-          duration: 1.35,
-        }}
+      {/* GOLD AMBIENCE — static blur, only opacity changes (no scale animation
+          to avoid full-screen repaint on mobile) */}
+      <div
         className="
-          absolute
-          left-1/2
-          top-1/2
-          h-[62vh]
-          w-[62vw]
-          -translate-x-1/2
-          -translate-y-1/2
+          absolute left-1/2 top-1/2
+          h-[62vh] w-[62vw]
+          -translate-x-1/2 -translate-y-1/2
           rounded-full
         "
         style={{
           background:
-            "radial-gradient(circle,rgba(218,187,103,.28),transparent 68%)",
-
-          filter: lowPower
-            ? undefined
-            : "blur(70px)",
+            "radial-gradient(circle,rgba(218,187,103,.18),transparent 68%)",
+          filter: lowPower ? undefined : "blur(70px)",
+          transform: "translate(-50%,-50%) translateZ(0)",
         }}
       />
 
       {/* TOP LIGHT */}
-
       <div
-        className="
-          absolute
-          left-1/2
-          top-0
-          h-[35vh]
-          w-[60vw]
-          -translate-x-1/2
-        "
+        className="absolute left-1/2 top-0 h-[35vh] w-[60vw] -translate-x-1/2"
         style={{
           background:
             "radial-gradient(ellipse at top,rgba(229,203,127,.06),transparent 68%)",
@@ -1564,12 +1532,8 @@ function Atmosphere({
       />
 
       {/* VIGNETTE */}
-
       <div
-        className="
-          absolute
-          inset-0
-        "
+        className="absolute inset-0"
         style={{
           background:
             "radial-gradient(circle,transparent 30%,rgba(0,0,0,.64) 100%)",
@@ -1748,56 +1712,35 @@ function RoyalDoor({
   const openingEase = [0.77, 0, 0.175, 1] as const;
 
   return (
-    <motion.div
+    /* Single wrapper — only translate handles door reveal fade,
+       no double-stacked opacity compositing */
+    <div
       className="pointer-events-none absolute inset-0 z-10 overflow-hidden"
       aria-hidden="true"
-      animate={{ opacity: opening ? [1, 1, 0] : 1 }}
-      transition={{
-        duration: opening ? duration + 0.25 : 0.25,
-        times: [0, 0.88, 1],
-        ease: "linear",
-      }}
+      style={{ transform: "translateZ(0)", isolation: "isolate" }}
     >
-      {/* Architectural surround gives the doors a believable luxury entrance. */}
-      <motion.div
-        animate={{
-          opacity: opening ? [1, 1, 0] : 1,
-          scale: opening ? [1, 1.01, 1.055] : 1,
-        }}
-        transition={{
-          duration: duration + 0.12,
-          times: [0, 0.72, 1],
-          ease: openingEase,
-        }}
-        className="absolute inset-0 z-0"
-        style={{ willChange: "transform, opacity" }}
-      >
+      {/* Architectural surround — static, no animation to avoid full repaint */}
+      <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[#030805]" />
         <div className="absolute inset-[clamp(5px,1.2vw,20px)] border border-[#d9bd73]/35 shadow-[inset_0_0_90px_rgba(0,0,0,.92),0_0_45px_rgba(0,0,0,.7)]" />
         <div className="absolute inset-[clamp(10px,2vw,34px)] border border-[#8e6b31]/25" />
         <div className="absolute left-1/2 top-[clamp(10px,2.3vw,38px)] h-[clamp(34px,6vw,80px)] w-[clamp(150px,32vw,440px)] -translate-x-1/2 rounded-t-full border border-[#d9bd73]/30 bg-[radial-gradient(ellipse_at_bottom,rgba(196,157,70,.12),transparent_70%)]" />
-      </motion.div>
+      </div>
 
-      {/* Soft website reveal. This stays flat: no page-turn perspective. */}
+      {/* Soft centre flash — opacity only, no scale to avoid repaint */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.86 }}
-        animate={
-          opening
-            ? {
-              opacity: [0, 0.15, 0.38, 0],
-              scale: [0.86, 0.96, 1.08, 1.22],
-            }
-            : { opacity: 0, scale: 0.86 }
-        }
+        initial={{ opacity: 0 }}
+        animate={opening ? { opacity: [0, 0.22, 0] } : { opacity: 0 }}
         transition={{
           duration: duration + 0.18,
-          times: [0, 0.28, 0.72, 1],
+          times: [0, 0.45, 1],
           ease: openingEase,
         }}
-        className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_center,rgba(255,235,181,.24)_0%,rgba(90,121,87,.08)_34%,transparent_70%)]"
-        style={{ willChange: "transform, opacity" }}
+        className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_center,rgba(255,235,181,.28)_0%,rgba(90,121,87,.06)_38%,transparent_68%)]"
+        style={{ willChange: "opacity", backfaceVisibility: "hidden" }}
       />
 
+      {/* Centre seam light — scaleX only on a composited layer, no blur animation */}
       <motion.div
         initial={{ opacity: 0, scaleX: 0.002 }}
         animate={
@@ -1813,7 +1756,8 @@ function RoyalDoor({
           times: [0, 0.12, 0.62, 1],
           ease: openingEase,
         }}
-        className="absolute inset-y-0 left-1/2 z-[25] w-full -translate-x-1/2 origin-center bg-[linear-gradient(90deg,transparent,rgba(255,237,185,.18),transparent)] blur-[10px]"
+        className="absolute inset-y-0 left-1/2 z-[25] w-full -translate-x-1/2 origin-center bg-[linear-gradient(90deg,transparent,rgba(255,237,185,.18),transparent)]"
+        style={{ willChange: "transform, opacity", backfaceVisibility: "hidden" }}
       />
 
       <DoorWing
@@ -1831,16 +1775,17 @@ function RoyalDoor({
         ease={openingEase}
       />
 
-      {/* Central lock line disappears first, then the doors glide apart. */}
+      {/* Central lock line — opacity + scaleY only */}
       <motion.div
         animate={{
-          opacity: opening ? [1, 0.9, 0] : 1,
-          scaleY: opening ? [1, 1.04, 0.2] : 1,
+          opacity: opening ? [1, 0, 0] : 1,
+          scaleY: opening ? [1, 0.2, 0] : 1,
         }}
-        transition={{ duration: lowPower ? 0.35 : 0.52, ease: "easeOut" }}
+        transition={{ duration: lowPower ? 0.3 : 0.45, ease: "easeOut" }}
         className="absolute inset-y-[3%] left-1/2 z-30 w-px -translate-x-1/2 origin-center bg-gradient-to-b from-transparent via-[#f0d68d]/75 to-transparent shadow-[0_0_18px_rgba(238,211,139,.38)]"
+        style={{ willChange: "transform, opacity", backfaceVisibility: "hidden" }}
       />
-    </motion.div>
+    </div>
   );
 }
 
@@ -1862,21 +1807,23 @@ function DoorWing({
   const isLeft = side === "left";
 
   return (
+    /* translateX only — no scale jitter, no filter on the composited layer.
+       Shadow is rendered on the inner static wrapper so it never triggers
+       a re-rasterise during the sliding animation. */
     <motion.div
-      initial={{ x: "0%", scale: 1 }}
+      initial={{ x: "0%" }}
       animate={
         opening
           ? {
             x: isLeft
-              ? ["0%", "-1.5%", "-9%", "-108%"]
-              : ["0%", "1.5%", "9%", "108%"],
-            scale: [1, 1, 0.998, 1.015],
+              ? ["0%", "-4%", "-108%"]
+              : ["0%", "4%", "108%"],
           }
-          : { x: "0%", scale: 1 }
+          : { x: "0%" }
       }
       transition={{
         duration,
-        times: [0, 0.12, 0.32, 1],
+        times: [0, 0.18, 1],
         ease,
       }}
       className={`absolute inset-y-0 z-20 w-[calc(50%+1px)] ${isLeft ? "left-0 origin-right" : "right-0 origin-left"
@@ -1884,14 +1831,23 @@ function DoorWing({
       style={{
         willChange: "transform",
         backfaceVisibility: "hidden",
-        filter: lowPower
-          ? undefined
-          : isLeft
-            ? "drop-shadow(26px 0 38px rgba(0,0,0,.62))"
-            : "drop-shadow(-26px 0 38px rgba(0,0,0,.62))",
+        /* GPU layer promotion — critical for jank-free sliding on mobile */
+        transform: "translateZ(0)",
       }}
     >
-      <RoyalDoorLeaf side={side} lowPower={lowPower} />
+      {/* Shadow lives here on a non-animating element */}
+      <div
+        className="absolute inset-0"
+        style={{
+          filter: lowPower
+            ? undefined
+            : isLeft
+              ? "drop-shadow(18px 0 28px rgba(0,0,0,.55))"
+              : "drop-shadow(-18px 0 28px rgba(0,0,0,.55))",
+        }}
+      >
+        <RoyalDoorLeaf side={side} lowPower={lowPower} />
+      </div>
     </motion.div>
   );
 }
@@ -1916,6 +1872,10 @@ function RoyalDoorLeaf({
         boxShadow: isLeft
           ? "inset -30px 0 64px rgba(0,0,0,.58),inset 18px 0 28px rgba(233,207,133,.035)"
           : "inset 30px 0 64px rgba(0,0,0,.58),inset -18px 0 28px rgba(233,207,133,.035)",
+        /* Promote inner content to its own GPU layer — rasterised once */
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
+        willChange: "auto",
       }}
     >
       {/* Fine wood grain remains subtle enough not to shimmer during movement. */}
