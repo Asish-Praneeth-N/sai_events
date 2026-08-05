@@ -2,10 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+} from "framer-motion";
 import {
   ArrowUpRight,
-  LockKeyhole,
   Sparkles,
 } from "lucide-react";
 
@@ -18,9 +20,9 @@ export default function LoginPage() {
 
   return (
     <div className="relative w-full">
-      {/* ============================================================
-          HEADER
-      ============================================================ */}
+      {/* ================================================================ */}
+      {/* HEADER                                                           */}
+      {/* ================================================================ */}
 
       <motion.header
         initial={{
@@ -32,104 +34,165 @@ export default function LoginPage() {
           y: 0,
         }}
         transition={{
-          duration: shouldReduceMotion ? 0.2 : 0.75,
+          duration: shouldReduceMotion ? 0.2 : 0.8,
           ease: EASE,
         }}
-        className="relative mb-8"
       >
-        {/* Editorial eyebrow */}
+        {/* Eyebrow */}
 
-        <div className="mb-6 flex items-center justify-between gap-5">
+        <div
+          className="
+            mb-4
+            flex items-center
+            justify-between
+            gap-4
+          "
+        >
           <div className="flex min-w-0 items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="h-px w-7 flex-shrink-0 bg-[#9A7531]/50 dark:bg-[#D4AF37]/40"
-            />
+            <span className="h-px w-7 flex-shrink-0 bg-[#173d2c]/35 dark:bg-[#d2b56b]/40" />
 
-            <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-[#9A7531] dark:text-[#D4AF37]">
+            <Sparkles className="h-2.5 w-2.5 text-[#a17a34] dark:text-[#d2b56b]" />
+
+            <span
+              className="
+                text-[7px] font-bold uppercase
+                tracking-[0.28em]
+                text-[#173d2c]/55
+                dark:text-[#d9c88d]/65
+              "
+            >
               Client Access
             </span>
           </div>
 
-          <span className="flex-shrink-0 text-[7px] font-semibold uppercase tracking-[0.24em] text-[#173D2A]/25 dark:text-white/20">
-            SAI · 01
+          <span
+            className="
+              text-[6px] font-semibold uppercase
+              tracking-[0.22em]
+              text-[#173d2c]/22
+              dark:text-white/18
+            "
+          >
+            01 / SIGN IN
           </span>
         </div>
 
-        {/* Main title */}
+        {/* Main title row */}
 
-        <div className="relative">
+        <div
+          className="
+            flex items-end
+            justify-between
+            gap-6
+          "
+        >
           <h1
             className="
-              max-w-[420px]
-              text-[clamp(2.8rem,7vw,4.35rem)]
-              font-normal leading-[0.94] tracking-[-0.045em]
-              text-[#173D2A] dark:text-[#F4EFE6]
+              font-heading
+              text-[clamp(2.85rem,7vw,4.65rem)]
+              font-normal
+              leading-[0.86]
+              tracking-[-0.055em]
+              text-[#143d2b]
+              dark:text-[#f0e8db]
             "
             style={{
               fontFamily: '"Playfair Display", serif',
             }}
           >
-            Welcome
-            <br />
-
-            <span className="italic text-[#9A7531] dark:text-[#D4AF37]">
+            Welcome{" "}
+            <span
+              className="
+                italic
+                text-[#9a742e]
+                dark:text-[#d2b56b]
+              "
+            >
               back.
             </span>
           </h1>
 
-          {/* Small decorative mark */}
-
-          <div
+          <span
             aria-hidden="true"
             className="
-              absolute right-0 top-2
-              hidden sm:flex
-              h-12 w-12
-              items-center justify-center
-              rounded-full
-              border border-[#173D2A]/10 dark:border-white/[0.07]
+              mb-1 hidden
+              font-heading
+              text-3xl italic
+              text-[#173d2c]/[0.08]
+              sm:block
+              dark:text-white/[0.05]
             "
+            style={{
+              fontFamily: '"Playfair Display", serif',
+            }}
           >
-            <Sparkles className="h-3.5 w-3.5 text-[#9A7531]/60 dark:text-[#D4AF37]/55" />
-          </div>
+            S
+          </span>
         </div>
 
-        {/* Description */}
-
-        <p
+        <div
           className="
-            mt-5 max-w-[390px]
-            text-[10px] sm:text-[11px]
-            font-light leading-[1.85]
-            text-[#173D2A]/45 dark:text-[#F7F3EC]/40
+            mt-4
+            grid grid-cols-1
+            items-end
+            gap-4
+            sm:grid-cols-[1fr_auto]
           "
-          style={{
-            fontFamily: '"Poppins", sans-serif',
-          }}
         >
-          Return to your event journey, review your plans and continue
-          creating something memorable with SAI Events.
-        </p>
+          <p
+            className="
+              max-w-[430px]
+              text-[10px]
+              leading-[1.75]
+              text-[#17392b]/50
+              sm:text-[11px]
+              dark:text-[#eee5d7]/42
+            "
+            style={{
+              fontFamily: '"Poppins", sans-serif',
+            }}
+          >
+            Continue your event journey and pick up exactly
+            where you left off.
+          </p>
 
-        {/* Decorative rule */}
+          <span
+            className="
+              hidden
+              text-[6px] font-semibold uppercase
+              tracking-[0.23em]
+              text-[#a17a34]/65
+              sm:block
+              dark:text-[#d2b56b]/55
+            "
+          >
+            Welcome home
+          </span>
+        </div>
 
-        <div className="mt-7 flex items-center gap-3">
-          <span className="h-px flex-1 bg-[#173D2A]/10 dark:bg-white/[0.08]" />
+        {/* Editorial divider */}
 
-          <span className="text-[7px] font-semibold uppercase tracking-[0.22em] text-[#173D2A]/25 dark:text-white/20">
-            Sign in
+        <div className="mt-5 flex items-center gap-3">
+          <span
+            className="
+              text-[6.5px] font-bold uppercase
+              tracking-[0.25em]
+              text-[#a17a34]
+              dark:text-[#d2b56b]
+            "
+          >
+            Credentials
           </span>
 
-          <span className="h-px w-9 bg-[#9A7531]/35 dark:bg-[#D4AF37]/30" />
+          <span className="h-px flex-1 bg-[#173d2c]/10 dark:bg-white/[0.08]" />
+
+          <span className="h-1.5 w-1.5 rotate-45 bg-[#a17a34]/55" />
         </div>
       </motion.header>
 
-      {/* ============================================================
-          AUTHENTICATION FORM
-
-          Authentication functionality intentionally untouched.
-      ============================================================ */}
+      {/* ================================================================ */}
+      {/* FORM                                                             */}
+      {/* ================================================================ */}
 
       <motion.div
         initial={{
@@ -145,18 +208,19 @@ export default function LoginPage() {
           delay: shouldReduceMotion ? 0 : 0.1,
           ease: EASE,
         }}
+        className="mt-5"
       >
         <AuthForm mode="login" />
       </motion.div>
 
-      {/* ============================================================
-          ACCOUNT CREATION
-      ============================================================ */}
+      {/* ================================================================ */}
+      {/* REGISTRATION CTA                                                 */}
+      {/* ================================================================ */}
 
       <motion.div
         initial={{
           opacity: 0,
-          y: shouldReduceMotion ? 0 : 12,
+          y: shouldReduceMotion ? 0 : 10,
         }}
         animate={{
           opacity: 1,
@@ -168,26 +232,45 @@ export default function LoginPage() {
           ease: EASE,
         }}
         className="
-          mt-8
-          border-t border-[#173D2A]/10 dark:border-white/[0.08]
-          pt-6
+          mt-5
+          border-t border-[#173d2c]/10
+          pt-4
+          dark:border-white/[0.08]
         "
       >
         <Link
           href="/register"
-          className="group flex w-full items-center justify-between gap-5"
+          className="
+            group
+            flex w-full
+            items-center
+            justify-between
+            gap-5
+          "
         >
-          <div className="min-w-0 text-left">
-            <span className="block text-[7px] font-bold uppercase tracking-[0.25em] text-[#173D2A]/30 dark:text-white/25">
-              First time here?
+          <div className="min-w-0">
+            <span
+              className="
+                block
+                text-[6px] font-bold uppercase
+                tracking-[0.24em]
+                text-[#173d2c]/30
+                dark:text-white/22
+              "
+            >
+              New to SAI?
             </span>
 
             <span
               className="
-                mt-1.5 block text-[17px] font-normal
-                text-[#173D2A] dark:text-[#F4EFE6]
+                mt-1 block
+                font-heading
+                text-[16px]
+                text-[#173d2c]
                 transition-colors duration-300
-                group-hover:text-[#9A7531] dark:group-hover:text-[#D4AF37]
+                group-hover:text-[#9a742e]
+                dark:text-[#f0e8db]
+                dark:group-hover:text-[#d2b56b]
               "
               style={{
                 fontFamily: '"Playfair Display", serif',
@@ -197,57 +280,37 @@ export default function LoginPage() {
             </span>
           </div>
 
-          {/* Arrow action */}
-
           <div
             className="
-              relative flex h-11 w-11 flex-shrink-0
+              flex h-9 w-9
+              flex-shrink-0
               items-center justify-center
-              overflow-hidden rounded-full
-              border border-[#173D2A]/15 dark:border-white/10
-              text-[#173D2A]/55 dark:text-white/45
-              transition-all duration-500
-              group-hover:border-[#9A7531] group-hover:bg-[#9A7531] group-hover:text-white
-              dark:group-hover:border-[#D4AF37] dark:group-hover:bg-[#D4AF37] dark:group-hover:text-[#102B1E]
+              border border-[#173d2c]/15
+              text-[#173d2c]/50
+              transition-all duration-400
+
+              group-hover:border-[#143d2b]
+              group-hover:bg-[#143d2b]
+              group-hover:text-white
+
+              dark:border-white/10
+              dark:text-white/40
+
+              dark:group-hover:border-[#d2b56b]
+              dark:group-hover:bg-[#d2b56b]
+              dark:group-hover:text-[#161812]
             "
           >
             <ArrowUpRight
               className="
-                h-4 w-4
-                transition-transform duration-500
-                group-hover:translate-x-0.5 group-hover:-translate-y-0.5
+                h-3.5 w-3.5
+                transition-transform duration-300
+                group-hover:translate-x-0.5
+                group-hover:-translate-y-0.5
               "
             />
           </div>
         </Link>
-      </motion.div>
-
-      {/* ============================================================
-          TRUST / SECURITY FOOTNOTE
-      ============================================================ */}
-
-      <motion.div
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 1,
-        }}
-        transition={{
-          duration: shouldReduceMotion ? 0.2 : 0.7,
-          delay: shouldReduceMotion ? 0 : 0.3,
-        }}
-        className="mt-7 flex items-center justify-center gap-3"
-      >
-        <span aria-hidden="true" className="h-px w-5 bg-[#173D2A]/10 dark:bg-white/[0.07]" />
-
-        <LockKeyhole className="h-2.5 w-2.5 text-[#9A7531]/55 dark:text-[#D4AF37]/45" />
-
-        <span className="text-[6.5px] font-semibold uppercase tracking-[0.23em] text-[#173D2A]/25 dark:text-white/20">
-          Private · Secure · Personal
-        </span>
-
-        <span aria-hidden="true" className="h-px w-5 bg-[#173D2A]/10 dark:bg-white/[0.07]" />
       </motion.div>
     </div>
   );
