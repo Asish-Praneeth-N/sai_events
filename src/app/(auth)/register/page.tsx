@@ -46,16 +46,16 @@ function RegisterPageContent() {
 
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="h-px w-6 bg-[#9b742f]/50 dark:bg-[#D4AF37]/45" />
+            <span className="h-px w-6 bg-[#9A7531]/50 dark:bg-[#D4AF37]/40" />
 
-            <Sparkles className="h-3 w-3 text-[#9b742f] dark:text-[#D4AF37]" />
+            <Sparkles className="h-3 w-3 text-[#9A7531] dark:text-[#D4AF37]" />
 
-            <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-[#9b742f] dark:text-[#D4AF37]">
+            <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-[#9A7531] dark:text-[#D4AF37]">
               Begin Your Journey
             </span>
           </div>
 
-          <span className="text-[8px] font-semibold tracking-[0.2em] text-foreground/25 dark:text-white/20">
+          <span className="text-[8px] font-semibold tracking-[0.2em] text-[#173D2A]/25 dark:text-white/20">
             01
           </span>
         </div>
@@ -65,13 +65,9 @@ function RegisterPageContent() {
         <h1
           className="
             text-[clamp(2.7rem,6vw,4rem)]
-            font-normal
-            leading-[0.98]
-            tracking-[-0.045em]
-            text-[#143d2b]
-            transition-colors
-            duration-300
-            dark:text-[#F3EBDD]
+            font-normal leading-[0.98] tracking-[-0.045em]
+            text-[#173D2A] dark:text-[#F3EBDD]
+            transition-colors duration-300
           "
           style={{
             fontFamily: '"Playfair Display", serif',
@@ -80,23 +76,18 @@ function RegisterPageContent() {
           Your story
           <br />
 
-          <span className="italic text-[#9b742f] dark:text-[#D4AF37]">
+          <span className="italic text-[#9A7531] dark:text-[#D4AF37]">
             begins here.
           </span>
         </h1>
 
         <p
           className="
-            mt-4
-            max-w-sm
-            text-[10px]
-            font-light
-            leading-[1.8]
-            text-[#143d2b]/45
-            transition-colors
-            duration-300
-            sm:text-[11px]
-            dark:text-[#F7F3EC]/40
+            mt-4 max-w-sm
+            text-[10px] sm:text-[11px]
+            font-light leading-[1.8]
+            text-[#173D2A]/45 dark:text-[#F7F3EC]/40
+            transition-colors duration-300
           "
           style={{
             fontFamily: '"Poppins", sans-serif',
@@ -110,11 +101,11 @@ function RegisterPageContent() {
         {/* Decorative divider */}
 
         <div className="mt-7 flex items-center gap-3">
-          <span className="h-px flex-1 bg-[#143d2b]/10 dark:bg-white/[0.08]" />
+          <span className="h-px flex-1 bg-[#173D2A]/10 dark:bg-white/[0.08]" />
 
-          <Feather className="h-3 w-3 text-[#9b742f]/50 dark:text-[#D4AF37]/45" />
+          <Feather className="h-3 w-3 text-[#9A7531]/50 dark:text-[#D4AF37]/45" />
 
-          <span className="h-px w-8 bg-[#9b742f]/35 dark:bg-[#D4AF37]/30" />
+          <span className="h-px w-8 bg-[#9A7531]/35 dark:bg-[#D4AF37]/30" />
         </div>
       </motion.div>
 
@@ -160,39 +151,25 @@ function RegisterPageContent() {
         }}
         className="
           mt-8
-          border-t
-          border-[#143d2b]/10
+          border-t border-[#173D2A]/10 dark:border-white/[0.08]
           pt-6
-          dark:border-white/[0.08]
         "
       >
         <Link
           href="/login"
-          className="
-            group
-            flex
-            w-full
-            items-center
-            justify-between
-            gap-5
-          "
+          className="group flex w-full items-center justify-between gap-5"
         >
           <div className="text-left">
-            <span className="block text-[8px] font-bold uppercase tracking-[0.24em] text-[#143d2b]/35 dark:text-white/25">
+            <span className="block text-[8px] font-bold uppercase tracking-[0.24em] text-[#173D2A]/30 dark:text-white/25">
               Already part of SAI Events?
             </span>
 
             <span
               className="
-                mt-1
-                block
-                text-base
-                text-[#143d2b]
-                transition-colors
-                duration-300
-                group-hover:text-[#9b742f]
-                dark:text-[#F3EBDD]
-                dark:group-hover:text-[#D4AF37]
+                mt-1 block text-base font-normal
+                text-[#173D2A] dark:text-[#F3EBDD]
+                transition-colors duration-300
+                group-hover:text-[#9A7531] dark:group-hover:text-[#D4AF37]
               "
               style={{
                 fontFamily: '"Playfair Display", serif',
@@ -204,25 +181,14 @@ function RegisterPageContent() {
 
           <div
             className="
-              flex
-              h-10
-              w-10
-              flex-shrink-0
-              items-center
-              justify-center
-              border
-              border-[#143d2b]/15
-              text-[#143d2b]/55
-              transition-all
-              duration-300
-              group-hover:border-[#9b742f]
-              group-hover:bg-[#9b742f]
-              group-hover:text-white
-              dark:border-white/10
-              dark:text-white/45
-              dark:group-hover:border-[#D4AF37]
-              dark:group-hover:bg-[#D4AF37]
-              dark:group-hover:text-[#102b1e]
+              flex h-10 w-10 flex-shrink-0
+              items-center justify-center
+              rounded-full
+              border border-[#173D2A]/15 dark:border-white/10
+              text-[#173D2A]/55 dark:text-white/45
+              transition-all duration-300
+              group-hover:border-[#9A7531] group-hover:bg-[#9A7531] group-hover:text-white
+              dark:group-hover:border-[#D4AF37] dark:group-hover:bg-[#D4AF37] dark:group-hover:text-[#102b1e]
             "
           >
             <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -243,13 +209,13 @@ function RegisterPageContent() {
         }}
         className="mt-7 flex items-center justify-center gap-2"
       >
-        <span className="h-[3px] w-[3px] rounded-full bg-[#9b742f]/60 dark:bg-[#D4AF37]/55" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#9A7531]/55 dark:bg-[#D4AF37]/50" />
 
-        <span className="text-[7px] font-semibold uppercase tracking-[0.22em] text-[#143d2b]/25 dark:text-white/20">
+        <span className="text-[7px] font-semibold uppercase tracking-[0.22em] text-[#173D2A]/25 dark:text-white/20">
           One Account · One Journey · One Team
         </span>
 
-        <span className="h-[3px] w-[3px] rounded-full bg-[#9b742f]/60 dark:bg-[#D4AF37]/55" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#9A7531]/55 dark:bg-[#D4AF37]/50" />
       </motion.div>
     </div>
   );
@@ -264,24 +230,20 @@ function RegistrationFallback() {
     <div className="flex min-h-[320px] w-full flex-col items-center justify-center">
       <div
         className="
-          flex
-          h-12
-          w-12
-          items-center
-          justify-center
-          border
-          border-[#9b742f]/20
-          dark:border-[#D4AF37]/20
+          flex h-12 w-12
+          items-center justify-center
+          rounded-full
+          border border-[#9A7531]/20 dark:border-[#D4AF37]/20
         "
       >
-        <LoaderCircle className="h-4 w-4 animate-spin text-[#9b742f] dark:text-[#D4AF37]" />
+        <LoaderCircle className="h-4 w-4 animate-spin text-[#9A7531] dark:text-[#D4AF37]" />
       </div>
 
-      <span className="mt-5 text-[8px] font-bold uppercase tracking-[0.28em] text-[#143d2b]/35 dark:text-[#F7F3EC]/30">
+      <span className="mt-5 text-[8px] font-bold uppercase tracking-[0.28em] text-[#173D2A]/35 dark:text-[#F7F3EC]/30">
         Preparing your journey
       </span>
 
-      <div className="mt-4 h-px w-12 bg-[#9b742f]/25 dark:bg-[#D4AF37]/20" />
+      <div className="mt-4 h-px w-12 bg-[#9A7531]/25 dark:bg-[#D4AF37]/20" />
     </div>
   );
 }

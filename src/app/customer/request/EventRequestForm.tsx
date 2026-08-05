@@ -31,6 +31,7 @@ interface Props {
   items: ServiceItem[];
   eventParts: EventPart[];
   recommendations: Recommendation[];
+  packages?: any[];
   userProfile?: UserProfile | null;
   existingDraft?: any;
 }

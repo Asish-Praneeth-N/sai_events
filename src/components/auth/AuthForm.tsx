@@ -13,11 +13,25 @@ interface AuthFormProps {
   mode: "login" | "register";
 }
 
+/* ─── Design tokens: aligned with landing page palette ──────────────────── */
 const inputClass =
-  "w-full px-4 py-3 bg-surface/65 dark:bg-[#130f0c]/60 border border-border dark:border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37] text-foreground dark:text-[#F7F3EC] placeholder-foreground/25 dark:placeholder-white/20 transition-all duration-300 text-sm font-light";
+  "w-full px-4 py-3 " +
+  "bg-white/70 dark:bg-white/[0.04] " +
+  "border border-[#173D2A]/12 dark:border-white/[0.08] " +
+  "rounded-xl " +
+  "focus:outline-none focus:ring-2 focus:ring-[#C8A435]/30 dark:focus:ring-[#D4AF37]/30 " +
+  "focus:border-[#C8A435] dark:focus:border-[#D4AF37] " +
+  "text-[#1A1917] dark:text-[#F7F3EC] " +
+  "placeholder-[#1A1917]/30 dark:placeholder-white/20 " +
+  "transition-all duration-300 " +
+  "text-sm font-light " +
+  "shadow-[0_1px_3px_rgba(26,25,23,0.06)] dark:shadow-none";
 
+/* Gold-toned labels matching landing page accent */
 const labelClass =
-  "text-[9px] font-bold text-[#D87A5E] dark:text-[#D4AF37]/80 uppercase tracking-[0.2em] transition-colors duration-300";
+  "text-[9px] font-bold uppercase tracking-[0.2em] " +
+  "text-[#9A7531] dark:text-[#D4AF37]/80 " +
+  "transition-colors duration-300";
 
 function AuthFormInner({ mode }: AuthFormProps) {
   const router = useRouter();
@@ -141,20 +155,42 @@ function AuthFormInner({ mode }: AuthFormProps) {
   return (
     <>
       <form onSubmit={handleSubmit} className="w-full space-y-5">
-        {error && (
-          <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-xl">
-            {error}
-          </div>
-        )}
+        {/* ── Error Banner ── */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3 }}
+              className="
+                flex items-start gap-3
+                p-3.5
+                bg-red-50 dark:bg-red-500/10
+                border border-red-200 dark:border-red-500/25
+                text-red-700 dark:text-red-400
+                text-xs font-medium
+                rounded-xl
+                leading-relaxed
+              "
+            >
+              <span className="shrink-0 mt-0.5 h-4 w-4 rounded-full border border-red-400/50 dark:border-red-400/30 flex items-center justify-center text-[9px] font-bold">!</span>
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
+        {/* ── Register-only fields ── */}
         {mode === "register" && (
           <div className="space-y-4">
-            <div className="space-y-1.5">
+            {/* Account Type */}
+            <div className="space-y-2">
               <label className={labelClass}>Account Type</label>
               <RoleSwitcher value={role} onChange={setRole} />
             </div>
 
-            <div className="space-y-1.5">
+            {/* Full Name */}
+            <div className="space-y-2">
               <label htmlFor="fullName" className={labelClass}>
                 Full Name
               </label>
@@ -169,7 +205,8 @@ function AuthFormInner({ mode }: AuthFormProps) {
               />
             </div>
 
-            <div className="space-y-1.5">
+            {/* Phone Number */}
+            <div className="space-y-2">
               <label htmlFor="phoneNumber" className={labelClass}>
                 Phone Number
               </label>
@@ -184,9 +221,10 @@ function AuthFormInner({ mode }: AuthFormProps) {
               />
             </div>
 
+            {/* Vendor-only fields */}
             {role === "vendor" && (
               <>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <label htmlFor="businessName" className={labelClass}>
                     Business Name
                   </label>
@@ -201,7 +239,7 @@ function AuthFormInner({ mode }: AuthFormProps) {
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <label htmlFor="address" className={labelClass}>
                     Business Address
                   </label>
@@ -220,7 +258,8 @@ function AuthFormInner({ mode }: AuthFormProps) {
           </div>
         )}
 
-        <div className="space-y-1.5">
+        {/* ── Email ── */}
+        <div className="space-y-2">
           <label htmlFor="email" className={labelClass}>
             Email Address
           </label>
@@ -235,7 +274,8 @@ function AuthFormInner({ mode }: AuthFormProps) {
           />
         </div>
 
-        <div className="space-y-1.5">
+        {/* ── Password ── */}
+        <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label htmlFor="password" className={labelClass}>
               Password
@@ -243,7 +283,12 @@ function AuthFormInner({ mode }: AuthFormProps) {
             {mode === "login" && (
               <Link
                 href="/forgot-password"
-                className="text-[10px] text-[#D87A5E] hover:text-[#F4A28A] dark:text-[#D4AF37] dark:hover:text-[#f5db91] transition-colors font-semibold"
+                className="
+                  text-[9px] font-semibold uppercase tracking-[0.14em]
+                  text-[#9A7531] dark:text-[#D4AF37]/70
+                  hover:text-[#C8A435] dark:hover:text-[#D4AF37]
+                  transition-colors duration-200
+                "
               >
                 Forgot Password?
               </Link>
@@ -262,15 +307,23 @@ function AuthFormInner({ mode }: AuthFormProps) {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
+              className="
+                absolute right-3.5 top-1/2 -translate-y-1/2
+                text-[#173D2A]/30 dark:text-white/30
+                hover:text-[#9A7531] dark:hover:text-[#D4AF37]
+                transition-colors duration-200
+                cursor-pointer
+              "
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
+        {/* ── Confirm Password (register only) ── */}
         {mode === "register" && (
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <label htmlFor="confirmPassword" className={labelClass}>
               Confirm Password
             </label>
@@ -287,7 +340,14 @@ function AuthFormInner({ mode }: AuthFormProps) {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
+                className="
+                  absolute right-3.5 top-1/2 -translate-y-1/2
+                  text-[#173D2A]/30 dark:text-white/30
+                  hover:text-[#9A7531] dark:hover:text-[#D4AF37]
+                  transition-colors duration-200
+                  cursor-pointer
+                "
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
               >
                 {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -295,16 +355,45 @@ function AuthFormInner({ mode }: AuthFormProps) {
           </div>
         )}
 
+        {/* ── Submit Button ── */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 bg-gradient-primary hover:bg-gradient-primary-hover disabled:opacity-50 text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-accent-gold/15 dark:shadow-[#D4AF37]/15 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-xs uppercase tracking-[0.18em]"
+          className="
+            relative w-full
+            py-3.5
+            bg-gradient-primary hover:bg-gradient-primary-hover
+            disabled:opacity-50 disabled:cursor-not-allowed
+            text-[#1A1917] dark:text-[#0d0b08]
+            font-bold
+            rounded-xl
+            transition-all duration-300
+            shadow-[0_4px_18px_rgba(200,164,53,0.25)] dark:shadow-[0_4px_18px_rgba(212,175,55,0.20)]
+            hover:shadow-[0_6px_24px_rgba(200,164,53,0.35)] dark:hover:shadow-[0_6px_24px_rgba(212,175,55,0.30)]
+            hover:scale-[1.015] active:scale-[0.985]
+            cursor-pointer
+            text-xs uppercase tracking-[0.2em]
+            overflow-hidden
+            group
+          "
         >
-          {loading
-            ? "Please wait..."
-            : mode === "login"
-            ? "Sign In"
-            : "Create Account"}
+          {/* Subtle shimmer on hover */}
+          <span
+            aria-hidden="true"
+            className="
+              absolute inset-0
+              bg-gradient-to-r from-transparent via-white/20 to-transparent
+              -translate-x-full group-hover:translate-x-full
+              transition-transform duration-700
+            "
+          />
+          <span className="relative">
+            {loading
+              ? "Please wait..."
+              : mode === "login"
+              ? "Sign In"
+              : "Create Account"}
+          </span>
         </button>
       </form>
 
@@ -322,7 +411,14 @@ function AuthFormInner({ mode }: AuthFormProps) {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-md bg-surface/90 dark:bg-[#0d0b08] border border-border dark:border-white/10 rounded-3xl p-8 text-center shadow-2xl overflow-hidden backdrop-blur-md transition-colors duration-300"
+              className="
+                relative w-full max-w-md
+                bg-[#FAFAF7] dark:bg-[#0d0b08]
+                border border-[#E2DDD6] dark:border-white/10
+                rounded-3xl p-8 text-center
+                shadow-2xl overflow-hidden backdrop-blur-md
+                transition-colors duration-300
+              "
             >
               {/* Confetti Animation Background overlay */}
               <div className="absolute inset-0 pointer-events-none opacity-40 z-0 select-none">
@@ -330,15 +426,18 @@ function AuthFormInner({ mode }: AuthFormProps) {
               </div>
 
               {/* Icon / Brand */}
-              <div className="relative z-10 mx-auto w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-lg shadow-accent-gold/15 dark:shadow-[#D4AF37]/20 mb-6">
-                <Sparkles className="w-7 h-7 text-white dark:text-black" />
+              <div className="relative z-10 mx-auto w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-[0_4px_18px_rgba(200,164,53,0.3)] dark:shadow-[0_4px_18px_rgba(212,175,55,0.25)] mb-6">
+                <Sparkles className="w-7 h-7 text-[#1A1917] dark:text-[#0d0b08]" />
               </div>
 
-              <h3 className="relative z-10 text-xl font-light text-foreground dark:text-white mb-3" style={{ fontFamily: "Playfair Display, serif" }}>
+              <h3
+                className="relative z-10 text-xl font-light text-[#1A1917] dark:text-white mb-3"
+                style={{ fontFamily: "Playfair Display, serif" }}
+              >
                 Celebration Begins!
               </h3>
 
-              <p className="relative z-10 text-xs text-muted-foreground dark:text-[#F7F3EC]/70 leading-relaxed mb-8 px-2">
+              <p className="relative z-10 text-xs text-[#5C5853] dark:text-[#F7F3EC]/70 leading-relaxed mb-8 px-2">
                 {message}
               </p>
 
@@ -349,7 +448,18 @@ function AuthFormInner({ mode }: AuthFormProps) {
                   setMessage(null);
                   router.push("/login");
                 }}
-                className="relative z-10 w-full py-3.5 bg-gradient-primary hover:bg-gradient-primary-hover text-white dark:text-black font-bold rounded-xl transition-all duration-300 shadow-lg shadow-accent-gold/15 dark:shadow-[#D4AF37]/15 hover:scale-[1.02] text-xs uppercase tracking-[0.18em] cursor-pointer"
+                className="
+                  relative z-10 w-full
+                  py-3.5
+                  bg-gradient-primary hover:bg-gradient-primary-hover
+                  text-[#1A1917] dark:text-[#0d0b08]
+                  font-bold rounded-xl
+                  transition-all duration-300
+                  shadow-[0_4px_18px_rgba(200,164,53,0.25)]
+                  hover:scale-[1.015]
+                  text-xs uppercase tracking-[0.2em]
+                  cursor-pointer
+                "
               >
                 Back to Sign In
               </button>
@@ -383,7 +493,11 @@ function AuthFormInner({ mode }: AuthFormProps) {
 
 export default function AuthForm({ mode }: AuthFormProps) {
   return (
-    <Suspense fallback={<div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" /></div>}>
+    <Suspense fallback={
+      <div className="flex justify-center py-8">
+        <div className="w-6 h-6 border-2 border-[#C8A435]/30 dark:border-[#D4AF37]/30 border-t-[#C8A435] dark:border-t-[#D4AF37] rounded-full animate-spin" />
+      </div>
+    }>
       <AuthFormInner mode={mode} />
     </Suspense>
   );

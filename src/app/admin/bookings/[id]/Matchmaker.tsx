@@ -124,6 +124,7 @@ interface MatchmakerProps {
   omAssignments: OMAssignment[];
   availableOMs: OperationalManager[];
   timelineLogs: TimelineLog[];
+  customerEventParts?: any[];
 }
 
 export default function Matchmaker({
