@@ -77,7 +77,7 @@ export default function CinematicDoors({
     useState<Phase>("arrival");
 
   const [lowPower, setLowPower] =
-    useState(false);
+    useState(() => getLowPowerDevice());
 
   /*
    * Keep latest callbacks without restarting
@@ -103,7 +103,8 @@ export default function CinematicDoors({
 
   useEffect(() => {
     const updateDeviceProfile = () => {
-      setLowPower(getLowPowerDevice());
+      const isLow = getLowPowerDevice();
+      setLowPower((prev) => (prev !== isLow ? isLow : prev));
     };
 
     updateDeviceProfile();
@@ -364,7 +365,7 @@ export default function CinematicDoors({
                 backfaceVisibility: "hidden",
               }}
             >
-              <PaperTexture />
+              <PaperTexture lowPower={quick} />
 
               {/* ========================================================
                   PAPER DEPTH
@@ -1389,7 +1390,7 @@ function BotanicalCorner({
    PAPER TEXTURE
 ============================================================================ */
 
-function PaperTexture() {
+function PaperTexture({ lowPower = false }: { lowPower?: boolean }) {
   return (
     <>
       <div
@@ -1404,25 +1405,27 @@ function PaperTexture() {
         }}
       />
 
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          opacity-[0.1]
-          mix-blend-multiply
-        "
-        style={{
-          backgroundImage: `
-            repeating-linear-gradient(
-              0deg,
-              rgba(69,52,28,.08) 0px,
-              transparent 1px,
-              transparent 4px
-            )
-          `,
-        }}
-      />
+      {!lowPower && (
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            opacity-[0.1]
+            mix-blend-multiply
+          "
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                0deg,
+                rgba(69,52,28,.08) 0px,
+                transparent 1px,
+                transparent 4px
+              )
+            `,
+          }}
+        />
+      )}
     </>
   );
 }
@@ -1667,8 +1670,10 @@ function RoyalDoor({
   opening: boolean;
   lowPower: boolean;
 }) {
-  const duration = lowPower ? 1.25 : 2.05;
-  const openingEase = [0.77, 0, 0.175, 1] as const;
+  const duration = lowPower ? 1.0 : 2.05;
+  const openingEase = lowPower
+    ? ([0.4, 0, 0.2, 1] as const)
+    : ([0.77, 0, 0.175, 1] as const);
 
   return (
     /* Single wrapper — only translate handles door reveal fade,
@@ -1676,43 +1681,50 @@ function RoyalDoor({
     <div
       className="pointer-events-none absolute inset-0 z-10 overflow-hidden"
       aria-hidden="true"
-      style={{ transform: "translateZ(0)", isolation: "isolate" }}
+      style={{ transform: "translate3d(0,0,0)", isolation: "isolate" }}
     >
-      {/* Architectural surround — static, no animation to avoid full repaint */}
+      {/* Architectural surround — static */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[#030805]" />
-        <div className="absolute inset-[clamp(5px,1.2vw,20px)] border border-[#d9bd73]/35 shadow-[inset_0_0_90px_rgba(0,0,0,.92),0_0_45px_rgba(0,0,0,.7)]" />
+        <div
+          className={`absolute inset-[clamp(5px,1.2vw,20px)] border border-[#d9bd73]/35 ${
+            lowPower
+              ? ""
+              : "shadow-[inset_0_0_90px_rgba(0,0,0,.92),0_0_45px_rgba(0,0,0,.7)]"
+          }`}
+        />
         <div className="absolute inset-[clamp(10px,2vw,34px)] border border-[#8e6b31]/25" />
         <div className="absolute left-1/2 top-[clamp(10px,2.3vw,38px)] h-[clamp(34px,6vw,80px)] w-[clamp(150px,32vw,440px)] -translate-x-1/2 rounded-t-full border border-[#d9bd73]/30 bg-[radial-gradient(ellipse_at_bottom,rgba(196,157,70,.12),transparent_70%)]" />
       </div>
 
-      {/* Soft centre flash — opacity only, no scale to avoid repaint */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={opening ? { opacity: [0, 0.22, 0] } : { opacity: 0 }}
-        transition={{
-          duration: duration + 0.18,
-          times: [0, 0.45, 1],
-          ease: openingEase,
-        }}
-        className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_center,rgba(255,235,181,.28)_0%,rgba(90,121,87,.06)_38%,transparent_68%)]"
-        style={{ willChange: "opacity", backfaceVisibility: "hidden" }}
-      />
+      {/* Soft centre flash — skipped on mobile to prevent compositing jitter */}
+      {!lowPower && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={opening ? { opacity: [0, 0.22, 0] } : { opacity: 0 }}
+          transition={{
+            duration: duration + 0.18,
+            times: [0, 0.45, 1],
+            ease: openingEase,
+          }}
+          className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_center,rgba(255,235,181,.28)_0%,rgba(90,121,87,.06)_38%,transparent_68%)]"
+          style={{ willChange: "opacity", backfaceVisibility: "hidden" }}
+        />
+      )}
 
-      {/* Centre seam light — scaleX only on a composited layer, no blur animation */}
+      {/* Centre seam light — simplified keyframe on mobile */}
       <motion.div
         initial={{ opacity: 0, scaleX: 0.002 }}
         animate={
           opening
             ? {
-              opacity: [0, 0.85, 0.28, 0],
-              scaleX: [0.002, 0.018, 0.48, 1.18],
-            }
+                opacity: lowPower ? [0, 0.7, 0] : [0, 0.85, 0.28, 0],
+                scaleX: lowPower ? [0.002, 0.6, 1.1] : [0.002, 0.018, 0.48, 1.18],
+              }
             : { opacity: 0, scaleX: 0.002 }
         }
         transition={{
           duration: duration,
-          times: [0, 0.12, 0.62, 1],
           ease: openingEase,
         }}
         className="absolute inset-y-0 left-1/2 z-[25] w-full -translate-x-1/2 origin-center bg-[linear-gradient(90deg,transparent,rgba(255,237,185,.18),transparent)]"
@@ -1734,14 +1746,14 @@ function RoyalDoor({
         ease={openingEase}
       />
 
-      {/* Central lock line — opacity + scaleY only */}
+      {/* Central lock line */}
       <motion.div
         animate={{
-          opacity: opening ? [1, 0, 0] : 1,
-          scaleY: opening ? [1, 0.2, 0] : 1,
+          opacity: opening ? 0 : 1,
+          scaleY: opening ? 0 : 1,
         }}
-        transition={{ duration: lowPower ? 0.3 : 0.45, ease: "easeOut" }}
-        className="absolute inset-y-[3%] left-1/2 z-30 w-px -translate-x-1/2 origin-center bg-gradient-to-b from-transparent via-[#f0d68d]/75 to-transparent shadow-[0_0_18px_rgba(238,211,139,.38)]"
+        transition={{ duration: lowPower ? 0.25 : 0.45, ease: "easeOut" }}
+        className="absolute inset-y-[3%] left-1/2 z-30 w-px -translate-x-1/2 origin-center bg-gradient-to-b from-transparent via-[#f0d68d]/75 to-transparent"
         style={{ willChange: "transform, opacity", backfaceVisibility: "hidden" }}
       />
     </div>
@@ -1765,36 +1777,28 @@ function DoorWing({
 }) {
   const isLeft = side === "left";
 
+  const animateX = lowPower
+    ? isLeft ? ["0%", "-105%"] : ["0%", "105%"]
+    : isLeft ? ["0%", "-4%", "-108%"] : ["0%", "4%", "108%"];
+
   return (
-    /* translateX only — no scale jitter, no filter on the composited layer.
-       Shadow is rendered on the inner static wrapper so it never triggers
-       a re-rasterise during the sliding animation. */
     <motion.div
       initial={{ x: "0%" }}
-      animate={
-        opening
-          ? {
-            x: isLeft
-              ? ["0%", "-4%", "-108%"]
-              : ["0%", "4%", "108%"],
-          }
-          : { x: "0%" }
-      }
+      animate={opening ? { x: animateX } : { x: "0%" }}
       transition={{
         duration,
-        times: [0, 0.18, 1],
+        times: lowPower ? undefined : [0, 0.18, 1],
         ease,
       }}
-      className={`absolute inset-y-0 z-20 w-[calc(50%+1px)] ${isLeft ? "left-0 origin-right" : "right-0 origin-left"
-        }`}
+      className={`absolute inset-y-0 z-20 w-[calc(50%+1px)] ${
+        isLeft ? "left-0 origin-right" : "right-0 origin-left"
+      }`}
       style={{
         willChange: "transform",
         backfaceVisibility: "hidden",
-        /* GPU layer promotion — critical for jank-free sliding on mobile */
-        transform: "translateZ(0)",
+        transform: "translate3d(0,0,0)",
       }}
     >
-      {/* Shadow lives here on a non-animating element */}
       <div
         className="absolute inset-0"
         style={{
@@ -1822,22 +1826,21 @@ function RoyalDoorLeaf({
 
   return (
     <div
-      className={`absolute inset-0 overflow-hidden ${isLeft ? "border-r" : "border-l"
-        } border-[#e0c779]/35`}
+      className={`absolute inset-0 overflow-hidden ${
+        isLeft ? "border-r" : "border-l"
+      } border-[#e0c779]/35`}
       style={{
         background: isLeft
           ? "linear-gradient(108deg,#020604 0%,#07160e 16%,#123823 47%,#0b291a 76%,#030b07 100%)"
           : "linear-gradient(252deg,#020604 0%,#07160e 16%,#123823 47%,#0b291a 76%,#030b07 100%)",
-        boxShadow: isLeft
-          ? "inset -30px 0 64px rgba(0,0,0,.58),inset 18px 0 28px rgba(233,207,133,.035)"
-          : "inset 30px 0 64px rgba(0,0,0,.58),inset -18px 0 28px rgba(233,207,133,.035)",
-        /* Promote inner content to its own GPU layer — rasterised once */
-        transform: "translateZ(0)",
+        boxShadow: lowPower
+          ? undefined
+          : isLeft
+            ? "inset -30px 0 64px rgba(0,0,0,.58),inset 18px 0 28px rgba(233,207,133,.035)"
+            : "inset 30px 0 64px rgba(0,0,0,.58),inset -18px 0 28px rgba(233,207,133,.035)",
         backfaceVisibility: "hidden",
-        willChange: "auto",
       }}
     >
-      {/* Fine wood grain remains subtle enough not to shimmer during movement. */}
       {!lowPower && (
         <div
           className="absolute inset-0 opacity-[0.16]"
@@ -1848,17 +1851,31 @@ function RoyalDoorLeaf({
         />
       )}
 
-      <div className="absolute inset-[clamp(7px,1.7vw,30px)] border border-[#e0c779]/36 shadow-[inset_0_0_38px_rgba(0,0,0,.42)]" />
+      <div
+        className={`absolute inset-[clamp(7px,1.7vw,30px)] border border-[#e0c779]/36 ${
+          lowPower ? "" : "shadow-[inset_0_0_38px_rgba(0,0,0,.42)]"
+        }`}
+      />
       <div className="absolute inset-[clamp(12px,2.5vw,45px)] border border-[#9d7938]/30" />
 
-      <DoorPanel className="left-[10%] right-[10%] top-[7%] h-[35%] rounded-t-[48%]" arched />
-      <DoorPanel className="bottom-[7%] left-[10%] right-[10%] h-[38%]" />
+      <DoorPanel
+        className="left-[10%] right-[10%] top-[7%] h-[35%] rounded-t-[48%]"
+        arched
+        lowPower={lowPower}
+      />
+      <DoorPanel
+        className="bottom-[7%] left-[10%] right-[10%] h-[38%]"
+        lowPower={lowPower}
+      />
 
-      <RoyalFiligree side={side} />
+      {!lowPower && <RoyalFiligree side={side} />}
 
       <div
-        className={`absolute top-[46%] flex size-[clamp(46px,9vw,112px)] -translate-y-1/2 items-center justify-center rounded-full border border-[#f0d68a]/42 bg-[radial-gradient(circle,#143622_0%,#07140d_72%)] shadow-[0_0_34px_rgba(223,194,113,.12),inset_0_0_26px_rgba(223,194,113,.1)] ${isLeft ? "right-[4.5%]" : "left-[4.5%]"
-          }`}
+        className={`absolute top-[46%] flex size-[clamp(46px,9vw,112px)] -translate-y-1/2 items-center justify-center rounded-full border border-[#f0d68a]/42 bg-[radial-gradient(circle,#143622_0%,#07140d_72%)] ${
+          lowPower
+            ? ""
+            : "shadow-[0_0_34px_rgba(223,194,113,.12),inset_0_0_26px_rgba(223,194,113,.1)]"
+        } ${isLeft ? "right-[4.5%]" : "left-[4.5%]"}`}
       >
         <div className="absolute inset-[10%] rotate-45 border border-[#b89145]/35" />
         <div className="absolute inset-[24%] rounded-full border border-[#efd488]/28" />
@@ -1870,25 +1887,28 @@ function RoyalDoorLeaf({
         </span>
       </div>
 
-      <DoorHandle side={side} />
+      <DoorHandle side={side} lowPower={lowPower} />
 
       {[19, 50, 81].map((top) => (
         <div
           key={top}
-          className={`absolute h-[clamp(24px,5svh,48px)] w-[clamp(5px,.65vw,9px)] -translate-y-1/2 rounded-sm border border-[#d0ad5e]/36 bg-[linear-gradient(90deg,#3d2a0d,#a57c35,#4a340f)] ${isLeft ? "left-[1.1%]" : "right-[1.1%]"
-            }`}
+          className={`absolute h-[clamp(24px,5svh,48px)] w-[clamp(5px,.65vw,9px)] -translate-y-1/2 rounded-sm border border-[#d0ad5e]/36 bg-[linear-gradient(90deg,#3d2a0d,#a57c35,#4a340f)] ${
+            isLeft ? "left-[1.1%]" : "right-[1.1%]"
+          }`}
           style={{ top: `${top}%` }}
         />
       ))}
 
-      <div
-        className="absolute inset-0 opacity-45"
-        style={{
-          background: isLeft
-            ? "linear-gradient(118deg,transparent 18%,rgba(255,228,151,.055) 49%,transparent 72%)"
-            : "linear-gradient(242deg,transparent 18%,rgba(255,228,151,.055) 49%,transparent 72%)",
-        }}
-      />
+      {!lowPower && (
+        <div
+          className="absolute inset-0 opacity-45"
+          style={{
+            background: isLeft
+              ? "linear-gradient(118deg,transparent 18%,rgba(255,228,151,.055) 49%,transparent 72%)"
+              : "linear-gradient(242deg,transparent 18%,rgba(255,228,151,.055) 49%,transparent 72%)",
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -1896,34 +1916,49 @@ function RoyalDoorLeaf({
 function DoorPanel({
   className,
   arched = false,
+  lowPower = false,
 }: {
   className: string;
   arched?: boolean;
+  lowPower?: boolean;
 }) {
   return (
     <div
-      className={`absolute overflow-hidden border border-[#dfc577]/30 bg-[linear-gradient(145deg,rgba(255,255,255,.018),rgba(0,0,0,.14))] shadow-[inset_0_0_44px_rgba(0,0,0,.44)] ${className}`}
+      className={`absolute overflow-hidden border border-[#dfc577]/30 bg-[linear-gradient(145deg,rgba(255,255,255,.018),rgba(0,0,0,.14))] ${
+        lowPower ? "" : "shadow-[inset_0_0_44px_rgba(0,0,0,.44)]"
+      } ${className}`}
     >
       <div
-        className={`absolute inset-[7%] border border-[#a8843d]/25 ${arched ? "rounded-t-[48%]" : ""
-          }`}
+        className={`absolute inset-[7%] border border-[#a8843d]/25 ${
+          arched ? "rounded-t-[48%]" : ""
+        }`}
       />
       <div
-        className={`absolute inset-x-[22%] inset-y-[17%] border border-[#ddc175]/18 ${arched ? "rounded-t-full" : ""
-          }`}
+        className={`absolute inset-x-[22%] inset-y-[17%] border border-[#ddc175]/18 ${
+          arched ? "rounded-t-full" : ""
+        }`}
       />
       <div className="absolute left-1/2 top-1/2 size-[clamp(18px,4vw,44px)] -translate-x-1/2 -translate-y-1/2 rotate-45 border border-[#c9a857]/17" />
     </div>
   );
 }
 
-function DoorHandle({ side }: { side: DoorSide }) {
+function DoorHandle({
+  side,
+  lowPower = false,
+}: {
+  side: DoorSide;
+  lowPower?: boolean;
+}) {
   const isLeft = side === "left";
 
   return (
     <div
-      className={`absolute top-[60%] h-[clamp(48px,9svh,88px)] w-[clamp(10px,1.2vw,16px)] -translate-y-1/2 rounded-full border border-[#f3db96]/48 bg-[linear-gradient(90deg,#604314,#d1ae5d,#8b6425)] shadow-[0_0_20px_rgba(229,199,120,.2),inset_1px_0_2px_rgba(255,244,195,.35)] ${isLeft ? "right-[3.6%]" : "left-[3.6%]"
-        }`}
+      className={`absolute top-[60%] h-[clamp(48px,9svh,88px)] w-[clamp(10px,1.2vw,16px)] -translate-y-1/2 rounded-full border border-[#f3db96]/48 bg-[linear-gradient(90deg,#604314,#d1ae5d,#8b6425)] ${
+        lowPower
+          ? ""
+          : "shadow-[0_0_20px_rgba(229,199,120,.2),inset_1px_0_2px_rgba(255,244,195,.35)]"
+      } ${isLeft ? "right-[3.6%]" : "left-[3.6%]"}`}
     >
       <div className="absolute left-1/2 top-0 size-[clamp(11px,2vw,16px)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#f0d58e]/42 bg-[#9b722d]" />
       <div className="absolute bottom-0 left-1/2 size-[clamp(11px,2vw,16px)] -translate-x-1/2 translate-y-1/2 rounded-full border border-[#f0d58e]/42 bg-[#9b722d]" />
@@ -1939,8 +1974,9 @@ function RoyalFiligree({ side }: { side: DoorSide }) {
     <svg
       viewBox="0 0 220 160"
       fill="none"
-      className={`absolute top-[13%] h-[clamp(72px,15vw,150px)] w-[clamp(100px,23vw,220px)] opacity-55 ${isLeft ? "right-[9%]" : "left-[9%] -scale-x-100"
-        }`}
+      className={`absolute top-[13%] h-[clamp(72px,15vw,150px)] w-[clamp(100px,23vw,220px)] opacity-55 ${
+        isLeft ? "right-[9%]" : "left-[9%] -scale-x-100"
+      }`}
     >
       <path
         d="M14 142C60 126 64 75 108 72C151 69 161 30 206 17"
