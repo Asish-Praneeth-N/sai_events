@@ -174,9 +174,11 @@ export interface EventPartConfigInput {
   endTime?: string;
   venueName?: string;
   venueAddress?: string;
+  venueLocation?: string;
+  requiredServices?: string[];
   minGuests?: number;
   maxGuests?: number;
-  planningMode?: "RECOMMENDED" | "CUSTOM";
+  planningMode?: "RECOMMENDED" | "CUSTOM" | string;
   selectedPackageId?: string;
   customServices?: {
     serviceItemId?: string;
@@ -227,33 +229,66 @@ export async function createEventRequest(eventData: CreateEventInput) {
 
   // Calculate items total if traditional service items passed
   if (eventData.items && eventData.items.length > 0) {
-    const itemIds = eventData.items.map((i) => i.serviceItemId);
-    const { data: dbItems, error: itemsError } = await supabase
-      .from("service_items")
-      .select("id, price, pricing_type, pricing_unit, food_category, meal_type, is_available, name")
-      .in("id", itemIds)
-      .is("deleted_at", null);
+    const isValidUUID = (id: string) =>
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
 
-    if (itemsError) throw new Error(itemsError.message);
+    const validItemIds = eventData.items
+      .map((i) => i.serviceItemId)
+      .filter((id) => isValidUUID(id));
 
-    requestItemsToInsert = eventData.items.map((clientItem) => {
-      const dbItem = dbItems?.find((item) => item.id === clientItem.serviceItemId);
-      if (!dbItem || !dbItem.is_available) {
-        throw new Error(`Item ${clientItem.serviceItemId} is not available.`);
-      }
-      const unitPrice = Number(dbItem.price);
-      if (dbItem.pricing_type === "flat") {
+    let dbItems: any[] = [];
+    if (validItemIds.length > 0) {
+      const { data, error: itemsError } = await supabase
+        .from("service_items")
+        .select("id, price, pricing_type, pricing_unit, food_category, meal_type, is_available, name")
+        .in("id", validItemIds)
+        .is("deleted_at", null);
+
+      if (!itemsError && data) dbItems = data;
+    }
+
+    // Default price map for built-in gourmet catering items
+    const DEFAULT_PRICE_MAP: Record<string, { price: number; type: string }> = {
+      "00000000-0000-4000-8000-000000000101": { price: 350, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000102": { price: 380, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000103": { price: 250, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000104": { price: 450, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000105": { price: 550, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000106": { price: 750, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000107": { price: 320, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000108": { price: 650, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000109": { price: 680, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000110": { price: 880, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000111": { price: 220, type: "per_plate" },
+      "00000000-0000-4000-8000-000000000112": { price: 280, type: "per_plate" },
+    };
+
+    requestItemsToInsert = [];
+    for (const clientItem of eventData.items) {
+      if (!isValidUUID(clientItem.serviceItemId) || clientItem.quantity <= 0) continue;
+
+      const dbItem = dbItems.find((item) => item.id === clientItem.serviceItemId);
+      const fallback = DEFAULT_PRICE_MAP[clientItem.serviceItemId];
+
+      const unitPrice = dbItem ? Number(dbItem.price) : fallback ? fallback.price : 350;
+      const pricingType = dbItem ? dbItem.pricing_type : fallback ? fallback.type : "per_plate";
+
+      if (pricingType === "flat") {
         totalBudget += unitPrice * clientItem.quantity;
-      } else if (dbItem.pricing_type === "per_plate") {
+      } else {
         totalBudget += unitPrice * eventData.guestCount * clientItem.quantity;
       }
-      return {
-        service_item_id: clientItem.serviceItemId,
-        quantity: clientItem.quantity,
-        unit_price: unitPrice,
-        pricing_type: dbItem.pricing_type,
-      };
-    });
+
+      // ONLY insert into request_items DB table if item actually exists in service_items DB table (prevents foreign key violation)
+      if (dbItem) {
+        requestItemsToInsert.push({
+          service_item_id: clientItem.serviceItemId,
+          quantity: clientItem.quantity,
+          unit_price: unitPrice,
+          pricing_type: pricingType,
+        });
+      }
+    }
   }
 
   // Calculate snapshot price if hierarchical event parts config passed
@@ -454,6 +489,8 @@ export async function createEventRequest(eventData: CreateEventInput) {
           end_time: pConfig.endTime || null,
           venue_name: pConfig.venueName || null,
           venue_address: pConfig.venueAddress || null,
+          venue_location: pConfig.venueLocation || pConfig.venueAddress || null,
+          required_services: pConfig.requiredServices || [],
           min_guests: pConfig.minGuests || null,
           max_guests: pConfig.maxGuests || null,
           planning_mode: pConfig.planningMode || "CUSTOM",

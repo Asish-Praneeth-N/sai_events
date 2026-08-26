@@ -47,6 +47,19 @@ export default async function EventWorkspacePage({
           email
         )
       ),
+      customer_event_parts (
+        id,
+        event_part_name,
+        event_date,
+        start_time,
+        end_time,
+        venue_name,
+        venue_address,
+        venue_location,
+        required_services,
+        min_guests,
+        max_guests
+      ),
       timelines (
         id,
         milestone_name,

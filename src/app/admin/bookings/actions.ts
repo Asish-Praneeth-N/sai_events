@@ -397,3 +397,16 @@ export async function reassignOperationalManager(
   revalidatePath(`/admin/bookings/${currentAsg.event_id}`);
   revalidatePath("/admin/bookings");
 }
+
+export async function cancelVendorAssignment(assignmentId: string, requestId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("vendor_assignments")
+    .update({ status: "Cancelled" })
+    .eq("id", assignmentId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/admin/bookings/${requestId}`);
+  revalidatePath("/admin/bookings");
+}

@@ -51,13 +51,6 @@ export default async function CustomerDashboardPage() {
           email
         )
       ),
-      documents (
-        id,
-        file_name,
-        file_url,
-        file_type,
-        created_at
-      ),
       timelines (
         id,
         milestone_name,

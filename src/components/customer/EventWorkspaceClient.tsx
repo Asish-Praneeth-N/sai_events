@@ -8,7 +8,7 @@ import {
   Trash2, Download, AlertCircle, Shield, CheckCircle2, 
   MessageSquare, Video, HelpCircle, Plus, X, ArrowUpRight,
   ChevronRight, CalendarDays, Compass, Info, Award, Bell,
-  Edit, Lock, Unlock, ExternalLink, RefreshCw, ShieldCheck, Tag, Check
+  Edit, Lock, Unlock, ExternalLink, RefreshCw, ShieldCheck, Tag, Check, Layers
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { createEditRequest, requestEventMeeting, createEventRequest } from "@/app/customer/actions";
@@ -259,6 +259,7 @@ export default function EventWorkspaceClient({
       <div className="flex items-center gap-2 border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-2 overflow-x-auto scrollbar-none">
         {[
           { id: "overview", label: "Overview", icon: Info },
+          { id: "subevents", label: `Sub-Events (${event.customer_event_parts?.length || 0})`, icon: Layers },
           { id: "journey", label: "Event Journey", icon: Compass },
           { id: "meetings", label: `Meetings (${meetings.length})`, icon: Video },
           { id: "edits", label: "Edit Access & Changes", icon: Edit },
@@ -463,6 +464,127 @@ export default function EventWorkspaceClient({
             </div>
 
           </div>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────
+          TAB 2: SUB-EVENTS & FUNCTION LOCATIONS
+      ──────────────────────────────────────────────────────── */}
+      {activeTab === "subevents" && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Function Breakdown</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-1" style={{ fontFamily: '"Playfair Display", serif' }}>
+                Selected Sub-Events & Venues
+              </h2>
+              <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 mt-1 font-light">
+                Overview of ceremonies, function locations, dates, and required service modules for {event.event_type}.
+              </p>
+            </div>
+          </div>
+
+          {event.customer_event_parts && event.customer_event_parts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {event.customer_event_parts.map((part: any, idx: number) => (
+                <div
+                  key={part.id || idx}
+                  className="p-6 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-4 relative overflow-hidden"
+                >
+                  <div className="flex justify-between items-start border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-3">
+                    <div>
+                      <span className="text-[8px] uppercase font-bold tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b] block">Function #{idx + 1}</span>
+                      <h3 className="text-lg font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-0.5" style={{ fontFamily: '"Playfair Display", serif' }}>
+                        {part.event_part_name}
+                      </h3>
+                    </div>
+                    <span className="px-2.5 py-1 bg-[#143d2b]/10 text-[#143d2b] dark:bg-[#d2b56b]/10 dark:text-[#d2b56b] font-mono text-[9px] font-bold uppercase tracking-wider">
+                      {part.event_date || event.event_date || "Date Pending"}
+                    </span>
+                  </div>
+
+                  {/* Function Location / Venue Address */}
+                  <div className="space-y-1">
+                    <span className="text-[8.5px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-wider block flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" />
+                      Function Venue / Location
+                    </span>
+                    <p className="text-xs font-semibold text-[#143d2b] dark:text-[#f0e8db] pl-4.5 leading-relaxed">
+                      {part.venue_location || part.venue_address || part.venue_name || event.venue_address || "Venue to be finalized"}
+                    </p>
+                  </div>
+
+                  {/* Required Service Modules */}
+                  <div className="space-y-2 pt-2 border-t border-[#173d2c]/10 dark:border-white/[0.08]">
+                    <span className="text-[8.5px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-wider block">
+                      Required Service Modules
+                    </span>
+                    {part.required_services && part.required_services.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {part.required_services.map((srv: string, sIdx: number) => (
+                          <span
+                            key={sIdx}
+                            className="px-2.5 py-1 bg-[#f3eadf] dark:bg-white/[0.04] border border-[#173d2c]/15 dark:border-white/10 text-[10px] font-semibold text-[#143d2b] dark:text-[#f0e8db]"
+                          >
+                            ✓ {srv}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {["Decor & Stage", "Food & Catering"].map((srv, sIdx) => (
+                          <span
+                            key={sIdx}
+                            className="px-2.5 py-1 bg-[#f3eadf] dark:bg-white/[0.04] border border-[#173d2c]/15 dark:border-white/10 text-[10px] font-semibold text-[#143d2b] dark:text-[#f0e8db]"
+                          >
+                            ✓ {srv}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-12 text-center bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08]">
+              <p className="text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 italic">
+                No specific sub-events listed for this celebration. Main event venue: {event.venue_address || event.location}
+              </p>
+            </div>
+          )}
+
+          {/* Selected Food & Catering Menu & Services Section */}
+          {event.request_items && event.request_items.length > 0 && (
+            <div className="p-6 sm:p-8 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-5">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                  <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Confirmed Menu & Services</span>
+                </div>
+                <h3 className="text-xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
+                  Selected Food & Service Catalog Items
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {event.request_items.map((item: any) => (
+                  <div key={item.id} className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] flex items-center justify-between">
+                    <div>
+                      <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] text-xs block">{item.service_items?.name || "Service Item"}</span>
+                      <span className="text-[10px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 font-mono">Qty: {item.quantity} · {item.pricing_unit || item.pricing_type}</span>
+                    </div>
+                    <span className="font-mono font-bold text-[#a17a34] dark:text-[#d2b56b] text-xs">
+                      ₹{(Number(item.unit_price) * item.quantity).toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -683,27 +805,27 @@ export default function EventWorkspaceClient({
 
           {/* Edit Request History */}
           {editRequests.length > 0 && (
-            <div className="p-6.5 rounded-3xl bg-surface border border-border/80 space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <div className="p-6 sm:p-8 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b]">
                 Edit Request History
               </h4>
               <div className="space-y-3 text-xs">
                 {editRequests.map((req) => (
-                  <div key={req.id} className="p-4 bg-background border border-border rounded-2xl space-y-2">
+                  <div key={req.id} className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-foreground">Requested Categories: {req.requested_categories?.join(", ")}</span>
-                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded-md border ${
+                      <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db]">Requested Categories: {req.requested_categories?.join(", ")}</span>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${
                         req.status === "approved"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                           : req.status === "rejected"
-                          ? "bg-red-500/10 text-red-400 border-red-500/20"
-                          : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
+                          : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                       }`}>
                         {req.status}
                       </span>
                     </div>
-                    <p className="text-muted-foreground font-light text-[11px] leading-relaxed">{req.description}</p>
-                    <div className="text-[9px] text-muted-foreground font-mono pt-1">
+                    <p className="text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light text-[11px] leading-relaxed">{req.description}</p>
+                    <div className="text-[9px] text-[#173d2c]/40 dark:text-white/30 font-mono pt-1">
                       Submitted on {formatDate(req.requested_at || req.created_at)}
                     </div>
                   </div>
@@ -719,27 +841,33 @@ export default function EventWorkspaceClient({
       ──────────────────────────────────────────────────────── */}
       {activeTab === "activity" && (
         <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
-          <div className="p-6.5 rounded-3xl bg-surface border border-border/80 space-y-4">
-            <h3 className="text-lg font-bold font-heading text-foreground">Customer Activity Log</h3>
-            <p className="text-xs text-muted-foreground font-light">
-              Audit timeline of major operational milestones registered for this event.
-            </p>
+          <div className="p-6 sm:p-8 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] shadow-sm space-y-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Operational Audit Trail</span>
+              </div>
+              <h3 className="text-2xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>Customer Activity Log</h3>
+              <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light mt-1">
+                Audit timeline of major operational milestones registered for this event.
+              </p>
+            </div>
 
             <div className="space-y-3 text-xs pt-2">
-              <div className="p-3.5 bg-background border border-border/60 rounded-2xl flex items-center justify-between">
-                <span className="font-bold text-foreground">Event Case Registered</span>
-                <span className="text-muted-foreground font-mono text-[10px]">{formatDate(event.created_at)}</span>
+              <div className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] flex items-center justify-between">
+                <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db]">Event Case Registered</span>
+                <span className="text-[#a17a34] dark:text-[#d2b56b] font-mono text-[10px] font-bold">{formatDate(event.created_at)}</span>
               </div>
               {event.event_assignments?.length > 0 && (
-                <div className="p-3.5 bg-background border border-border/60 rounded-2xl flex items-center justify-between">
-                  <span className="font-bold text-foreground">Operational Manager Allocated</span>
-                  <span className="text-muted-foreground font-mono text-[10px]">{formatDate(event.event_assignments[0].created_at || event.created_at)}</span>
+                <div className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] flex items-center justify-between">
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db]">Operational Manager Allocated</span>
+                  <span className="text-[#a17a34] dark:text-[#d2b56b] font-mono text-[10px] font-bold">{formatDate(event.event_assignments[0].created_at || event.created_at)}</span>
                 </div>
               )}
               {editRequests.map((e) => (
-                <div key={e.id} className="p-3.5 bg-background border border-border/60 rounded-2xl flex items-center justify-between">
-                  <span className="font-bold text-foreground">Edit Access Requested ({e.status})</span>
-                  <span className="text-muted-foreground font-mono text-[10px]">{formatDate(e.requested_at || e.created_at)}</span>
+                <div key={e.id} className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] flex items-center justify-between">
+                  <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db]">Edit Access Requested ({e.status})</span>
+                  <span className="text-[#a17a34] dark:text-[#d2b56b] font-mono text-[10px] font-bold">{formatDate(e.requested_at || e.created_at)}</span>
                 </div>
               ))}
             </div>
@@ -749,27 +877,27 @@ export default function EventWorkspaceClient({
 
       {/* ── Request Edit Access Modal ── */}
       {showEditModal && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <form onSubmit={handleEditRequestSubmit} className="bg-surface border border-border rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-border/40 pb-4">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <form onSubmit={handleEditRequestSubmit} className="bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/15 dark:border-white/[0.10] p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
               <div>
-                <span className="text-[9px] uppercase font-bold tracking-widest text-accent-gold">SAI EVENTS Operations</span>
-                <h3 className="text-lg font-bold font-heading text-foreground mt-0.5">Request Edit Access</h3>
+                <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b]">SAI EVENTS Operations</span>
+                <h3 className="text-lg font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-0.5" style={{ fontFamily: '"Playfair Display", serif' }}>Request Edit Access</h3>
               </div>
-              <button type="button" onClick={() => setShowEditModal(false)} className="p-2 text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={() => setShowEditModal(false)} className="p-2 text-[#173d2c]/60 dark:text-[#eee5d7]/50 hover:text-[#143d2b] dark:hover:text-[#f0e8db]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
               <div className="space-y-2">
-                <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Select Categories to Modify *</label>
+                <label className="block font-bold text-[#173d2c]/60 dark:text-[#eee5d7]/50 uppercase text-[9.5px] tracking-wider">Select Categories to Modify *</label>
                 <div className="grid grid-cols-2 gap-2">
                   {EDIT_CATEGORIES.map((cat) => {
                     const isChecked = selectedCategories.includes(cat);
                     return (
-                      <label key={cat} className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 cursor-pointer transition ${
-                        isChecked ? "bg-accent-gold/15 border-accent-gold text-foreground" : "bg-background border-border text-muted-foreground"
+                      <label key={cat} className={`p-2.5 border text-xs font-semibold flex items-center gap-2 cursor-pointer transition ${
+                        isChecked ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] border-transparent" : "bg-[#f3eadf]/50 dark:bg-white/[0.02] border-[#173d2c]/10 dark:border-white/[0.08] text-[#173d2c]/70 dark:text-[#eee5d7]/60"
                       }`}>
                         <input
                           type="checkbox"
@@ -778,7 +906,7 @@ export default function EventWorkspaceClient({
                             if (e.target.checked) setSelectedCategories((prev) => [...prev, cat]);
                             else setSelectedCategories((prev) => prev.filter((c) => c !== cat));
                           }}
-                          className="w-4 h-4 rounded text-accent-gold focus:ring-accent-gold/30 accent-[#D4AF37]"
+                          className="w-4 h-4 text-[#a17a34] focus:ring-[#a17a34]/30 accent-[#a17a34]"
                         />
                         <span>{cat}</span>
                       </label>
@@ -788,26 +916,26 @@ export default function EventWorkspaceClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Describe Requested Changes *</label>
+                <label className="block font-bold text-[#173d2c]/60 dark:text-[#eee5d7]/50 uppercase text-[9.5px] tracking-wider">Describe Requested Changes *</label>
                 <textarea
                   required
                   rows={4}
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   placeholder="e.g. Need to update venue to Novotel and change expected guest count from 200 to 350..."
-                  className="w-full p-3.5 bg-background border border-border rounded-xl text-xs text-foreground placeholder:text-muted-foreground/60 resize-none font-light leading-relaxed"
+                  className="w-full p-3.5 bg-[#fffaf3] dark:bg-[#11130f] border border-[#173d2c]/15 dark:border-white/10 text-xs text-[#143d2b] dark:text-[#f0e8db] placeholder:text-[#173d2c]/35 dark:placeholder:text-white/30 resize-none font-light leading-relaxed"
                 />
               </div>
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2.5 text-xs text-muted-foreground hover:text-foreground font-bold">
+              <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2.5 text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 font-bold uppercase tracking-wider">
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submittingEditRequest}
-                className="px-6 py-2.5 bg-accent-gold text-black font-bold text-xs uppercase tracking-wider rounded-xl hover:brightness-110 transition shadow cursor-pointer disabled:opacity-50"
+                className="px-6 py-2.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:brightness-110 shadow-md cursor-pointer disabled:opacity-50"
               >
                 {submittingEditRequest ? "Submitting..." : "Submit Edit Request"}
               </button>

@@ -2,7 +2,7 @@ export type UserRole = "customer" | "vendor" | "admin" | "operational_manager";
 
 export type PricingUnit = "per_plate" | "per_piece" | "fixed";
 export type FoodCategory = "veg" | "non_veg" | "beverage" | "dessert" | "general";
-export type MealType = "breakfast" | "lunch" | "dinner" | "high_tea" | "general";
+export type MealType = "breakfast" | "lunch" | "dinner" | "high_tea" | "cocktail" | "dessert" | "general";
 
 export type VendorAvailabilityStatus = "Available" | "Not Available" | "Busy" | "Leave" | "In Work";
 export type ServiceStatusColor = "not_sent" | "sent_waiting" | "vendor_responded" | "vendor_finalized";
@@ -83,6 +83,7 @@ export interface Subcategory {
 export interface ServiceItem {
   id: string;
   subcategory_id: string;
+  category_id?: string;
   name: string;
   description: string;
   price: number;

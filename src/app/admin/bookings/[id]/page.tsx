@@ -257,17 +257,19 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/bookings"
-          className="px-3.5 py-2 bg-surface hover:bg-surface-raised text-foreground border border-border hover:border-zinc-300 dark:hover:border-zinc-700 text-xs font-semibold rounded-xl transition-all duration-200"
+          className="px-4 py-2 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[9px] uppercase tracking-[0.2em] font-bold transition shadow-sm hover:brightness-110"
         >
           ← Back to Registry
         </Link>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 pb-5 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-5 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold font-heading text-foreground tracking-tight">Manage Event Case</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Case ID: <span className="font-mono">{request.id}</span> • Event: <span className="font-semibold text-foreground">{request.event_type}</span>
+          <h1 className="font-heading text-3xl sm:text-4xl font-normal text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
+            Manage Event Case <span className="inline-block h-3 w-3 rounded-full border-2 border-[#a17a34] dark:border-[#d2b56b] ml-1" />
+          </h1>
+          <p className="text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 mt-1 font-light">
+            Case ID: <span className="font-mono text-[#9a742e] dark:text-[#d2b56b]">{request.id}</span> • Event: <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db]">{request.event_type}</span>
           </p>
         </div>
       </div>
@@ -279,14 +281,25 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
           fullName: request.profiles?.full_name || "Unknown Customer",
           phone: request.profiles?.phone_number || "N/A",
           email: request.profiles?.email || "N/A",
-          address: request.location || "N/A",
+          address: request.venue_address || request.location || "N/A",
           additionalContacts: request.additional_contacts || null,
           referenceVideoUrl: request.reference_video_url || null,
           specialRequirements: request.special_requirements || null,
           referenceImages: request.reference_images || [],
+          eventDate: request.event_date || null,
+          eventTime: request.event_time || null,
+          durationHours: request.duration_hours || null,
+          guestCount: request.guest_count || null,
+          minGuestCount: request.min_guest_count || null,
+          maxGuestCount: request.max_guest_count || null,
+          budgetRange: request.budget_range || null,
+          whatsappNumber: request.whatsapp_number || null,
+          eventFor: request.event_for || null,
+          celebrantName: request.celebrant_name || null,
         }}
         groups={groups}
         omAssignments={omAssignments as any[]}
+        activeOMAssignment={omAssignments.find((a: any) => a.status === "Pending" || a.status === "Accepted" || a.status === "In Progress" || a.status === "Completed") || omAssignments[0] || null}
         availableOMs={availableOMs}
         timelineLogs={timelineLogs as any[]}
         customerEventParts={customerEventParts as any[]}

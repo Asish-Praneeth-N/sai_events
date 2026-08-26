@@ -171,7 +171,7 @@ export async function saveServiceItem(formData: {
   pricing_type: "flat" | "per_plate";
   pricing_unit?: "per_plate" | "per_piece" | "fixed";
   food_category?: "veg" | "non_veg" | "beverage" | "dessert" | "general";
-  meal_type?: "breakfast" | "lunch" | "dinner" | "high_tea" | "general";
+  meal_type?: "breakfast" | "lunch" | "dinner" | "high_tea" | "cocktail" | "dessert" | "general";
   is_available?: boolean;
   sort_order?: number;
   media_urls?: string[];

@@ -6,6 +6,7 @@ import { createEventRequest, saveEventDraft, discardEventDraft } from "../action
 import { Category, Subcategory, ServiceItem, EventPart, Recommendation } from "@/lib/types";
 import EventPartsStep from "@/components/customer/request/EventPartsStep";
 import RecommendationsStep from "@/components/customer/request/RecommendationsStep";
+import CategoryServiceCatalog from "@/components/customer/request/CategoryServiceCatalog";
 import FoodSelectionModule from "@/components/customer/request/FoodSelectionModule";
 import { 
   Sparkles, Calendar, MapPin, Users, Clock, 
@@ -160,11 +161,15 @@ export default function EventRequestForm({
   // Additional Contacts State (Up to 3 optional secondary contact persons)
   const [additionalContacts, setAdditionalContacts] = useState<{ name: string; phone: string; relation?: string }[]>([]);
 
-  // Synchronize 12-hour time selectors into eventTime state
+  // Synchronize 12-hour time selectors into eventTime state safely
   useEffect(() => {
-    if (timeHour && timeMinute && timePeriod) {
+    let isMounted = true;
+    if (timeHour && timeMinute && timePeriod && isMounted) {
       setEventTime(`${timeHour}:${timeMinute} ${timePeriod}`);
     }
+    return () => {
+      isMounted = false;
+    };
   }, [timeHour, timeMinute, timePeriod]);
 
   // Interactive Map Venue Picker Modal States
@@ -177,8 +182,9 @@ export default function EventRequestForm({
   const [selectedMapAddress, setSelectedMapAddress] = useState<string>("");
   const [mapLocating, setMapLocating] = useState(false);
 
-  // Step 2: Event Parts
+  // Step 2: Event Parts & Sub-Event Configurations
   const [selectedPartIds, setSelectedPartIds] = useState<string[]>([]);
+  const [subEventDetails, setSubEventDetails] = useState<Record<string, any>>({});
 
   // Step 3 & 4 & 5: Service Selections
   const [selectedItems, setSelectedItems] = useState<{ serviceItemId: string; quantity: number }[]>([]);
@@ -434,6 +440,21 @@ export default function EventRequestForm({
 
     try {
       const validContacts = additionalContacts.filter(c => c.name.trim() && c.phone.trim());
+
+      const eventPartsConfig = selectedPartIds.map((pId) => {
+        const partObj = eventParts.find((p) => p.id === pId);
+        const detail = subEventDetails[pId] || { venueLocation: "", requiredServices: [] };
+        return {
+          eventPartId: pId,
+          eventPartName: partObj?.name || "Sub Event",
+          eventDate: eventDate,
+          venueAddress: detail.venueLocation || venueAddress,
+          venueLocation: detail.venueLocation || venueAddress,
+          requiredServices: detail.requiredServices || ["Decor & Stage Setup", "Food & Catering"],
+          planningMode: "CUSTOM",
+        };
+      });
+
       const result = await createEventRequest({
         requestId: draftId,
         eventType,
@@ -454,6 +475,7 @@ export default function EventRequestForm({
         referenceVideoUrl,
         additionalContacts: validContacts,
         eventPartIds: selectedPartIds,
+        eventPartsConfig,
         items: selectedItems,
       });
 
@@ -1174,6 +1196,8 @@ export default function EventRequestForm({
             availableParts={eventParts}
             selectedPartIds={selectedPartIds}
             onChange={setSelectedPartIds}
+            subEventDetails={subEventDetails}
+            onSubEventDetailsChange={setSubEventDetails}
           />
 
           <div className="flex justify-between items-center max-w-4xl mx-auto pt-4">
@@ -1203,6 +1227,8 @@ export default function EventRequestForm({
             eventType={eventType}
             recommendations={recommendations}
             selectedItemIds={selectedItems.map((i) => i.serviceItemId)}
+            selectedPartIds={selectedPartIds}
+            availableParts={eventParts}
             onToggleItem={handleToggleItem}
             onApplyAll={handleApplyRecommendations}
           />
@@ -1227,96 +1253,25 @@ export default function EventRequestForm({
         </div>
       )}
 
-      {/* ── STEP 4: NON-FOOD SERVICES SELECTION ── */}
+      {/* ── STEP 4: NON-FOOD CATEGORY-WISE SERVICES SELECTION (SCROLLSPY) ── */}
       {step === 4 && (
-        <div className="space-y-6 animate-fade-in-up max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] p-5 shadow-sm">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
-                <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Service Catalog</span>
-              </div>
-              <h3 className="text-xl font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>Design, Decor & Execution Services</h3>
-              <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 font-light">Select Verified Services for your {eventType}.</p>
-            </div>
-            <div className="text-right">
-              <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.18em] block">Estimated Services Total</span>
-              <span className="text-xl font-bold font-mono text-[#a17a34] dark:text-[#d2b56b]">₹{grandTotal.toLocaleString("en-IN")}</span>
-            </div>
-          </div>
+        <div className="space-y-6 animate-fade-in-up">
+          <CategoryServiceCatalog
+            categories={categories}
+            items={nonFoodItems}
+            selectedItems={selectedItems}
+            onToggleItem={handleToggleItem}
+            onQuantityChange={handleQuantityChange}
+            grandTotal={grandTotal}
+          />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {nonFoodItems.map((item) => {
-              const isSelected = selectedItems.some((s) => s.serviceItemId === item.id);
-              const selObj = selectedItems.find((s) => s.serviceItemId === item.id);
-              const mediaUrl = (item as any).service_item_media?.[0]?.media_url;
-
-              return (
-                <div
-                  key={item.id}
-                  className={`p-5 border transition flex flex-col justify-between gap-3 shadow-sm ${
-                    isSelected ? "bg-[#fbf7f0] dark:bg-[#161813] border-[#a17a34] dark:border-[#d2b56b]" : "bg-[#fbf7f0] dark:bg-[#161813] border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40"
-                  }`}
-                >
-                  <div className="flex items-start gap-3.5">
-                    {mediaUrl ? (
-                      <img src={mediaUrl} alt={item.name} className="w-14 h-14 object-cover border border-[#173d2c]/10 dark:border-white/[0.08] shrink-0" />
-                    ) : (
-                      <div className="w-14 h-14 border border-[#173d2c]/15 bg-[#f3eadf]/50 dark:border-white/[0.10] dark:bg-white/[0.02] flex items-center justify-center text-[#a17a34] dark:text-[#d2b56b] shrink-0">
-                        <Sparkles className="w-6 h-6" />
-                      </div>
-                    )}
-                    <div className="space-y-1">
-                      <h4 className="font-normal font-heading text-base text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>{item.name}</h4>
-                      <p className="text-xs text-[#173d2c]/60 dark:text-[#eee5d7]/50 line-clamp-2 font-light">{item.description}</p>
-                      <div className="text-xs font-mono font-bold text-[#a17a34] dark:text-[#d2b56b] pt-0.5">
-                        ₹{Number(item.price).toLocaleString("en-IN")} <span className="text-[10px] text-[#173d2c]/40 dark:text-white/30 font-normal">/ {item.pricing_unit || item.pricing_type}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-[#173d2c]/10 dark:border-white/[0.08]">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleItem(item.id)}
-                      className={`px-3.5 py-2 text-[8px] font-bold uppercase tracking-[0.18em] transition cursor-pointer ${
-                        isSelected ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812]" : "border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] hover:border-[#a17a34]/40"
-                      }`}
-                    >
-                      {isSelected ? "Selected" : "Select Service"}
-                    </button>
-                    {isSelected && (
-                      <div className="flex items-center gap-2 border border-[#173d2c]/15 dark:border-white/[0.10] bg-[#f3eadf]/40 dark:bg-white/[0.02] px-2 py-1">
-                        <button
-                          type="button"
-                          onClick={() => handleQuantityChange(item.id, -1)}
-                          className="w-5 h-5 flex items-center justify-center text-[#173d2c]/60 dark:text-[#eee5d7]/50 hover:text-[#143d2b] text-xs font-bold"
-                        >
-                          -
-                        </button>
-                        <span className="text-xs font-mono font-bold">{selObj?.quantity || 1}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleQuantityChange(item.id, 1)}
-                          className="w-5 h-5 flex items-center justify-center text-[#173d2c]/60 dark:text-[#eee5d7]/50 hover:text-[#143d2b] text-xs font-bold"
-                        >
-                          +
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="flex justify-between items-center pt-4">
+          <div className="flex justify-between items-center max-w-5xl mx-auto pt-4">
             <button
               type="button"
               onClick={prevStep}
               className="px-5 py-3 border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035] text-[8px] font-bold uppercase tracking-[0.2em] transition flex items-center gap-2 cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> Back to Recommendations
             </button>
             <button
               type="button"

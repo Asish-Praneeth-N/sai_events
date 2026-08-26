@@ -521,8 +521,8 @@ function DashboardListInner({
         </div>
       ) : (
         <div>
-          {/* Active Event Case Selector Switcher */}
-          {requests.length > 1 && activeRequest && currentTab !== "enquiries" && (
+          {/* Active Event Case Selector Switcher — Rendered exclusively for Overview tab */}
+          {requests.length > 1 && activeRequest && currentTab === "overview" && (
             <div className="flex flex-wrap items-center gap-3.5 mb-6 px-1.5 relative">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#173d2c]/50 dark:text-[#eee5d7]/45">
                 Select Active Project:

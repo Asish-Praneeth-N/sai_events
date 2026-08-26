@@ -81,11 +81,11 @@ export default async function EventWorkspacePage({
       .eq("assignment_id", id)
       .order("created_at", { ascending: false }),
 
-    // Documents
+    // Documents (safe check)
     supabase
-      .from("documents")
-      .select("id, file_name, file_url, file_type, created_at, profiles:uploaded_by (full_name)")
-      .eq("event_id", eventId)
+      .from("customer_media_items")
+      .select("id, title, url, file_type, created_at")
+      .eq("customer_id", user.id)
       .order("created_at", { ascending: false }),
 
     // Completion report

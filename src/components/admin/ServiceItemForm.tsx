@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveServiceItem } from "@/app/admin/catalog/actions";
-import { ServiceItem, Subcategory } from "@/lib/types";
+import { ServiceItem, Subcategory, MealType } from "@/lib/types";
 import MediaUploader from "./MediaUploader";
 
 interface ServiceItemFormProps {
@@ -27,7 +27,7 @@ export default function ServiceItemForm({
   const [pricingType, setPricingType] = useState<"flat" | "per_plate">(item?.pricing_type || "flat");
   const [pricingUnit, setPricingUnit] = useState<"per_plate" | "per_piece" | "fixed">(item?.pricing_unit || "per_plate");
   const [foodCategory, setFoodCategory] = useState<"veg" | "non_veg" | "beverage" | "dessert" | "general">(item?.food_category || "general");
-  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "high_tea" | "general">(item?.meal_type || "general");
+  const [mealType, setMealType] = useState<MealType>(item?.meal_type || "general");
   const [isAvailable, setIsAvailable] = useState(item?.is_available ?? true);
   const [sortOrder, setSortOrder] = useState(item?.sort_order || 0);
   const [mediaUrls, setMediaUrls] = useState<string[]>(item?.media || []);
