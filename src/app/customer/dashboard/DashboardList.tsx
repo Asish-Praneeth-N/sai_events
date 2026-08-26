@@ -9,10 +9,12 @@ import {
   Phone, Mail, ArrowRight, UserCheck, Sparkles, Upload, 
   Trash2, Download, AlertCircle, Shield, CheckCircle2, 
   MessageSquare, Video, HelpCircle, Plus, X, ArrowUpRight,
-  ChevronRight, CalendarDays, Compass, Info, Award, Bell
+  ChevronRight, CalendarDays, Compass, Info, Award, Bell,
+  ChevronDown, Check
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { cancelEventRequest, uploadCustomerDocument, deleteCustomerDocument, requestEventMeeting } from "../actions";
+import CustomerMediaStudio from "@/components/customer/CustomerMediaStudio";
 
 interface RequestItem {
   quantity: number;
@@ -100,6 +102,16 @@ const MILESTONES = [
   { key: "Closed", label: "Closed", desc: "Event case is officially archived." }
 ];
 
+const CANCELLATION_REASONS = [
+  "Change in event date or schedule",
+  "Venue relocated or unavailable",
+  "Budget constraints / financial adjustment",
+  "Booked another event planner / vendor directly",
+  "Event postponed indefinitely",
+  "Personal / family circumstances",
+  "Other (Specify custom reason)"
+];
+
 function DashboardListInner({
   requests,
   notifications,
@@ -113,10 +125,13 @@ function DashboardListInner({
   const [activeEventId, setActiveEventId] = useState<string | null>(
     requests.length > 0 ? requests[0].id : null
   );
+  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [cancellationReason, setCancellationReason] = useState("");
+  const [cancelReasonPreset, setCancelReasonPreset] = useState<string>("Change in event date or schedule");
+  const [cancelCustomReason, setCancelCustomReason] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -214,10 +229,10 @@ function DashboardListInner({
 
   // Meetings Request Modal States
   const [showMeetingModal, setShowMeetingModal] = useState(false);
+  const [meetingPurpose, setMeetingPurpose] = useState("");
   const [meetingDate, setMeetingDate] = useState("");
-  const [meetingTime, setMeetingTime] = useState("");
+  const [meetingTimeWindow, setMeetingTimeWindow] = useState("10:00 AM - 1:00 PM");
   const [meetingNotes, setMeetingNotes] = useState("");
-  const [meetingType, setMeetingType] = useState("video");
   const [requestingMeeting, setRequestingMeeting] = useState(false);
 
   // New Enquiry Modal States
@@ -275,6 +290,8 @@ function DashboardListInner({
 
   const openCancelModal = (id: string) => {
     setCancelTargetId(id);
+    setCancelReasonPreset("Change in event date or schedule");
+    setCancelCustomReason("");
     setCancellationReason("");
     setShowCancelModal(true);
   };
@@ -282,15 +299,20 @@ function DashboardListInner({
   const handleCancelSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cancelTargetId) return;
-    if (!cancellationReason.trim()) {
-      setError("Cancellation reason is mandatory.");
+
+    const finalReason = cancelReasonPreset === "Other (Specify custom reason)"
+      ? cancelCustomReason.trim()
+      : cancelReasonPreset;
+
+    if (!finalReason) {
+      setError("Please select or specify a cancellation reason.");
       return;
     }
 
     setCancellingId(cancelTargetId);
     setError(null);
     try {
-      await cancelEventRequest(cancelTargetId, cancellationReason.trim());
+      await cancelEventRequest(cancelTargetId, finalReason);
       setSuccess("Your event request has been cancelled.");
       setShowCancelModal(false);
       router.refresh();
@@ -346,8 +368,17 @@ function DashboardListInner({
       setError("Please select an active event request first.");
       return;
     }
+    if (!meetingPurpose.trim()) {
+      setError("Meeting purpose is required.");
+      return;
+    }
     if (!meetingDate) {
       setError("Preferred date is required.");
+      return;
+    }
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (meetingDate < todayStr) {
+      setError("Meeting date cannot be in the past. Please select today or a future date.");
       return;
     }
     setRequestingMeeting(true);
@@ -355,15 +386,16 @@ function DashboardListInner({
     try {
       await requestEventMeeting(
         activeRequest.id,
-        meetingType === "video" ? "Video Staging Consultation" : "In-Person Decor Sync",
+        meetingPurpose.trim(),
         meetingDate,
-        meetingTime || "10:00 AM - 1:00 PM",
-        meetingNotes
+        meetingTimeWindow,
+        meetingNotes.trim()
       );
       setSuccess("Meeting request submitted to SAI EVENTS Admin!");
       setShowMeetingModal(false);
+      setMeetingPurpose("");
       setMeetingDate("");
-      setMeetingTime("");
+      setMeetingTimeWindow("10:00 AM - 1:00 PM");
       setMeetingNotes("");
       router.refresh();
     } catch (err: any) {
@@ -451,19 +483,19 @@ function DashboardListInner({
   }, [activeRequest, activeDocCategory]);
 
   return (
-    <div className="space-y-7 sm:space-y-8 select-none">
+    <div className="space-y-7 sm:space-y-8">
       
       {/* ── Custom Status & Alerts banner ── */}
       {error && (
-        <div className="p-4.5 bg-red-950/35 border border-red-900/40 text-red-400 text-xs rounded-xl flex items-center gap-3 animate-fade-in max-w-4xl">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="p-4.5 bg-red-100/90 border border-red-300 text-red-900 dark:bg-red-950/40 dark:border-red-900/50 dark:text-red-300 text-xs rounded-xl flex items-center gap-3 animate-fade-in max-w-4xl font-medium shadow-sm">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="p-4.5 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs rounded-xl flex items-center gap-3 animate-fade-in max-w-4xl">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+        <div className="p-4.5 bg-emerald-100/90 border border-emerald-300 text-emerald-950 dark:bg-emerald-950/40 dark:border-emerald-900/50 dark:text-emerald-300 text-xs rounded-xl flex items-center gap-3 animate-fade-in max-w-4xl font-medium shadow-sm">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
           <span>{success}</span>
         </div>
       )}
@@ -490,22 +522,67 @@ function DashboardListInner({
       ) : (
         <div>
           {/* Active Event Case Selector Switcher */}
-          {requests.length > 1 && (
-            <div className="flex items-center gap-3.5 mb-6 px-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#173d2c]/50 dark:text-[#eee5d7]/45">Select Active Project:</span>
-              <select
-                value={activeEventId || ""}
-                onChange={(e) => {
-                  setActiveEventId(e.target.value);
-                  setError(null);
-                  setSuccess(null);
-                }}
-                className="bg-[#f8f2e9]/80 dark:bg-[#171914]/80 border border-[#173d2c]/10 dark:border-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-[#173d2c] dark:text-[#f0e8db] font-semibold focus:outline-none focus:border-[#a17a34]/45 dark:border-[#d2b56b]/45 cursor-pointer max-w-xs"
-              >
-                {requests.map(r => (
-                  <option key={r.id} value={r.id}>{r.event_type} ({r.event_date})</option>
-                ))}
-              </select>
+          {requests.length > 1 && activeRequest && currentTab !== "enquiries" && (
+            <div className="flex flex-wrap items-center gap-3.5 mb-6 px-1.5 relative">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#173d2c]/50 dark:text-[#eee5d7]/45">
+                Select Active Project:
+              </span>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProjectDropdownOpen((prev) => !prev)}
+                  className="flex items-center gap-2.5 bg-[#f8f2e9] dark:bg-[#171914] border border-[#a17a34]/35 dark:border-[#d2b56b]/35 px-4 py-2 text-xs font-semibold text-[#173d2c] dark:text-[#f0e8db] hover:border-[#a17a34] dark:hover:border-[#d2b56b] transition cursor-pointer shadow-sm"
+                >
+                  <span className="font-heading font-medium">{activeRequest.event_type}</span>
+                  <span className="font-mono text-[10.5px] text-[#9a742e] dark:text-[#d2b56b]">({activeRequest.event_date})</span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-[#9a742e] dark:text-[#d2b56b] transition-transform duration-200 ${projectDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {projectDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setProjectDropdownOpen(false)}
+                    />
+                    <div className="absolute left-0 top-full mt-2 w-72 z-50 bg-[#f8f2e9] dark:bg-[#171914] border border-[#173d2c]/15 dark:border-white/[0.10] shadow-2xl p-1.5 animate-scale-in max-h-64 overflow-y-auto no-scrollbar scrollbar-none">
+                      <span className="text-[7.5px] font-bold uppercase tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b] px-3 py-1.5 block border-b border-[#173d2c]/10 dark:border-white/[0.08] mb-1">
+                        Your Event Projects ({requests.length})
+                      </span>
+                      {requests.map((r) => {
+                        const isCurrent = r.id === activeEventId;
+                        return (
+                          <button
+                            key={r.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveEventId(r.id);
+                              setProjectDropdownOpen(false);
+                              setError(null);
+                              setSuccess(null);
+                            }}
+                            className={`w-full text-left px-3 py-2.5 text-xs transition cursor-pointer flex items-center justify-between gap-2 ${
+                              isCurrent
+                                ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] font-bold"
+                                : "text-[#173d2c]/75 dark:text-[#eee5d7]/70 hover:bg-[#173d2c]/[0.04] dark:hover:bg-white/[0.04] hover:text-[#143d2b] dark:hover:text-[#f0e8db]"
+                            }`}
+                          >
+                            <div className="min-w-0">
+                              <span className="block truncate font-heading font-medium">{r.event_type}</span>
+                              <span className={`text-[9.5px] font-mono block ${isCurrent ? "text-[#fffaf1]/80 dark:text-[#161812]/80" : "text-[#173d2c]/50 dark:text-[#eee5d7]/40"}`}>
+                                {r.event_date} · ₹{Number(r.total_budget).toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                            {isCurrent && (
+                              <Check className="w-3.5 h-3.5 shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
 
@@ -609,6 +686,20 @@ function DashboardListInner({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
+                            setShowMeetingModal(true);
+                          }}
+                          className="w-full text-center px-4 py-2.5 bg-[#a17a34]/15 border border-[#a17a34]/40 hover:bg-[#a17a34]/25 text-[#9a742e] dark:text-[#d2b56b] text-[8px] font-bold uppercase tracking-[0.2em] transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                        >
+                          <Video className="w-3.5 h-3.5" />
+                          <span>Request Meeting for Project</span>
+                        </button>
+                      )}
+
+                      {activeRequest.status !== "Cancelled" && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
                             openCancelModal(activeRequest.id);
                           }}
                           className="w-full text-center px-4 py-2 border border-red-500/30 hover:bg-red-500/10 text-red-600 dark:text-red-400 text-[8px] font-bold uppercase tracking-[0.2em] transition cursor-pointer"
@@ -687,7 +778,7 @@ function DashboardListInner({
                           Planning Workspace Controls
                         </h3>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <button 
                           onClick={() => setShowMeetingModal(true)} 
                           className="p-5 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 dark:hover:border-[#d2b56b]/40 hover:bg-[#173d2c]/[0.025] dark:hover:bg-white/[0.025] text-left flex flex-col justify-between h-[115px] group transition-all duration-300 cursor-pointer"
@@ -695,37 +786,18 @@ function DashboardListInner({
                           <Video className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
                           <div>
                             <span className="text-xs font-semibold text-[#143d2b] dark:text-[#f0e8db] block">Request Consultation</span>
-                            <span className="text-[8.5px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 block mt-0.5">Schedule meeting</span>
+                            <span className="text-[8.5px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 block mt-0.5">Schedule sync for {activeRequest.event_type}</span>
                           </div>
                         </button>
-                        <a 
-                          href="/customer/dashboard?tab=journey" 
-                          className="p-5 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 dark:hover:border-[#d2b56b]/40 hover:bg-[#173d2c]/[0.025] dark:hover:bg-white/[0.025] flex flex-col justify-between h-[115px] group transition-all duration-300"
+                        <button 
+                          type="button"
+                          onClick={() => router.push(`/customer/events/${activeRequest.id}?tab=journey`)}
+                          className="p-5 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 dark:hover:border-[#d2b56b]/40 hover:bg-[#173d2c]/[0.025] dark:hover:bg-white/[0.025] text-left flex flex-col justify-between h-[115px] group transition-all duration-300 cursor-pointer"
                         >
                           <Compass className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
                           <div>
                             <span className="text-xs font-semibold text-[#143d2b] dark:text-[#f0e8db] block">Event Journey</span>
                             <span className="text-[8.5px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 block mt-0.5">View timeline</span>
-                          </div>
-                        </a>
-                        <button 
-                          onClick={() => setShowUploadModal(true)}
-                          className="p-5 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 dark:hover:border-[#d2b56b]/40 hover:bg-[#173d2c]/[0.025] dark:hover:bg-white/[0.025] text-left flex flex-col justify-between h-[115px] group transition-all duration-300 cursor-pointer"
-                        >
-                          <Upload className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
-                          <div>
-                            <span className="text-xs font-semibold text-[#143d2b] dark:text-[#f0e8db] block">Upload Reference</span>
-                            <span className="text-[8.5px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 block mt-0.5">Add document</span>
-                          </div>
-                        </button>
-                        <button 
-                          onClick={() => window.print()}
-                          className="p-5 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] hover:border-[#a17a34]/40 dark:hover:border-[#d2b56b]/40 hover:bg-[#173d2c]/[0.025] dark:hover:bg-white/[0.025] text-left flex flex-col justify-between h-[115px] group transition-all duration-300 cursor-pointer"
-                        >
-                          <FileText className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
-                          <div>
-                            <span className="text-xs font-semibold text-[#143d2b] dark:text-[#f0e8db] block">Print Proposal</span>
-                            <span className="text-[8.5px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 block mt-0.5">Download summary</span>
                           </div>
                         </button>
                       </div>
@@ -983,128 +1055,15 @@ function DashboardListInner({
               </motion.div>
             )}
 
-            {/* 4. DOCUMENTS TAB */}
-            {currentTab === "documents" && activeRequest && (
+            {/* 4. MEDIA STUDIO TAB */}
+            {currentTab === "media" && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-8"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="h-1 w-1 rotate-45 bg-[#a17a34]" />
-                      <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b]">Reference Vault</span>
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl font-normal font-heading tracking-[-0.03em] text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
-                      Document Workspace
-                    </h2>
-                    <p className="text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 mt-1 font-light">
-                      Manage inspiration layouts, layouts, and review event proposal agreements.
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => setShowUploadModal(true)}
-                    className="px-5 py-3 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] flex items-center gap-1.5 cursor-pointer shadow-md shrink-0"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> Add File Reference
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                  
-                  {/* Left Column Categories Menu — Horizontal scrolling on mobile */}
-                  <div className="lg:col-span-3 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] p-4 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 no-scrollbar scrollbar-none whitespace-nowrap shadow-sm">
-                    <span className="text-[8px] uppercase font-bold text-[#173d2c]/40 dark:text-white/30 tracking-[0.2em] px-2.5 hidden lg:block mb-2">Workspace Directories</span>
-                    {[
-                      { key: "all", label: "All References" },
-                      { key: "inspiration", label: "Inspirations" },
-                      { key: "reference", label: "References" },
-                      { key: "venue", label: "Venue Plans" },
-                      { key: "quotation", label: "Quotations" },
-                      { key: "agreement", label: "Agreements" }
-                    ].map((cat) => (
-                      <button
-                        key={cat.key}
-                        onClick={() => setActiveDocCategory(cat.key)}
-                        className={`px-3.5 py-2.5 text-xs text-left font-medium border transition-all duration-150 cursor-pointer shrink-0 ${
-                          activeDocCategory === cat.key
-                            ? "bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] border-transparent font-bold"
-                            : "bg-transparent border-transparent text-[#173d2c]/65 dark:text-[#eee5d7]/55 hover:text-[#143d2b] dark:hover:text-[#f0e8db] hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035]"
-                        }`}
-                      >
-                        {cat.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Right Column Files list */}
-                  <div className="lg:col-span-9 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] p-6.5 min-h-[380px] flex flex-col justify-between shadow-sm">
-                    
-                    {filteredDocs.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {filteredDocs.map((doc) => (
-                          <div 
-                            key={doc.id} 
-                            className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] flex items-center justify-between gap-4 hover:border-[#a17a34]/40 transition-all"
-                          >
-                            <div className="min-w-0">
-                              <span className="text-xs font-semibold text-[#143d2b] dark:text-[#f0e8db] block truncate">{doc.file_name}</span>
-                              <span className="text-[8px] uppercase tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b] mt-1 block font-bold">
-                                {doc.file_type} · {formatDate(doc.created_at)}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              <a
-                                href={doc.file_url}
-                                className="p-2 border border-[#173d2c]/10 dark:border-white/[0.08] hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035] text-[#173d2c]/60 dark:text-[#eee5d7]/50 hover:text-[#143d2b] dark:hover:text-[#f0e8db] transition duration-150"
-                                title="Download reference"
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                              </a>
-                              <button
-                                onClick={() => handleDeleteDoc(doc.id)}
-                                className="p-2 border border-red-950/20 hover:bg-red-950/15 text-red-600 dark:text-red-400 transition cursor-pointer"
-                                title="Delete reference"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      // Empty state
-                      <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                        <div className="w-12 h-12 bg-[#f3eadf]/60 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] flex items-center justify-center mb-4 text-[#a17a34] dark:text-[#d2b56b]">
-                          <FileText className="w-5 h-5" />
-                        </div>
-                        <h4 className="text-sm font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>No Document files found</h4>
-                        <p className="text-[11px] text-[#173d2c]/60 dark:text-[#eee5d7]/50 max-w-[250px] mt-1.5 leading-relaxed font-light">
-                          Provide mandap layouts, menu structures, or visual inspiration PDFs under this folder.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Drag and Drop Upload Area */}
-                    <div 
-                      onClick={() => setShowUploadModal(true)}
-                      className="border border-dashed border-[#173d2c]/15 dark:border-white/[0.10] hover:border-[#a17a34]/50 dark:hover:border-[#d2b56b]/50 p-6.5 text-center mt-6 bg-[#f3eadf]/30 dark:bg-white/[0.015] cursor-pointer hover:bg-[#f3eadf]/60 dark:hover:bg-white/[0.03] transition duration-300 flex flex-col items-center justify-center gap-2"
-                    >
-                      <Upload className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b]" />
-                      <div>
-                        <span className="text-xs font-semibold text-[#143d2b] dark:text-[#f0e8db] block">Click to upload planning reference</span>
-                        <span className="text-[8.5px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 block mt-0.5">Supports PDF, JPG, PNG, and DOCX (Max 15MB)</span>
-                      </div>
-                    </div>
-
-                  </div>
-
-                </div>
+                <CustomerMediaStudio />
               </motion.div>
             )}
 
@@ -1422,123 +1381,7 @@ function DashboardListInner({
               </motion.div>
             )}
 
-            {/* 7. SUPPORT CONCIERGE HUB TAB */}
-            {currentTab === "support" && activeRequest && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-8"
-              >
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-normal font-heading tracking-[-0.03em] text-[#173d2c] dark:text-[#f0e8db]">Dedicated Concierge Hub</h2>
-                  <p className="text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/45 mt-1 font-light">
-                    Direct communication workspace to resolve planning queries and stage coordination items.
-                  </p>
-                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                  
-                  {/* Left Column Coordinator Card */}
-                  <div className="lg:col-span-5 bg-[#f8f2e9]/80 dark:bg-[#171914]/80 border border-[#173d2c]/10 dark:border-white/[0.08] rounded-3xl p-8 space-y-6 relative overflow-hidden w-full">
-                    <div className="space-y-4">
-                      <span className="text-[8.5px] uppercase font-bold tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b] block">Assigned Advisor</span>
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#173d2c]/50 dark:text-[#eee5d7]/45 -mt-3.5">
-                        Your Event Partner
-                      </h3>
-
-                      {activeRequest.event_assignments && activeRequest.event_assignments.length > 0 && activeRequest.event_assignments[0].profiles ? (
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-xl bg-[#f3eadf] dark:bg-[#11130f] border border-[#173d2c]/10 dark:border-white/[0.08] flex items-center justify-center text-[#9a742e] dark:text-[#d2b56b] font-bold text-sm uppercase shadow-sm">
-                              {activeRequest.event_assignments[0].profiles.full_name.substring(0, 2)}
-                            </div>
-                            <div>
-                              <h4 className="text-sm font-bold text-[#173d2c] dark:text-[#f0e8db]">
-                                {activeRequest.event_assignments[0].profiles.full_name}
-                              </h4>
-                              <p className="text-[9px] uppercase tracking-wider text-[#9a742e] dark:text-[#d2b56b] font-semibold mt-0.5">
-                                Executive Event Coordinator
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="space-y-3 pt-4 border-t border-[#173d2c]/10 dark:border-white/[0.08] font-mono text-[10px] text-[#173d2c]/50 dark:text-[#eee5d7]/45">
-                            <div className="flex items-center gap-3">
-                              <Phone className="w-4 h-4 text-[#9a742e] dark:text-[#d2b56b]" />
-                              <span>{activeRequest.event_assignments[0].profiles.phone_number}</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <Mail className="w-4 h-4 text-[#9a742e] dark:text-[#d2b56b]" />
-                              <span className="truncate">{activeRequest.event_assignments[0].profiles.email}</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <Clock className="w-4 h-4 text-[#9a742e] dark:text-[#d2b56b]" />
-                              <span>Availability: Mon - Sat (9:00 - 18:00)</span>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2 pt-2">
-                            <a
-                              href={`tel:${activeRequest.event_assignments[0].profiles.phone_number}`}
-                              className="px-4 py-2.5 border border-[#173d2c]/10 dark:border-white/[0.08] bg-[#f3eadf] dark:bg-[#11130f] hover:bg-[#173d2c]/[0.035] dark:bg-white/[0.035] rounded-lg text-xs font-bold uppercase tracking-wider text-[#173d2c] dark:text-[#f0e8db] text-center transition cursor-pointer"
-                            >
-                              Call Concierge
-                            </a>
-                            <a
-                              href={`mailto:${activeRequest.event_assignments[0].profiles.email}`}
-                              className="px-4 py-2.5 bg-gradient-to-r from-accent-gold to-amber-500 hover:from-amber-500 hover:to-accent-gold text-black text-xs font-bold uppercase tracking-wider text-center rounded-lg transition cursor-pointer animate-pulse-glow"
-                            >
-                              Email Partner
-                            </a>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="py-12 text-center text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/45 font-light flex flex-col items-center justify-center gap-3 bg-[#173d2c]/[0.02] dark:bg-black/10 rounded-xl border border-dashed border-[#173d2c]/10 dark:border-white/[0.08]">
-                          <UserCheck className="w-8 h-8 text-[#173d2c]/50 dark:text-[#eee5d7]/45/35" />
-                          <p className="max-w-[200px] leading-relaxed mx-auto">
-                            Advisor Assignment Pending. Our admin team will dispatch your coordinator partner within 24 hours.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Right Column support contact info */}
-                  <div className="lg:col-span-7 bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/10 dark:border-white/[0.08] p-8 space-y-6 w-full shadow-sm">
-                    <div className="space-y-1">
-                      <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#9a742e] dark:text-[#d2b56b] block">SAI EVENTS Concierge Standards</span>
-                      <h3 className="text-base font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>Orchestration Philosophy</h3>
-                    </div>
-                    
-                    <div className="space-y-4 text-xs text-[#173d2c]/65 dark:text-[#eee5d7]/55 leading-relaxed font-light">
-                      <p>
-                        At <span className="text-[#143d2b] dark:text-[#f0e8db] font-semibold">SAI EVENTS</span>, we orchestrate experiences. You are not managing decorators, sound systems, or catering timelines; we abstract provider details, scheduling, and staging to ensure a singular premium celebration.
-                      </p>
-                      <p>
-                        Should you require structural alterations to your layout or timeline adjustments, please reach out to your assigned coordinator, or file a consultation query below.
-                      </p>
-                    </div>
-
-                    <div className="border-t border-[#173d2c]/10 dark:border-white/[0.08] pt-6 space-y-4">
-                      <span className="text-[8px] uppercase font-bold text-[#9a742e] dark:text-[#d2b56b] tracking-[0.2em] block font-mono">SAI Concierge Guarantees</span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <div className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] space-y-1">
-                          <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] block">Zero Vendor Anxiety</span>
-                          <span className="text-[10px] text-[#173d2c]/60 dark:text-[#eee5d7]/50 font-light">No direct vendor calls. We manage everything onsite.</span>
-                        </div>
-                        <div className="p-4 bg-[#f3eadf]/50 dark:bg-white/[0.02] border border-[#173d2c]/10 dark:border-white/[0.08] space-y-1">
-                          <span className="font-semibold text-[#143d2b] dark:text-[#f0e8db] block">Guaranteed Execution</span>
-                          <span className="text-[10px] text-[#173d2c]/60 dark:text-[#eee5d7]/50 font-light">Dedicated managers verify decor alignment metrics.</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </motion.div>
-            )}
 
             {/* 8. MY ENQUIRIES TAB */}
             {currentTab === "enquiries" && (
@@ -1720,10 +1563,14 @@ function DashboardListInner({
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
           <div className="bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/15 dark:border-white/[0.10] max-w-md w-full overflow-hidden p-6.5 space-y-6 shadow-2xl animate-scale-in">
             <div className="flex justify-between items-center border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
-              <h3 className="text-base font-normal font-heading text-[#143d2b] dark:text-[#f0e8db]" style={{ fontFamily: '"Playfair Display", serif' }}>
-                Request Consultation Call
-              </h3>
+              <div>
+                <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b]">SAI EVENTS Operations</span>
+                <h3 className="text-base font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-0.5" style={{ fontFamily: '"Playfair Display", serif' }}>
+                  Request Event Sync Meeting
+                </h3>
+              </div>
               <button 
+                type="button"
                 onClick={() => setShowMeetingModal(false)}
                 className="text-[#173d2c]/50 dark:text-[#eee5d7]/40 hover:text-[#143d2b] dark:hover:text-[#f0e8db] transition cursor-pointer p-1"
               >
@@ -1731,57 +1578,59 @@ function DashboardListInner({
               </button>
             </div>
 
-            <form onSubmit={handleRequestMeetingSubmit} className="space-y-5 text-xs">
+            <form onSubmit={handleRequestMeetingSubmit} className="space-y-4 text-xs">
+              <div className="space-y-1.5">
+                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Meeting Purpose *</label>
+                <input
+                  type="text"
+                  required
+                  value={meetingPurpose}
+                  onChange={(e) => setMeetingPurpose(e.target.value)}
+                  placeholder="e.g. Venue decor staging & catering menu sync"
+                  className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] text-xs font-medium"
+                />
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Preferred Date</label>
+                  <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Preferred Date *</label>
                   <input
                     type="date"
                     required
+                    min={new Date().toISOString().split("T")[0]}
                     value={meetingDate}
                     onChange={(e) => setMeetingDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] text-xs font-mono cursor-pointer"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Preferred Time</label>
-                  <input
-                    type="time"
-                    required
-                    value={meetingTime}
-                    onChange={(e) => setMeetingTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] text-xs font-mono"
-                  />
+                  <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Time Window *</label>
+                  <select
+                    value={meetingTimeWindow}
+                    onChange={(e) => setMeetingTimeWindow(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-[#171914] dark:text-[#f0e8db] cursor-pointer text-xs"
+                  >
+                    <option value="10:00 AM - 1:00 PM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">10:00 AM - 1:00 PM</option>
+                    <option value="2:00 PM - 5:00 PM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">2:00 PM - 5:00 PM</option>
+                    <option value="5:00 PM - 8:00 PM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">5:00 PM - 8:00 PM</option>
+                    <option value="Evening Call (After 6:00 PM)" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">Evening Call (After 6:00 PM)</option>
+                  </select>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Meeting Medium</label>
-                <select
-                  value={meetingType}
-                  onChange={(e) => setMeetingType(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-[#171914] dark:text-[#f0e8db] cursor-pointer text-xs"
-                >
-                  <option value="video">Google Meet Video Sync</option>
-                  <option value="phone">Standard Voice Call</option>
-                  <option value="in_person">In-Person Consultation</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Consultation Agenda</label>
+                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Additional Notes / Specific Questions</label>
                 <textarea
                   rows={3}
-                  required
-                  placeholder="Specify staging questions, catering tasters alignment, or timeline additions..."
+                  placeholder="Mention any specific topics or participants..."
                   value={meetingNotes}
                   onChange={(e) => setMeetingNotes(e.target.value)}
                   className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] font-light text-xs resize-none"
                 />
               </div>
 
-              <div className="pt-5 flex items-center justify-end gap-3 border-t border-[#173d2c]/10 dark:border-white/[0.08]">
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#173d2c]/10 dark:border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setShowMeetingModal(false)}
@@ -1792,9 +1641,9 @@ function DashboardListInner({
                 <button
                   type="submit"
                   disabled={requestingMeeting}
-                  className="px-5 py-3 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer shadow-md"
+                  className="px-5 py-3 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer shadow-md disabled:opacity-50"
                 >
-                  {requestingMeeting ? "Logging request..." : "Confirm Request"}
+                  {requestingMeeting ? "Submitting..." : "Submit Meeting Request"}
                 </button>
               </div>
             </form>
@@ -1820,19 +1669,36 @@ function DashboardListInner({
 
             <form onSubmit={handleCancelSubmit} className="space-y-4 text-xs">
               <p className="text-[#173d2c]/65 dark:text-[#eee5d7]/55 text-xs font-light leading-relaxed">
-                Are you sure you want to cancel this event request? Please provide a mandatory reason for cancellation.
+                Are you sure you want to cancel this event request? Please select a cancellation reason.
               </p>
 
-              <div className="space-y-1.5">
-                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Cancellation Reason *</label>
-                <textarea
-                  rows={3}
-                  required
-                  placeholder="Specify why you are cancelling (e.g., date changed, venue relocated, budget update)..."
-                  value={cancellationReason}
-                  onChange={(e) => setCancellationReason(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-red-500/25 text-[#173d2c] focus:border-red-500 focus:outline-none dark:bg-white/[0.02] dark:text-[#f0e8db] font-light text-xs resize-none"
-                />
+              <div className="space-y-2">
+                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Select Cancellation Reason *</label>
+                <select
+                  value={cancelReasonPreset}
+                  onChange={(e) => setCancelReasonPreset(e.target.value)}
+                  className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-red-500/30 text-[#173d2c] focus:border-red-500 focus:outline-none dark:border-white/[0.10] dark:bg-[#171914] dark:text-[#f0e8db] cursor-pointer text-xs font-medium"
+                >
+                  {CANCELLATION_REASONS.map((r) => (
+                    <option key={r} value={r} className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">
+                      {r}
+                    </option>
+                  ))}
+                </select>
+
+                {cancelReasonPreset === "Other (Specify custom reason)" && (
+                  <div className="space-y-1.5 pt-2 animate-fade-in">
+                    <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Specify Custom Reason *</label>
+                    <textarea
+                      rows={3}
+                      required
+                      placeholder="Please specify your cancellation reason details..."
+                      value={cancelCustomReason}
+                      onChange={(e) => setCancelCustomReason(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-red-500/30 text-[#173d2c] focus:border-red-500 focus:outline-none dark:bg-white/[0.02] dark:text-[#f0e8db] font-light text-xs resize-none"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#173d2c]/10 dark:border-white/[0.08]">

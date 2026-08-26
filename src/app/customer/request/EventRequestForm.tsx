@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createEventRequest, saveEventDraft, discardEventDraft } from "../actions";
 import { Category, Subcategory, ServiceItem, EventPart, Recommendation } from "@/lib/types";
@@ -12,9 +12,11 @@ import {
   ArrowRight, ArrowLeft, CheckCircle2, ChevronRight,
   Gift, Heart, Music, Award, Users2, AlertCircle, Phone, Mail,
   Utensils, Camera, Palette, Check, ExternalLink, ShieldCheck,
-  Video, RefreshCw, Trash2, Tag, DollarSign, Navigation
+  Video, RefreshCw, Trash2, Tag, DollarSign, Navigation, Plus, UserPlus,
+  FolderHeart, Image as ImageIcon, X
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { getStoredCustomerMedia } from "@/components/customer/CustomerMediaStudio";
 
 interface UserProfile {
   fullName: string;
@@ -101,8 +103,13 @@ export default function EventRequestForm({
   const [eventFor, setEventFor] = useState("Self");
   const [celebrantName, setCelebrantName] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [eventTime, setEventTime] = useState("");
+  const [eventTime, setEventTime] = useState("10:00 AM");
+  const [timeHour, setTimeHour] = useState("10");
+  const [timeMinute, setTimeMinute] = useState("00");
+  const [timePeriod, setTimePeriod] = useState("AM");
   const [durationHours, setDurationHours] = useState<number>(4);
+  const [durationSelection, setDurationSelection] = useState<string>("4");
+  const [customDurationValue, setCustomDurationValue] = useState<string>("");
   const [venueName, setVenueName] = useState("");
   const [venueAddress, setVenueAddress] = useState("");
   const [minGuestCount, setMinGuestCount] = useState<number>(100);
@@ -111,6 +118,54 @@ export default function EventRequestForm({
   const [customBudget, setCustomBudget] = useState<number | undefined>(undefined);
   const [specialRequirements, setSpecialRequirements] = useState("");
   const [referenceVideoUrl, setReferenceVideoUrl] = useState("");
+
+  // Reference Images State (Up to 10 max attached images)
+  const [referenceImages, setReferenceImages] = useState<string[]>([]);
+  const [showMediaPickerModal, setShowMediaPickerModal] = useState<boolean>(false);
+
+  const handleDeviceImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const remainingSlots = 10 - referenceImages.length;
+    if (remainingSlots <= 0) {
+      alert("Maximum 10 reference images allowed.");
+      return;
+    }
+
+    const filesToRead = Array.from(files).slice(0, remainingSlots);
+    filesToRead.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        if (evt.target?.result) {
+          const res = evt.target.result as string;
+          setReferenceImages((prev) => {
+            if (prev.length >= 10) return prev;
+            if (prev.includes(res)) return prev;
+            return [...prev, res];
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveReferenceImage = (index: number) => {
+    setReferenceImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Ref for auto-focusing time field after date selection
+  const timeHourRef = useRef<HTMLSelectElement>(null);
+
+  // Additional Contacts State (Up to 3 optional secondary contact persons)
+  const [additionalContacts, setAdditionalContacts] = useState<{ name: string; phone: string; relation?: string }[]>([]);
+
+  // Synchronize 12-hour time selectors into eventTime state
+  useEffect(() => {
+    if (timeHour && timeMinute && timePeriod) {
+      setEventTime(`${timeHour}:${timeMinute} ${timePeriod}`);
+    }
+  }, [timeHour, timeMinute, timePeriod]);
 
   // Interactive Map Venue Picker Modal States
   const [showMapModal, setShowMapModal] = useState(false);
@@ -144,7 +199,15 @@ export default function EventRequestForm({
     setCelebrantName(activeDraft.celebrant_name || "");
     setEventDate(activeDraft.event_date || "");
     setEventTime(activeDraft.event_time || "");
-    setDurationHours(activeDraft.duration_hours || 4);
+    const dHours = activeDraft.duration_hours || 4;
+    setDurationHours(dHours);
+    if ([2, 4, 6, 8, 12].includes(dHours)) {
+      setDurationSelection(dHours.toString());
+      setCustomDurationValue("");
+    } else {
+      setDurationSelection("custom");
+      setCustomDurationValue(dHours.toString());
+    }
     setVenueAddress(activeDraft.venue_address || activeDraft.location || "");
     setMinGuestCount(activeDraft.min_guest_count || 100);
     setMaxGuestCount(activeDraft.max_guest_count || 200);
@@ -322,6 +385,7 @@ export default function EventRequestForm({
 
     setSavingDraft(true);
     try {
+      const validContacts = additionalContacts.filter(c => c.name.trim() && c.phone.trim());
       const res = await saveEventDraft({
         draftId,
         eventType,
@@ -339,6 +403,7 @@ export default function EventRequestForm({
         specialRequirements,
         referenceVideoUrl,
         whatsappNumber,
+        additionalContacts: validContacts,
       });
 
       if (res.draftId) {
@@ -368,6 +433,7 @@ export default function EventRequestForm({
     }
 
     try {
+      const validContacts = additionalContacts.filter(c => c.name.trim() && c.phone.trim());
       const result = await createEventRequest({
         requestId: draftId,
         eventType,
@@ -386,6 +452,7 @@ export default function EventRequestForm({
         customBudget,
         specialRequirements,
         referenceVideoUrl,
+        additionalContacts: validContacts,
         eventPartIds: selectedPartIds,
         items: selectedItems,
       });
@@ -402,7 +469,7 @@ export default function EventRequestForm({
   // If Success Screen (Step 6)
   if (step === 6 && submittedRefNumber) {
     return (
-      <div className="max-w-2xl mx-auto border border-[#a17a34]/35 bg-[#f7f0e6] dark:border-[#d2b56b]/25 dark:bg-[#191b17] p-8 sm:p-10 space-y-6 text-center animate-scale-in shadow-2xl relative overflow-hidden select-none">
+      <div className="max-w-2xl mx-auto border border-[#a17a34]/35 bg-[#f7f0e6] dark:border-[#d2b56b]/25 dark:bg-[#191b17] p-8 sm:p-10 space-y-6 text-center animate-scale-in shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#143d2b] via-[#a17a34] to-[#143d2b] dark:from-[#d2b56b] dark:via-[#8f7338] dark:to-[#d2b56b]" />
 
         <div className="w-16 h-16 rounded-none bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
@@ -607,6 +674,99 @@ export default function EventRequestForm({
                   />
                 </div>
               </div>
+
+              {/* Additional Secondary Contacts Section (Up to 3 Optional Contacts) */}
+              <div className="pt-3 border-t border-[#173d2c]/10 dark:border-white/[0.08] space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-[#143d2b] dark:text-[#f0e8db] tracking-wider block">
+                      Additional Event Contacts (Optional - Up to 3)
+                    </span>
+                    <span className="text-[9px] text-[#173d2c]/55 dark:text-[#eee5d7]/45 block font-light">
+                      Add secondary contact persons for event coordination (e.g., Co-Host, Family Member, Manager)
+                    </span>
+                  </div>
+                  {additionalContacts.length < 3 && (
+                    <button
+                      type="button"
+                      onClick={() => setAdditionalContacts(prev => [...prev, { name: "", phone: "", relation: "Co-Host" }])}
+                      className="px-3 py-1.5 bg-[#a17a34]/15 border border-[#a17a34]/40 text-[#9a742e] dark:text-[#d2b56b] hover:bg-[#a17a34]/25 text-[8px] font-bold uppercase tracking-[0.18em] transition cursor-pointer flex items-center gap-1 shrink-0 self-start sm:self-auto shadow-sm"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>Add Additional Contact</span>
+                    </button>
+                  )}
+                </div>
+
+                {additionalContacts.map((contact, idx) => (
+                  <div key={idx} className="p-3.5 bg-[#f3eadf]/40 dark:bg-white/[0.025] border border-[#173d2c]/12 dark:border-white/[0.08] space-y-3 animate-fade-in">
+                    <div className="flex items-center justify-between border-b border-[#173d2c]/10 dark:border-white/[0.06] pb-2">
+                      <span className="text-[8px] uppercase font-bold text-[#9a742e] dark:text-[#d2b56b] tracking-[0.2em]">
+                        Secondary Contact #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setAdditionalContacts(prev => prev.filter((_, i) => i !== idx))}
+                        className="text-red-500 hover:text-red-700 p-1 cursor-pointer transition flex items-center gap-1 text-[9px] uppercase font-bold"
+                        title="Remove contact"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[8px] uppercase font-bold text-[#173d2c]/50 dark:text-[#eee5d7]/45">Contact Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={contact.name}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalContacts(prev => prev.map((c, i) => i === idx ? { ...c, name: val } : c));
+                          }}
+                          placeholder="e.g. Harish Kumar"
+                          className="w-full px-3 py-2 bg-[#fffaf3] dark:bg-[#11130f] border border-[#173d2c]/12 dark:border-white/10 text-xs text-[#143d2b] dark:text-[#f0e8db] focus:border-[#a17a34] focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[8px] uppercase font-bold text-[#173d2c]/50 dark:text-[#eee5d7]/45">Mobile Number *</label>
+                        <input
+                          type="tel"
+                          required
+                          value={contact.phone}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalContacts(prev => prev.map((c, i) => i === idx ? { ...c, phone: val } : c));
+                          }}
+                          placeholder="e.g. +91 9876543210"
+                          className="w-full px-3 py-2 bg-[#fffaf3] dark:bg-[#11130f] border border-[#173d2c]/12 dark:border-white/10 text-xs font-mono text-[#143d2b] dark:text-[#f0e8db] focus:border-[#a17a34] focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[8px] uppercase font-bold text-[#173d2c]/50 dark:text-[#eee5d7]/45">Role / Relationship</label>
+                        <select
+                          value={contact.relation || "Co-Host"}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalContacts(prev => prev.map((c, i) => i === idx ? { ...c, relation: val } : c));
+                          }}
+                          className="w-full px-3 py-2 bg-[#fffaf3] dark:bg-[#11130f] border border-[#173d2c]/12 dark:border-white/10 text-xs text-[#143d2b] dark:text-[#f0e8db] cursor-pointer focus:border-[#a17a34] focus:outline-none"
+                        >
+                          <option value="Co-Host" className="bg-[#f8f2e9] dark:bg-[#171914]">Co-Host</option>
+                          <option value="Event Manager / Contact" className="bg-[#f8f2e9] dark:bg-[#171914]">Event Manager / Contact</option>
+                          <option value="Family Member" className="bg-[#f8f2e9] dark:bg-[#171914]">Family Member</option>
+                          <option value="Venue Coordinator" className="bg-[#f8f2e9] dark:bg-[#171914]">Venue Coordinator</option>
+                          <option value="Other" className="bg-[#f8f2e9] dark:bg-[#171914]">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Section B: Event Information */}
@@ -626,7 +786,7 @@ export default function EventRequestForm({
                     className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] cursor-pointer text-xs"
                   >
                     {EVENT_TYPES.map((t) => (
-                      <option key={t.id} value={t.id} className="bg-surface text-[#143d2b] dark:text-[#f0e8db]">{t.label}</option>
+                      <option key={t.id} value={t.id} className="bg-[#f8f2e9] dark:bg-[#171914] text-[#143d2b] dark:text-[#f0e8db]">{t.label}</option>
                     ))}
                   </select>
                 </div>
@@ -640,7 +800,7 @@ export default function EventRequestForm({
                     className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] cursor-pointer text-xs"
                   >
                     {EVENT_FOR_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt} className="bg-surface text-[#143d2b] dark:text-[#f0e8db]">{opt}</option>
+                      <option key={opt} value={opt} className="bg-[#f8f2e9] dark:bg-[#171914] text-[#143d2b] dark:text-[#f0e8db]">{opt}</option>
                     ))}
                   </select>
                 </div>
@@ -658,7 +818,7 @@ export default function EventRequestForm({
                   />
                 </div>
 
-                {/* Event Date (min = today) */}
+                {/* Event Date (min = today) - Auto opens calendar & focuses time on pick */}
                 <div className="space-y-1.5">
                   <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Event Date * (Today or Future)</label>
                   <input
@@ -666,33 +826,114 @@ export default function EventRequestForm({
                     required
                     min={todayDate}
                     value={eventDate}
-                    onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs [color-scheme:dark]"
+                    onClick={(e) => e.currentTarget.showPicker?.()}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEventDate(val);
+                      if (val && timeHourRef.current) {
+                        setTimeout(() => {
+                          try {
+                            timeHourRef.current?.focus();
+                            timeHourRef.current?.showPicker?.();
+                          } catch (_) {}
+                        }, 100);
+                      }
+                    }}
+                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs cursor-pointer font-mono"
                   />
                 </div>
 
-                {/* Start Time & Duration */}
+                {/* Event Start Time (12-Hour Format with AM/PM) */}
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Start Time & Duration *</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="time"
-                      required
-                      value={eventTime}
-                      onChange={(e) => setEventTime(e.target.value)}
-                      className="w-1/2 px-3 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs [color-scheme:dark]"
-                    />
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">
+                    Start Time (12-Hour Format) * ({eventTime})
+                  </label>
+                  <div className="flex items-center gap-1.5">
                     <select
-                      value={durationHours}
-                      onChange={(e) => setDurationHours(Number(e.target.value))}
-                      className="w-1/2 px-3 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs cursor-pointer"
+                      ref={timeHourRef}
+                      value={timeHour}
+                      onChange={(e) => setTimeHour(e.target.value)}
+                      className="w-1/3 px-2.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono cursor-pointer"
                     >
-                      <option value={2} className="bg-surface">2 Hours</option>
-                      <option value={4} className="bg-surface">4 Hours</option>
-                      <option value={6} className="bg-surface">6 Hours</option>
-                      <option value={8} className="bg-surface">Full Day (8 Hrs)</option>
-                      <option value={12} className="bg-surface">Multi-Day / 12+ Hrs</option>
+                      {["01","02","03","04","05","06","07","08","09","10","11","12"].map(h => (
+                        <option key={h} value={h} className="bg-[#f8f2e9] dark:bg-[#171914] text-[#143d2b] dark:text-[#f0e8db]">
+                          {h} Hr
+                        </option>
+                      ))}
                     </select>
+
+                    <span className="text-[#173d2c]/40 dark:text-[#eee5d7]/40 font-mono font-bold">:</span>
+
+                    <select
+                      value={timeMinute}
+                      onChange={(e) => setTimeMinute(e.target.value)}
+                      className="w-1/3 px-2.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono cursor-pointer"
+                    >
+                      {["00","15","30","45"].map(m => (
+                        <option key={m} value={m} className="bg-[#f8f2e9] dark:bg-[#171914] text-[#143d2b] dark:text-[#f0e8db]">
+                          {m} Min
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={timePeriod}
+                      onChange={(e) => setTimePeriod(e.target.value)}
+                      className="w-1/3 px-2.5 py-2.5 border border-[#a17a34]/35 dark:border-[#d2b56b]/35 bg-[#a17a34]/10 dark:bg-[#d2b56b]/10 text-[#9a742e] dark:text-[#d2b56b] text-xs font-bold font-mono cursor-pointer"
+                    >
+                      <option value="AM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#143d2b] dark:text-[#f0e8db]">AM</option>
+                      <option value="PM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#143d2b] dark:text-[#f0e8db]">PM</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Event Duration with Custom Input Option */}
+                <div className="space-y-1.5">
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">
+                    Event Duration * ({durationHours} {durationHours === 1 ? "Hour" : "Hours"})
+                  </label>
+                  <div className="space-y-2">
+                    <select
+                      value={durationSelection}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setDurationSelection(val);
+                        if (val !== "custom") {
+                          setDurationHours(Number(val));
+                        } else {
+                          const num = Number(customDurationValue) || 5;
+                          setDurationHours(num);
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs cursor-pointer font-medium"
+                    >
+                      <option value="2" className="bg-[#f8f2e9] dark:bg-[#171914]">2 Hours</option>
+                      <option value="4" className="bg-[#f8f2e9] dark:bg-[#171914]">4 Hours (Standard)</option>
+                      <option value="6" className="bg-[#f8f2e9] dark:bg-[#171914]">6 Hours</option>
+                      <option value="8" className="bg-[#f8f2e9] dark:bg-[#171914]">Full Day (8 Hours)</option>
+                      <option value="12" className="bg-[#f8f2e9] dark:bg-[#171914]">12 Hours (Multi-Event)</option>
+                      <option value="custom" className="bg-[#f8f2e9] dark:bg-[#171914]">Custom Duration (Specify Hours)...</option>
+                    </select>
+
+                    {durationSelection === "custom" && (
+                      <div className="flex items-center gap-2 animate-fade-in pt-0.5">
+                        <input
+                          type="number"
+                          min={1}
+                          max={168}
+                          required
+                          value={customDurationValue}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setCustomDurationValue(val);
+                            setDurationHours(Number(val) || 1);
+                          }}
+                          placeholder="e.g. 3, 5, 14, 24"
+                          className="flex-1 px-3 py-2 border border-[#a17a34]/35 bg-[#fffaf3] dark:border-[#d2b56b]/35 dark:bg-[#11130f] text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono focus:outline-none focus:border-[#a17a34]"
+                        />
+                        <span className="text-xs font-bold text-[#a17a34] dark:text-[#d2b56b] shrink-0">Hours</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -762,32 +1003,57 @@ export default function EventRequestForm({
                   />
                 </div>
 
-                {/* Target Budget Range */}
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Target Budget Range (INR) *</label>
-                  <select
-                    value={budgetRange}
-                    onChange={(e) => setBudgetRange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] cursor-pointer text-xs"
-                  >
-                    {BUDGET_RANGES.map((b) => (
-                      <option key={b} value={b} className="bg-surface text-[#143d2b] dark:text-[#f0e8db]">{b}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {budgetRange === "Custom Budget" && (
-                  <div className="space-y-1.5 sm:col-span-2 animate-fade-in">
-                    <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">Custom Budget Amount (INR) *</label>
-                    <input
-                      type="number"
-                      value={customBudget || ""}
-                      onChange={(e) => setCustomBudget(Number(e.target.value) || undefined)}
-                      placeholder="e.g. 1500000"
-                      className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono"
-                    />
+                {/* Target Budget Range - Single Choice Radio Selection */}
+                <div className="space-y-2 sm:col-span-2">
+                  <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px]">
+                    Target Budget Range (INR) *
+                  </label>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    {BUDGET_RANGES.map((b) => {
+                      const isChecked = budgetRange === b;
+                      return (
+                        <label
+                          key={b}
+                          className={`p-3 border transition cursor-pointer flex items-center gap-2.5 text-xs font-medium ${
+                            isChecked
+                              ? "bg-[#143d2b]/10 border-[#143d2b] dark:bg-[#d2b56b]/10 dark:border-[#d2b56b] text-[#143d2b] dark:text-[#f0e8db]"
+                              : "bg-[#fffaf3]/75 dark:bg-[#11130f]/60 border-[#173d2c]/12 dark:border-white/10 text-[#173d2c]/80 dark:text-[#eee5d7]/70 hover:border-[#a17a34]"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="budgetRange"
+                            value={b}
+                            checked={isChecked}
+                            onChange={(e) => setBudgetRange(e.target.value)}
+                            className="w-4 h-4 text-[#a17a34] dark:text-[#d2b56b] accent-[#143d2b] dark:accent-[#d2b56b] cursor-pointer shrink-0"
+                          />
+                          <span>{b}</span>
+                        </label>
+                      );
+                    })}
                   </div>
-                )}
+
+                  {budgetRange === "Custom Budget" && (
+                    <div className="pt-2 animate-fade-in space-y-1.5">
+                      <label className="block font-semibold text-[#a17a34] dark:text-[#d2b56b] uppercase text-[9.5px]">
+                        Specify Custom Budget Amount (INR) *
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-xs text-[#173d2c]/50 dark:text-[#eee5d7]/50 font-bold">₹</span>
+                        <input
+                          type="number"
+                          required
+                          value={customBudget || ""}
+                          onChange={(e) => setCustomBudget(Number(e.target.value) || undefined)}
+                          placeholder="e.g. 1500000"
+                          className="w-full pl-8 pr-3.5 py-2.5 border border-[#a17a34]/40 bg-[#fffaf3] dark:border-[#d2b56b]/40 dark:bg-[#11130f] text-[#143d2b] dark:text-[#f0e8db] text-xs font-mono focus:outline-none focus:border-[#a17a34]"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Special Requirements */}
                 <div className="space-y-1.5 sm:col-span-2">
@@ -804,7 +1070,7 @@ export default function EventRequestForm({
                 {/* Reference Video Link */}
                 <div className="space-y-1.5 sm:col-span-2">
                   <label className="block font-semibold text-[#173d2c]/50 dark:text-[#eee5d7]/45 uppercase text-[9.5px] flex items-center gap-1">
-                    <Video className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" /> Reference Video Link (YouTube / Vimeo / Web URL)
+                    <Video className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" /> Reference Video Link (YouTube / Vimeo / Web URL - Optional)
                   </label>
                   <input
                     type="url"
@@ -813,6 +1079,72 @@ export default function EventRequestForm({
                     placeholder="https://www.youtube.com/watch?v=example"
                     className="w-full px-3.5 py-2.5 border border-[#173d2c]/12 bg-[#fffaf3]/75 dark:border-white/10 dark:bg-[#11130f]/60 focus:ring-2 focus:ring-[#a17a34]/25 text-[#143d2b] dark:text-[#f0e8db] placeholder:text-muted-foreground/60 text-xs font-mono"
                   />
+                </div>
+
+                {/* Reference Images Attachment Module (Up to 10 max from device or Media Studio folders) */}
+                <div className="space-y-3 sm:col-span-2 border-t border-[#173d2c]/10 dark:border-white/10 pt-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <label className="block font-semibold text-[#173d2c]/60 dark:text-[#eee5d7]/50 uppercase text-[9.5px] flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-[#a17a34] dark:text-[#d2b56b]" />
+                      <span>Attach Reference Images (Up to 10 Max)</span>
+                      <span className="font-mono text-[9px] text-[#9a742e] dark:text-[#d2b56b] font-bold">
+                        ({referenceImages.length} / 10 attached)
+                      </span>
+                    </label>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Option 1: Device Upload */}
+                      <label className="px-3 py-1.5 bg-[#f3eadf] dark:bg-white/[0.05] border border-[#173d2c]/15 dark:border-white/10 hover:border-[#a17a34] text-[#143d2b] dark:text-[#f0e8db] text-[9px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5">
+                        <Camera className="w-3 h-3 text-[#9a742e] dark:text-[#d2b56b]" />
+                        <span>Upload from Device</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          disabled={referenceImages.length >= 10}
+                          onChange={handleDeviceImageUpload}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {/* Option 2: Select from Media Studio folders */}
+                      <button
+                        type="button"
+                        onClick={() => setShowMediaPickerModal(true)}
+                        disabled={referenceImages.length >= 10}
+                        className="px-3 py-1.5 bg-[#143d2b]/10 dark:bg-[#d2b56b]/10 border border-[#143d2b]/30 dark:border-[#d2b56b]/30 hover:border-[#a17a34] text-[#143d2b] dark:text-[#f0e8db] text-[9px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                      >
+                        <FolderHeart className="w-3 h-3 text-[#9a742e] dark:text-[#d2b56b]" />
+                        <span>Select from Media Tab</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Attached Images Preview Grid */}
+                  {referenceImages.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5 pt-1">
+                      {referenceImages.map((imgUrl, idx) => (
+                        <div key={idx} className="relative aspect-[4/3] bg-black/10 border border-[#173d2c]/15 dark:border-white/10 group overflow-hidden">
+                          <img src={imgUrl} alt={`Reference ${idx + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveReferenceImage(idx)}
+                            className="absolute top-1 right-1 p-1 bg-red-600/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                            title="Remove image"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 text-white font-mono text-[8px] font-bold">
+                            #{idx + 1}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[10.5px] text-[#173d2c]/50 dark:text-[#eee5d7]/40 italic font-light">
+                      No reference images attached yet. Upload photos of stage setups, seating layouts, or decor styles you prefer.
+                    </p>
+                  )}
                 </div>
 
               </div>
@@ -1177,6 +1509,81 @@ export default function EventRequestForm({
                 className="px-6 py-2.5 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer shadow-md"
               >
                 Confirm Venue Location
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Media Studio Selection Modal */}
+      {showMediaPickerModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-[#f8f2e9] dark:bg-[#171914] border border-[#a17a34]/40 w-full max-w-2xl p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col justify-between">
+            <div className="flex justify-between items-center border-b border-[#173d2c]/10 dark:border-white/10 pb-3 shrink-0">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[#143d2b] dark:text-[#f0e8db] flex items-center gap-2">
+                <FolderHeart className="w-4 h-4 text-[#9a742e] dark:text-[#d2b56b]" />
+                <span>Select Photos from Your Media Studio</span>
+              </h3>
+              <button type="button" onClick={() => setShowMediaPickerModal(false)} className="text-muted-foreground hover:text-foreground cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Media Items Grid */}
+            <div className="flex-1 overflow-y-auto no-scrollbar space-y-4 pr-1">
+              {getStoredCustomerMedia().items.length === 0 ? (
+                <div className="py-12 text-center text-xs text-muted-foreground italic">
+                  No photos found in your Media Tab. Upload photos under the Media tab first or upload directly from your device.
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {getStoredCustomerMedia().items.map((item) => {
+                    const isSelected = referenceImages.includes(item.url);
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          if (isSelected) {
+                            setReferenceImages((prev) => prev.filter((u) => u !== item.url));
+                          } else {
+                            if (referenceImages.length >= 10) {
+                              alert("Maximum 10 reference images allowed.");
+                              return;
+                            }
+                            setReferenceImages((prev) => [...prev, item.url]);
+                          }
+                        }}
+                        className={`relative aspect-[4/3] border cursor-pointer overflow-hidden transition ${
+                          isSelected ? "border-2 border-[#a17a34] ring-2 ring-[#a17a34]/40" : "border-[#173d2c]/10 hover:border-[#a17a34]/50"
+                        }`}
+                      >
+                        <img src={item.url} alt={item.title} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/20" />
+                        <div className="absolute top-2 right-2">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${isSelected ? "bg-[#a17a34] text-black" : "bg-black/40 text-white"}`}>
+                            {isSelected ? "✓" : "+"}
+                          </div>
+                        </div>
+                        <span className="absolute bottom-1 left-1 right-1 text-[8px] font-bold text-white bg-black/60 px-1 truncate">
+                          {item.title}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-between items-center border-t border-[#173d2c]/10 dark:border-white/10 pt-3 shrink-0">
+              <span className="text-xs font-mono text-[#a17a34] font-bold">
+                Attached: {referenceImages.length} / 10 max
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowMediaPickerModal(false)}
+                className="px-5 py-2 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-xs font-bold uppercase tracking-wider cursor-pointer"
+              >
+                Done Selecting
               </button>
             </div>
           </div>

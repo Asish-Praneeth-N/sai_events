@@ -24,11 +24,12 @@ export default function CustomerHeader({ customerName, onSearchClick, onMenuClic
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-[#173d2c]/10 bg-[#f8f2e9]/85 px-4 backdrop-blur-xl transition-all duration-300 dark:border-white/[0.08] dark:bg-[#151712]/85 sm:px-6">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-[#173d2c]/10 bg-[#f8f2e9]/85 px-4 backdrop-blur-xl transition-all duration-300 dark:border-white/[0.08] dark:bg-[#151712]/85 sm:px-6 shrink-0">
       <div className="flex items-center gap-3">
         <button
+          type="button"
           onClick={onMenuClick}
-          className="flex h-9 w-9 items-center justify-center border border-[#173d2c]/10 bg-[#f3eadf]/70 text-[#173d2c]/55 transition duration-150 hover:border-[#a17a34]/30 hover:text-[#173d2c] dark:border-white/[0.08] dark:bg-white/[0.025] dark:text-[#eee5d7]/50 dark:hover:text-[#f0e8db] md:hidden"
+          className="flex h-9 w-9 items-center justify-center border border-[#173d2c]/10 bg-[#f3eadf]/70 text-[#173d2c]/55 transition duration-150 hover:border-[#a17a34]/30 hover:text-[#173d2c] dark:border-white/[0.08] dark:bg-white/[0.025] dark:text-[#eee5d7]/50 dark:hover:text-[#f0e8db] md:hidden cursor-pointer"
           aria-label="Open sidebar menu"
         >
           <Menu className="h-4 w-4" />

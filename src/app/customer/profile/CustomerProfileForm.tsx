@@ -205,8 +205,8 @@ export default function CustomerProfileForm({
       <form onSubmit={handleSubmit} className="lg:col-span-8 space-y-6 w-full min-w-0">
         
         {isCompletionRequired && (
-          <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs flex items-center gap-3 animate-fade-in">
-            <AlertCircle className="w-5 h-5 shrink-0 text-amber-400" />
+          <div className="p-4 bg-amber-100/90 border border-amber-300 text-amber-950 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-300 text-xs flex items-center gap-3 animate-fade-in font-medium">
+            <AlertCircle className="w-5 h-5 shrink-0 text-amber-700 dark:text-amber-400" />
             <div>
               <strong className="block font-bold">Profile Completion Required:</strong>
               Please complete your contact details and address before planning your luxury event.
@@ -215,15 +215,15 @@ export default function CustomerProfileForm({
         )}
 
         {error && (
-          <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs flex items-center gap-2.5 animate-fade-in">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-4 bg-red-100/90 border border-red-300 text-red-900 dark:bg-red-950/40 dark:border-red-900/50 dark:text-red-300 text-xs flex items-center gap-2.5 animate-fade-in font-medium">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
             <span>{error}</span>
           </div>
         )}
 
         {message && (
-          <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs flex items-center gap-2.5 animate-fade-in">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+          <div className="p-4 bg-emerald-100/90 border border-emerald-300 text-emerald-950 dark:bg-emerald-950/40 dark:border-emerald-900/50 dark:text-emerald-300 text-xs flex items-center gap-2.5 animate-fade-in font-medium">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
             <span>{message}</span>
           </div>
         )}

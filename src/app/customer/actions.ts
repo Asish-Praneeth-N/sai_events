@@ -58,6 +58,12 @@ export async function saveCustomerProfile(formData: {
   revalidatePath("/customer/request");
 }
 
+export interface AdditionalContactInput {
+  name: string;
+  phone: string;
+  relation?: string;
+}
+
 export interface SaveDraftInput {
   draftId?: string;
   eventType: string;
@@ -77,6 +83,7 @@ export interface SaveDraftInput {
   specialRequirements?: string;
   referenceVideoUrl?: string;
   whatsappNumber?: string;
+  additionalContacts?: AdditionalContactInput[];
 }
 
 export async function saveEventDraft(draftInput: SaveDraftInput) {
@@ -108,6 +115,7 @@ export async function saveEventDraft(draftInput: SaveDraftInput) {
     special_requirements: draftInput.specialRequirements || null,
     reference_video_url: draftInput.referenceVideoUrl || null,
     whatsapp_number: draftInput.whatsappNumber || null,
+    additional_contacts: draftInput.additionalContacts || null,
   };
 
   let savedId = draftInput.draftId;
@@ -201,6 +209,7 @@ export interface CreateEventInput {
   customBudget?: number;
   specialRequirements?: string;
   referenceVideoUrl?: string;
+  additionalContacts?: AdditionalContactInput[];
   eventPartIds?: string[];
   eventPartsConfig?: EventPartConfigInput[];
   items: { serviceItemId: string; quantity: number }[];
@@ -228,48 +237,89 @@ export async function createEventRequest(eventData: CreateEventInput) {
     if (itemsError) throw new Error(itemsError.message);
 
     requestItemsToInsert = eventData.items.map((clientItem) => {
-      const dbItem = (dbItems || []).find((i) => i.id === clientItem.serviceItemId);
-      if (!dbItem) throw new Error("Item not found");
-      if (!dbItem.is_available) throw new Error(`Item ${dbItem.name} is not available.`);
-
-      const unitPrice = Number(dbItem.price);
-      const unit = dbItem.pricing_unit || (dbItem.pricing_type === "per_plate" ? "per_plate" : "fixed");
-
-      let itemTotal = 0;
-      if (unit === "per_plate") {
-        itemTotal = unitPrice * eventData.guestCount * clientItem.quantity;
-      } else {
-        itemTotal = unitPrice * clientItem.quantity;
+      const dbItem = dbItems?.find((item) => item.id === clientItem.serviceItemId);
+      if (!dbItem || !dbItem.is_available) {
+        throw new Error(`Item ${clientItem.serviceItemId} is not available.`);
       }
-
-      totalBudget += itemTotal;
-
+      const unitPrice = Number(dbItem.price);
+      if (dbItem.pricing_type === "flat") {
+        totalBudget += unitPrice * clientItem.quantity;
+      } else if (dbItem.pricing_type === "per_plate") {
+        totalBudget += unitPrice * eventData.guestCount * clientItem.quantity;
+      }
       return {
         service_item_id: clientItem.serviceItemId,
         quantity: clientItem.quantity,
         unit_price: unitPrice,
         pricing_type: dbItem.pricing_type,
-        pricing_unit: unit,
-        food_category: dbItem.food_category || "general",
-        meal_type: dbItem.meal_type || "general",
       };
     });
   }
 
-  const refNumber = `SAI-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+  // Calculate snapshot price if hierarchical event parts config passed
+  if (eventData.eventPartsConfig && eventData.eventPartsConfig.length > 0) {
+    for (const pConfig of eventData.eventPartsConfig) {
+      if (pConfig.planningMode === "RECOMMENDED" && pConfig.selectedPackageId) {
+        const { data: pkgData } = await supabase
+          .from("packages")
+          .select("price")
+          .eq("id", pConfig.selectedPackageId)
+          .single();
+        if (pkgData) {
+          totalBudget += Number(pkgData.price);
+        }
+      } else if (pConfig.planningMode === "CUSTOM" && pConfig.customServices) {
+        for (const cs of pConfig.customServices) {
+          if (cs.servicePackageId) {
+            const { data: sp } = await supabase.from("packages").select("price").eq("id", cs.servicePackageId).single();
+            if (sp) totalBudget += Number(sp.price);
+          } else if (cs.serviceItemId) {
+            const { data: si } = await supabase.from("service_items").select("price").eq("id", cs.serviceItemId).single();
+            if (si) totalBudget += Number(si.price);
+          }
+        }
+      }
+
+      if (pConfig.cateringConfig) {
+        const cat = pConfig.cateringConfig;
+        const basePlateEstimate = 600;
+        totalBudget += (cat.vegPlateCount + cat.nonVegPlateCount) * basePlateEstimate;
+      }
+    }
+  }
+
+  if (eventData.customBudget && eventData.customBudget > 0) {
+    totalBudget = Math.max(totalBudget, eventData.customBudget);
+  }
+
+  let finalSpecialRequirements = eventData.specialRequirements || null;
+  if (eventData.additionalContacts && eventData.additionalContacts.length > 0) {
+    const contactsStr = eventData.additionalContacts
+      .filter(c => c.name && c.phone)
+      .map(c => `${c.name} (${c.phone}${c.relation ? ` - ${c.relation}` : ""})`)
+      .join(", ");
+    if (contactsStr) {
+      finalSpecialRequirements = finalSpecialRequirements
+        ? `${finalSpecialRequirements}\n[Secondary Contacts: ${contactsStr}]`
+        : `[Secondary Contacts: ${contactsStr}]`;
+    }
+  }
+
   let requestId = eventData.requestId;
+  const refNumber = `SAI-${Date.now().toString().slice(-6)}`;
 
   if (requestId) {
-    const { data: existing, error: fetchErr } = await supabase
+    const { data: existing, error: getErr } = await supabase
       .from("event_requests")
-      .select("status, customer_id, is_draft")
+      .select("id, status, is_draft")
       .eq("id", requestId)
+      .eq("customer_id", user.id)
       .single();
 
-    if (fetchErr || !existing) throw new Error("Event request not found.");
-    if (existing.customer_id !== user.id) throw new Error("Unauthorized.");
-    
-    // Allow editing if status is Request Submitted OR if it is a Draft OR if edit permission granted
+    if (getErr || !existing) {
+      throw new Error("Event request not found or access denied.");
+    }
+
     const isSubmittedState = existing.status === "Request Submitted" || existing.is_draft;
     if (!isSubmittedState) {
       const { data: approvedEdit } = await supabase
@@ -310,8 +360,9 @@ export async function createEventRequest(eventData: CreateEventInput) {
         max_guest_count: eventData.maxGuestCount || null,
         budget_range: eventData.budgetRange || null,
         custom_budget: eventData.customBudget || null,
-        special_requirements: eventData.specialRequirements || null,
+        special_requirements: finalSpecialRequirements,
         reference_video_url: eventData.referenceVideoUrl || null,
+        additional_contacts: eventData.additionalContacts || null,
       })
       .eq("id", requestId);
 
@@ -344,8 +395,9 @@ export async function createEventRequest(eventData: CreateEventInput) {
         max_guest_count: eventData.maxGuestCount || null,
         budget_range: eventData.budgetRange || null,
         custom_budget: eventData.customBudget || null,
-        special_requirements: eventData.specialRequirements || null,
+        special_requirements: finalSpecialRequirements,
         reference_video_url: eventData.referenceVideoUrl || null,
+        additional_contacts: eventData.additionalContacts || null,
       })
       .select("id, reference_number")
       .single();

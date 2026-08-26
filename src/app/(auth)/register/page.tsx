@@ -122,7 +122,9 @@ function RegisterPageContent() {
         }}
         className="mt-5"
       >
-        <AuthForm mode="register" />
+        <Suspense fallback={<div className="py-8 text-center text-xs text-[#143d2b]/60 dark:text-[#eee5d7]/60">Loading registration...</div>}>
+          <AuthForm mode="register" />
+        </Suspense>
       </motion.div>
 
       {/* ============================================================

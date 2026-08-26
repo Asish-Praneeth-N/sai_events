@@ -242,15 +242,15 @@ export default function EventWorkspaceClient({
 
       {/* ── Alerts ── */}
       {error && (
-        <div className="p-4 bg-red-950/35 border border-red-900/40 text-red-400 text-xs flex items-center gap-2.5 animate-fade-in">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="p-4 bg-red-100/90 border border-red-300 text-red-900 dark:bg-red-950/40 dark:border-red-900/50 dark:text-red-300 text-xs flex items-center gap-2.5 animate-fade-in font-medium">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-emerald-950/35 border border-emerald-900/40 text-emerald-400 text-xs flex items-center gap-2.5 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+        <div className="p-4 bg-emerald-100/90 border border-emerald-300 text-emerald-950 dark:bg-emerald-950/40 dark:border-emerald-900/50 dark:text-emerald-300 text-xs flex items-center gap-2.5 animate-fade-in font-medium">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
           <span>{success}</span>
         </div>
       )}
@@ -816,82 +816,93 @@ export default function EventWorkspaceClient({
         </div>
       )}
 
-      {/* ── Request Meeting Modal ── */}
+      {/* ─── REQUEST MEETINGS MODAL ─── */}
       {showMeetingModal && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <form onSubmit={handleMeetingRequestSubmit} className="bg-surface border border-border rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-border/40 pb-4">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <form onSubmit={handleMeetingRequestSubmit} className="bg-[#fbf7f0] dark:bg-[#161813] border border-[#173d2c]/15 dark:border-white/[0.10] max-w-md w-full overflow-hidden p-6.5 space-y-6 shadow-2xl animate-scale-in">
+            <div className="flex items-center justify-between border-b border-[#173d2c]/10 dark:border-white/[0.08] pb-4">
               <div>
-                <span className="text-[9px] uppercase font-bold tracking-widest text-accent-gold">SAI EVENTS Operations</span>
-                <h3 className="text-lg font-bold font-heading text-foreground mt-0.5">Request Event Sync Meeting</h3>
+                <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-[#9a742e] dark:text-[#d2b56b]">SAI EVENTS Operations</span>
+                <h3 className="text-base font-normal font-heading text-[#143d2b] dark:text-[#f0e8db] mt-0.5" style={{ fontFamily: '"Playfair Display", serif' }}>
+                  Request Event Sync Meeting
+                </h3>
               </div>
-              <button type="button" onClick={() => setShowMeetingModal(false)} className="p-2 text-muted-foreground hover:text-foreground">
-                <X className="w-5 h-5" />
+              <button 
+                type="button" 
+                onClick={() => setShowMeetingModal(false)} 
+                className="text-[#173d2c]/50 dark:text-[#eee5d7]/40 hover:text-[#143d2b] dark:hover:text-[#f0e8db] transition cursor-pointer p-1"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
               <div className="space-y-1.5">
-                <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Meeting Purpose *</label>
+                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Meeting Purpose *</label>
                 <input
                   type="text"
                   required
                   value={meetingPurpose}
                   onChange={(e) => setMeetingPurpose(e.target.value)}
                   placeholder="e.g. Venue decor staging & catering menu sync"
-                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-xs text-foreground placeholder:text-muted-foreground/60"
+                  className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] text-xs font-medium"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Preferred Date *</label>
+                  <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Preferred Date *</label>
                   <input
                     type="date"
                     required
                     min={new Date().toISOString().split("T")[0]}
                     value={preferredDate}
                     onChange={(e) => setPreferredDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-xs text-foreground"
+                    className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] text-xs font-mono cursor-pointer"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Time Window *</label>
+                  <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Time Window *</label>
                   <select
                     value={preferredTimeWindow}
                     onChange={(e) => setPreferredTimeWindow(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-xs text-foreground cursor-pointer"
+                    className="w-full px-3.5 py-2.5 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-[#171914] dark:text-[#f0e8db] cursor-pointer text-xs"
                   >
-                    <option value="10:00 AM - 1:00 PM">10:00 AM - 1:00 PM</option>
-                    <option value="2:00 PM - 5:00 PM">2:00 PM - 5:00 PM</option>
-                    <option value="5:00 PM - 8:00 PM">5:00 PM - 8:00 PM</option>
+                    <option value="10:00 AM - 1:00 PM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">10:00 AM - 1:00 PM</option>
+                    <option value="2:00 PM - 5:00 PM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">2:00 PM - 5:00 PM</option>
+                    <option value="5:00 PM - 8:00 PM" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">5:00 PM - 8:00 PM</option>
+                    <option value="Evening Call (After 6:00 PM)" className="bg-[#f8f2e9] dark:bg-[#171914] text-[#173d2c] dark:text-[#f0e8db]">Evening Call (After 6:00 PM)</option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block font-bold text-muted-foreground uppercase text-[9.5px]">Additional Notes / Specific Questions</label>
+                <label className="text-[8px] uppercase font-bold text-[#173d2c]/55 dark:text-[#eee5d7]/45 tracking-[0.2em]">Additional Notes / Specific Questions</label>
                 <textarea
                   rows={3}
                   value={meetingNotes}
                   onChange={(e) => setMeetingNotes(e.target.value)}
                   placeholder="Mention any specific topics or participants..."
-                  className="w-full p-3.5 bg-background border border-border rounded-xl text-xs text-foreground placeholder:text-muted-foreground/60 resize-none font-light leading-relaxed"
+                  className="w-full px-4 py-3 bg-[#f3eadf]/40 border border-[#173d2c]/15 text-[#173d2c] focus:border-[#a17a34] focus:outline-none dark:border-white/[0.10] dark:bg-white/[0.02] dark:text-[#f0e8db] font-light text-xs resize-none"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setShowMeetingModal(false)} className="px-4 py-2.5 text-xs text-muted-foreground hover:text-foreground font-bold">
+            <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#173d2c]/10 dark:border-white/[0.08]">
+              <button
+                type="button"
+                onClick={() => setShowMeetingModal(false)}
+                className="px-4.5 py-2.5 border border-[#173d2c]/15 text-[#173d2c] dark:border-white/[0.10] dark:text-[#f0e8db] hover:bg-[#173d2c]/[0.035] dark:hover:bg-white/[0.035] text-[8px] font-bold uppercase tracking-[0.2em] transition cursor-pointer"
+              >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submittingMeeting}
-                className="px-6 py-2.5 bg-accent-gold text-black font-bold text-xs uppercase tracking-wider rounded-xl hover:brightness-110 transition shadow cursor-pointer disabled:opacity-50"
+                className="px-5 py-3 bg-[#143d2b] text-[#fffaf1] dark:bg-[#d2b56b] dark:text-[#161812] text-[8px] font-bold uppercase tracking-[0.2em] transition hover:bg-[#174631] dark:hover:bg-[#dfc580] cursor-pointer shadow-md disabled:opacity-50"
               >
-                {submittingMeeting ? "Requesting..." : "Submit Meeting Request"}
+                {submittingMeeting ? "Submitting..." : "Submit Meeting Request"}
               </button>
             </div>
           </form>

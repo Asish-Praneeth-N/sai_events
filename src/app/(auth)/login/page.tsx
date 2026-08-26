@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import {
   motion,
@@ -108,7 +108,9 @@ export default function LoginPage() {
         }}
         className="mt-5"
       >
-        <AuthForm mode="login" />
+        <Suspense fallback={<div className="py-8 text-center text-xs text-[#143d2b]/60 dark:text-[#eee5d7]/60">Loading sign in...</div>}>
+          <AuthForm mode="login" />
+        </Suspense>
       </motion.div>
 
       {/* ================================================================ */}

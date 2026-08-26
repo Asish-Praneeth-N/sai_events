@@ -280,6 +280,10 @@ export default async function AdminBookingDetailPage({ params }: PageProps) {
           phone: request.profiles?.phone_number || "N/A",
           email: request.profiles?.email || "N/A",
           address: request.location || "N/A",
+          additionalContacts: request.additional_contacts || null,
+          referenceVideoUrl: request.reference_video_url || null,
+          specialRequirements: request.special_requirements || null,
+          referenceImages: request.reference_images || [],
         }}
         groups={groups}
         omAssignments={omAssignments as any[]}
