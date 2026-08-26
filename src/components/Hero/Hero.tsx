@@ -189,7 +189,7 @@ export default function Hero() {
           }}
           className="
             pointer-events-none
-            absolute -right-8 top-[17%]
+            absolute right-2 lg:right-6 top-[17%]
             hidden select-none
 
             font-heading
@@ -215,13 +215,13 @@ export default function Hero() {
         <div
           className="
             relative z-10
-            px-6 pb-8 pt-20
+            px-6 pb-8 pt-28
 
-            sm:px-10 sm:pt-24
+            sm:px-10 sm:pt-32
 
-            md:px-[7%] md:pb-10 md:pt-28
+            md:px-[7%] md:pb-10 md:pt-36
 
-            lg:px-[7.5%]
+            lg:px-[7.5%] lg:pt-40
           "
         >
           {/* ================================================================ */}
@@ -248,14 +248,14 @@ export default function Hero() {
           >
             <span className="h-px w-9 bg-[#173d2c]/45 dark:bg-[#d2b56b]/45" />
 
-            <Sparkles className="h-3 w-3 text-[#a17a34] dark:text-[#d2b56b]" />
+            <Sparkles className="h-3.5 w-3.5 text-[#a17a34] dark:text-[#d2b56b]" />
 
             <span
               className="
-                text-[9px] font-semibold uppercase
-                tracking-[0.32em]
-                text-[#173d2c]/65
-                dark:text-[#d9c88d]/75
+                text-xs sm:text-[13px] font-semibold uppercase
+                tracking-[0.24em]
+                text-[#173d2c]/80
+                dark:text-[#d9c88d]/90
               "
             >
               Sai Events · Curated Celebrations
@@ -278,7 +278,7 @@ export default function Hero() {
               font-heading
               text-[clamp(3.15rem,7.3vw,7.4rem)]
               font-normal
-              leading-[0.93]
+              leading-[1.08] sm:leading-[1.04]
               tracking-[-0.055em]
               text-[#143d2b]
 
@@ -290,14 +290,14 @@ export default function Hero() {
               fontFamily: '"Playfair Display", serif',
             }}
           >
-            <span className="flex flex-wrap justify-center gap-x-[0.18em] md:justify-start">
+            <span className="flex flex-wrap justify-center gap-x-[0.18em] gap-y-[0.1em] md:justify-start">
               {titleWords.map((word, idx) => {
                 const highlight = idx >= titleWords.length - 2;
 
                 return (
                   <span
                     key={`${word}-${idx}`}
-                    className="inline-block overflow-hidden pb-[0.12em]"
+                    className="inline-block overflow-hidden py-3 -my-3 px-1 -mx-1"
                   >
                     <motion.span
                       variants={wordReveal}
@@ -380,13 +380,13 @@ export default function Hero() {
                   className="
                     [writing-mode:vertical-rl]
                     rotate-180
-                    text-[8px]
+                    text-[11px]
                     font-semibold
                     uppercase
-                    tracking-[0.3em]
-                    text-[#173d2c]/45
+                    tracking-[0.24em]
+                    text-[#173d2c]/65
 
-                    dark:text-white/35
+                    dark:text-white/55
                   "
                 >
                   Celebrations
@@ -491,13 +491,13 @@ export default function Hero() {
                   >
                     <p
                       className="
-                        text-[8px]
+                        text-[11px]
                         font-semibold
                         uppercase
-                        tracking-[0.25em]
-                        text-[#173d2c]/60
+                        tracking-[0.2em]
+                        text-[#173d2c]/75
 
-                        dark:text-[#eee5d7]/55
+                        dark:text-[#eee5d7]/75
                       "
                     >
                       Moments, beautifully made
@@ -654,13 +654,13 @@ export default function Hero() {
                     <span
                       className="
                         block
-                        text-[7px]
+                        text-[9px]
                         font-bold
                         uppercase
-                        tracking-[0.18em]
-                        text-[#173d2c]/70
+                        tracking-[0.16em]
+                        text-[#173d2c]/80
 
-                        dark:text-[#eee5d7]/65
+                        dark:text-[#eee5d7]/75
                       "
                     >
                       SAI
@@ -669,12 +669,12 @@ export default function Hero() {
                     <span
                       className="
                         block
-                        text-[6px]
+                        text-[8px]
                         uppercase
                         tracking-[0.14em]
-                        text-[#173d2c]/45
+                        text-[#173d2c]/60
 
-                        dark:text-white/35
+                        dark:text-white/50
                       "
                     >
                       Events
@@ -708,7 +708,7 @@ export default function Hero() {
                     className="
                       block
                       font-heading
-                      text-xl
+                      text-2xl
                       italic
                       text-[#173d2c]
 
@@ -724,13 +724,13 @@ export default function Hero() {
                   <span
                     className="
                       mt-1 block
-                      text-[7px]
+                      text-[10px]
                       font-semibold
                       uppercase
-                      tracking-[0.2em]
-                      text-[#173d2c]/45
+                      tracking-[0.18em]
+                      text-[#173d2c]/65
 
-                      dark:text-white/35
+                      dark:text-white/55
                     "
                   >
                     Event Planning
@@ -750,7 +750,7 @@ export default function Hero() {
                     className="
                       block
                       font-heading
-                      text-xl
+                      text-2xl
                       italic
                       text-[#173d2c]
 
@@ -766,13 +766,13 @@ export default function Hero() {
                   <span
                     className="
                       mt-1 block
-                      text-[7px]
+                      text-[10px]
                       font-semibold
                       uppercase
-                      tracking-[0.2em]
-                      text-[#173d2c]/45
+                      tracking-[0.18em]
+                      text-[#173d2c]/65
 
-                      dark:text-white/35
+                      dark:text-white/55
                     "
                   >
                     Dedicated Team
@@ -784,7 +784,7 @@ export default function Hero() {
                     className="
                       block
                       font-heading
-                      text-xl
+                      text-2xl
                       italic
                       text-[#173d2c]
 
@@ -800,13 +800,13 @@ export default function Hero() {
                   <span
                     className="
                       mt-1 block
-                      text-[7px]
+                      text-[10px]
                       font-semibold
                       uppercase
-                      tracking-[0.2em]
-                      text-[#173d2c]/45
+                      tracking-[0.18em]
+                      text-[#173d2c]/65
 
-                      dark:text-white/35
+                      dark:text-white/55
                     "
                   >
                     Detail Managed
@@ -901,13 +901,13 @@ export default function Hero() {
 
                     <span
                       className="
-                        text-[7px]
+                        text-[11px]
                         font-bold
                         uppercase
-                        tracking-[0.22em]
-                        text-[#173d2c]/40
+                        tracking-[0.2em]
+                        text-[#173d2c]/65
 
-                        dark:text-white/30
+                        dark:text-white/55
                       "
                     >
                       Our Philosophy
@@ -1008,10 +1008,10 @@ export default function Hero() {
                 <div className="mb-4 flex items-center gap-3">
                   <span
                     className="
-                      text-[8px]
+                      text-[11px]
                       font-bold
                       uppercase
-                      tracking-[0.3em]
+                      tracking-[0.24em]
                       text-[#a17a34]
 
                       dark:text-[#d2b56b]
@@ -1025,16 +1025,16 @@ export default function Hero() {
 
                 <p
                   className="
-                    text-[13px]
+                    text-[15px]
                     font-normal
                     leading-[1.85]
-                    text-[#17392b]/75
+                    text-[#17392b]/85
 
-                    sm:text-[14px]
+                    sm:text-[16px]
 
-                    lg:text-[15px]
+                    lg:text-[17px]
 
-                    dark:text-[#eee5d7]/60
+                    dark:text-[#eee5d7]/80
                   "
                   style={{
                     fontFamily: '"Poppins", sans-serif',
@@ -1087,10 +1087,10 @@ export default function Hero() {
 
                       px-6 py-3.5
 
-                      text-[8px]
+                      text-xs sm:text-[13px]
                       font-bold
                       uppercase
-                      tracking-[0.2em]
+                      tracking-[0.16em]
                       text-[#fffaf1]
 
                       shadow-[0_10px_28px_rgba(20,61,43,0.14)]
@@ -1160,10 +1160,10 @@ export default function Hero() {
 
                         px-6 py-3.5
 
-                        text-[8px]
+                        text-xs sm:text-[13px]
                         font-bold
                         uppercase
-                        tracking-[0.2em]
+                        tracking-[0.16em]
                         text-[#143d2b]
 
                         transition-all
@@ -1277,13 +1277,13 @@ export default function Hero() {
                     >
                       <span
                         className="
-                          text-[7px]
+                          text-[10px]
                           font-semibold
                           uppercase
                           tracking-[0.2em]
-                          text-[#173d2c]/60
+                          text-[#173d2c]/75
 
-                          dark:text-[#eee5d7]/55
+                          dark:text-[#eee5d7]/70
                         "
                       >
                         Designed with intention
@@ -1336,15 +1336,15 @@ export default function Hero() {
                     <p
                       className="
                         mt-2
-                        max-w-[120px]
-                        text-[8px]
+                        max-w-[140px]
+                        text-[11px]
                         font-semibold
                         uppercase
                         leading-[1.7]
-                        tracking-[0.18em]
-                        text-[#173d2c]/45
+                        tracking-[0.16em]
+                        text-[#173d2c]/65
 
-                        dark:text-white/35
+                        dark:text-white/55
                       "
                     >
                       Your vision.
@@ -1401,15 +1401,15 @@ export default function Hero() {
 
               <span
                 className="
-                  text-[7px]
+                  text-[10px]
                   font-semibold
                   uppercase
-                  tracking-[0.25em]
-                  text-[#173d2c]/40
+                  tracking-[0.2em]
+                  text-[#173d2c]/60
 
-                  sm:text-[8px]
+                  sm:text-[11px]
 
-                  dark:text-white/30
+                  dark:text-white/50
                 "
               >
                 Weddings · Celebrations · Experiences
@@ -1419,13 +1419,15 @@ export default function Hero() {
             <div className="hidden items-center gap-3 sm:flex">
               <span
                 className="
-                  text-[8px]
+                  text-[10px]
                   font-semibold
                   uppercase
-                  tracking-[0.25em]
-                  text-[#173d2c]/40
+                  tracking-[0.2em]
+                  text-[#173d2c]/60
 
-                  dark:text-white/30
+                  sm:text-[11px]
+
+                  dark:text-white/50
                 "
               >
                 Designed · Managed · Delivered

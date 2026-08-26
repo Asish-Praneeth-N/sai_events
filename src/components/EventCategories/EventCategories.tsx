@@ -110,7 +110,7 @@ export default function EventCategories() {
             >
               <span className="h-px w-8 bg-[#9b742f]/55 dark:bg-[#d4af37]/45" />
 
-              <span className="text-[8px] font-bold uppercase tracking-[0.34em] text-[#9b742f] dark:text-[#d2b56b]">
+              <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#9b742f] dark:text-[#d2b56b]">
                 Every Occasion
               </span>
             </motion.div>
@@ -153,7 +153,7 @@ export default function EventCategories() {
             className="lg:pb-2"
           >
             <p
-              className="max-w-[390px] text-[11px] leading-[1.9] text-[#143d2b]/50 sm:text-xs dark:text-[#eee5d7]/42"
+              className="max-w-[390px] text-[14px] leading-[1.8] text-[#143d2b]/80 sm:text-[15px] dark:text-[#eee5d7]/80"
               style={{ fontFamily: '"Poppins", sans-serif' }}
             >
               From intimate beginnings to extraordinary celebrations,
@@ -244,7 +244,7 @@ export default function EventCategories() {
                 {/* Top number */}
 
                 <div className="absolute left-5 right-5 top-5 z-10 flex items-center justify-between sm:left-6 sm:right-6 sm:top-6">
-                  <span className="text-[8px] font-semibold tracking-[0.25em] text-white/55">
+                  <span className="text-[11px] font-semibold tracking-[0.2em] text-white/75">
                     0{idx + 1}
                   </span>
 
@@ -274,7 +274,7 @@ export default function EventCategories() {
                   </h3>
 
                   <div className="mt-3 flex items-center justify-between gap-4">
-                    <span className="text-[8px] font-semibold uppercase tracking-[0.22em] text-[#d2b56b]">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d2b56b]">
                       {cat.count}
                     </span>
 
@@ -293,7 +293,7 @@ export default function EventCategories() {
         {/* bottom editorial note */}
 
         <div className="mt-8 flex flex-col justify-between gap-4 border-t border-[#143d2b]/10 pt-5 sm:flex-row sm:items-center dark:border-white/[0.07]">
-          <span className="text-[7px] font-bold uppercase tracking-[0.25em] text-[#143d2b]/30 dark:text-white/20">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#143d2b]/50 dark:text-white/40">
             Weddings · Celebrations · Corporate · Private Occasions
           </span>
 

@@ -652,14 +652,14 @@ export default function Footer() {
                     mt-1
                     block
 
-                    text-[7px]
+                    text-[9px]
                     font-semibold
                     uppercase
-                    tracking-[0.27em]
+                    tracking-[0.24em]
 
-                    text-[#143d2b]/35
+                    text-[#143d2b]/60
 
-                    dark:text-white/25
+                    dark:text-white/50
                   "
                 >
                   Curated Celebrations
@@ -672,15 +672,15 @@ export default function Footer() {
                 mt-6
                 max-w-[360px]
 
-                text-[11px]
+                text-[13px]
                 font-normal
-                leading-[1.9]
+                leading-[1.8]
 
-                text-[#143d2b]/50
+                text-[#143d2b]/75
 
-                sm:text-[12px]
+                sm:text-[14px]
 
-                dark:text-[#eee5d7]/40
+                dark:text-[#eee5d7]/70
               "
               style={{
                 fontFamily: '"Poppins", sans-serif',
@@ -729,14 +729,14 @@ export default function Footer() {
                       items-center
                       gap-2
 
-                      text-[#143d2b]/45
+                      text-[#143d2b]/60
 
                       transition-colors
                       duration-300
 
                       hover:text-[#9b742f]
 
-                      dark:text-white/35
+                      dark:text-white/50
                       dark:hover:text-[#d2b56b]
                     "
                   >
@@ -749,10 +749,10 @@ export default function Footer() {
 
                     <span
                       className="
-                        text-[7px]
+                        text-[10px]
                         font-bold
                         uppercase
-                        tracking-[0.18em]
+                        tracking-[0.16em]
                       "
                     >
                       {social.label}
@@ -786,19 +786,19 @@ export default function Footer() {
                 items-center
                 gap-2.5
 
-                text-[7px]
+                text-[10px]
                 font-bold
                 uppercase
-                tracking-[0.2em]
+                tracking-[0.18em]
 
-                text-[#143d2b]/30
+                text-[#143d2b]/60
 
                 transition-colors
                 duration-300
 
                 hover:text-[#9b742f]
 
-                dark:text-white/25
+                dark:text-white/50
                 dark:hover:text-[#d2b56b]
               "
             >
@@ -847,10 +847,10 @@ export default function Footer() {
             <div className="mb-6 flex items-center gap-3">
               <span
                 className="
-                  text-[8px]
+                  text-[11px]
                   font-bold
                   uppercase
-                  tracking-[0.28em]
+                  tracking-[0.24em]
 
                   text-[#9b742f]
 
@@ -900,12 +900,12 @@ export default function Footer() {
                       className="
                         font-heading
 
-                        text-[10px]
+                        text-[12px]
                         italic
 
-                        text-[#9b742f]/45
+                        text-[#9b742f]/60
 
-                        dark:text-[#d2b56b]/35
+                        dark:text-[#d2b56b]/50
                       "
                       style={{
                         fontFamily: '"Playfair Display", serif',
@@ -916,18 +916,18 @@ export default function Footer() {
 
                     <span
                       className="
-                        text-[10px]
+                        text-[13px]
                         font-medium
                         tracking-[0.04em]
 
-                        text-[#143d2b]/55
+                        text-[#143d2b]/75
 
                         transition-colors
                         duration-300
 
                         group-hover:text-[#143d2b]
 
-                        dark:text-[#eee5d7]/45
+                        dark:text-[#eee5d7]/75
                         dark:group-hover:text-[#eee5d7]
                       "
                     >

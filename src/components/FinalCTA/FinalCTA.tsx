@@ -383,10 +383,10 @@ export default function FinalCTA() {
                     fontFamily: '"Playfair Display", serif',
                   }}
                 >
-                  I have an event
+                  Book your
                   <br />
                   <span className="italic">
-                    in mind.
+                    event.
                   </span>
                 </h3>
 
@@ -539,10 +539,10 @@ export default function FinalCTA() {
                     fontFamily: '"Playfair Display", serif',
                   }}
                 >
-                  I&apos;d like to talk
+                  Speak to
                   <br />
                   <span className="italic text-[#d2b56b]">
-                    it through.
+                    our team.
                   </span>
                 </h3>
 

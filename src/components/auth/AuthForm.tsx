@@ -47,18 +47,20 @@ const fieldClass = `
 
 const labelClass = `
   block
-  mb-1
+  mb-2
 
-  text-[6.5px]
+  text-[11px]
   font-bold
   uppercase
   tracking-[0.22em]
 
-  text-[#a17a34]
+  text-[#143d2b]/80
 
-  sm:text-[7px]
+  sm:text-[12px]
 
-  dark:text-[#d2b56b]/75
+  dark:text-[#eee5d7]/80
+  group-focus-within:text-[#a17a34]
+  dark:group-focus-within:text-[#d2b56b]
 `;
 
 const inputClass = `
@@ -66,7 +68,7 @@ const inputClass = `
 
   border-0
   border-b
-  border-[#173d2c]/15
+  border-[#173d2c]/30
 
   bg-transparent
 
@@ -74,25 +76,25 @@ const inputClass = `
   pb-2.5
   pt-1
 
-  text-[12px]
+  text-[15px]
   font-normal
 
   text-[#173d2c]
 
   outline-none
 
-  placeholder:text-[#173d2c]/22
+  placeholder:text-[#173d2c]/45
 
   transition-all
   duration-300
 
   focus:border-[#a17a34]
 
-  sm:text-[13px]
+  sm:text-[16px]
 
-  dark:border-white/[0.10]
-  dark:text-[#eee5d7]
-  dark:placeholder:text-white/18
+  dark:border-white/25
+  dark:text-[#fffaf3]
+  dark:placeholder:text-[#eee5d7]/40
   dark:focus:border-[#d2b56b]
 `;
 

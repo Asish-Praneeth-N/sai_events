@@ -301,16 +301,14 @@ export default function Gallery() {
 
               <span
                 className="
-                  text-[8px]
+                  text-[11px]
                   font-bold
                   uppercase
-                  tracking-[0.32em]
+                  tracking-[0.24em]
 
-                  text-[#173d2c]/55
+                  text-[#173d2c]/75
 
-                  sm:text-[9px]
-
-                  dark:text-[#d9c88d]/70
+                  dark:text-[#d9c88d]/85
                 "
               >
                 Visual Memories
@@ -356,15 +354,15 @@ export default function Gallery() {
                 mt-5
                 max-w-[540px]
 
-                text-[12px]
+                text-[14px]
                 font-normal
                 leading-[1.8]
 
-                text-[#17392b]/60
+                text-[#17392b]/80
 
-                sm:text-[13px]
+                sm:text-[15px]
 
-                dark:text-[#eee5d7]/50
+                dark:text-[#eee5d7]/80
               "
               style={{
                 fontFamily: '"Poppins", sans-serif',
@@ -510,15 +508,15 @@ export default function Gallery() {
 
                     py-2
 
-                    text-[8px]
+                    text-[12px]
                     font-bold
                     uppercase
-                    tracking-[0.22em]
+                    tracking-[0.14em]
 
                     transition-colors
                     duration-300
 
-                    sm:text-[9px]
+                    sm:text-[13px]
                   "
                 >
                   <span

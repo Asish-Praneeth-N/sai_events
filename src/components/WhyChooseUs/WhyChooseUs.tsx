@@ -95,7 +95,7 @@ export default function WhyChooseUs() {
 
               <Sparkles className="h-3 w-3 text-[#9b742f] dark:text-[#d2b56b]" />
 
-              <span className="text-[8px] font-bold uppercase tracking-[0.34em] text-[#9b742f] dark:text-[#d2b56b]">
+              <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#9b742f] dark:text-[#d2b56b]">
                 Our Philosophy
               </span>
             </motion.div>
@@ -131,7 +131,7 @@ export default function WhyChooseUs() {
           </div>
 
           <p
-            className="max-w-[370px] text-[11px] leading-[1.9] text-[#143d2b]/50 sm:text-xs dark:text-[#eee5d7]/42"
+            className="max-w-[390px] text-[14px] leading-[1.8] text-[#143d2b]/80 sm:text-[15px] dark:text-[#eee5d7]/80"
             style={{ fontFamily: '"Poppins", sans-serif' }}
           >
             Beautiful events are not created by adding more.
@@ -404,7 +404,7 @@ export default function WhyChooseUs() {
                             className="overflow-hidden"
                           >
                             <p
-                              className="max-w-[480px] pt-3 text-[11px] leading-[1.85] text-[#143d2b]/50 sm:text-xs dark:text-[#eee5d7]/42"
+                              className="max-w-[480px] pt-3 text-[13px] leading-[1.8] text-[#143d2b]/80 sm:text-[14px] dark:text-[#eee5d7]/80"
                               style={{
                                 fontFamily: '"Poppins", sans-serif',
                               }}

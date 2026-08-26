@@ -183,10 +183,10 @@ export default function About() {
 
               <span
                 className="
-                  text-[9px]
+                  text-[12px]
                   font-bold
                   uppercase
-                  tracking-[0.32em]
+                  tracking-[0.24em]
                   text-[#8c6827]
 
                   dark:text-[#d4af37]
@@ -200,15 +200,15 @@ export default function About() {
               className="
                 mt-6
                 hidden
-                max-w-[190px]
-                text-[10px]
-                font-medium
+                max-w-[210px]
+                text-[12px]
+                font-semibold
                 uppercase
-                leading-[1.9]
-                tracking-[0.18em]
-                text-[#173d2a]/40
+                leading-[1.8]
+                tracking-[0.16em]
+                text-[#173d2a]/65
 
-                dark:text-white/30
+                dark:text-white/55
 
                 lg:block
               "

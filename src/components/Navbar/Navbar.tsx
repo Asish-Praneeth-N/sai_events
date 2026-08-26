@@ -474,16 +474,16 @@ export default function Navbar({
                   mt-1.5
                   hidden
 
-                  text-[6px]
-                  font-bold
+                  text-[9px]
+                  font-semibold
                   uppercase
-                  tracking-[0.28em]
+                  tracking-[0.24em]
 
-                  text-[#143d2b]/35
+                  text-[#143d2b]/60
 
                   sm:block
 
-                  dark:text-white/25
+                  dark:text-white/50
                 "
               >
                 Curated Celebrations
@@ -547,14 +547,14 @@ export default function Navbar({
 
                   <span
                     className="
-                      text-[7px]
-                      font-bold
+                      text-[10px]
+                      font-semibold
                       uppercase
-                      tracking-[0.3em]
+                      tracking-[0.24em]
 
-                      text-[#143d2b]/35
+                      text-[#143d2b]/60
 
-                      dark:text-[#eee5d7]/25
+                      dark:text-[#eee5d7]/60
                     "
                   >
                     {currentSectionLabel}
@@ -582,10 +582,11 @@ export default function Navbar({
             className="
               hidden
               items-center
-              gap-5
+              gap-3
 
               lg:flex
-              xl:gap-7
+              lg:gap-4
+              xl:gap-5
             "
           >
             {navItems.map((item, index) => (
@@ -615,22 +616,24 @@ export default function Navbar({
                   relative
 
                   py-2
+                  whitespace-nowrap
 
-                  text-[8px]
+                  text-[10px]
                   font-semibold
                   uppercase
-                  tracking-[0.18em]
+                  tracking-[0.12em]
 
-                  text-[#143d2b]/55
+                  text-[#143d2b]/80
 
                   transition-colors
                   duration-300
 
                   hover:text-[#143d2b]
 
-                  xl:text-[9px]
+                  lg:text-[11px]
+                  xl:text-[12px]
 
-                  dark:text-[#eee5d7]/45
+                  dark:text-[#eee5d7]/80
                   dark:hover:text-[#eee5d7]
                 "
               >
@@ -1254,24 +1257,26 @@ export default function Navbar({
                   className="
                     relative
 
-                    px-2
+                    px-2.5
                     py-2
+                    whitespace-nowrap
 
-                    text-[8px]
+                    text-[10px]
                     font-bold
                     uppercase
-                    tracking-[0.18em]
+                    tracking-[0.12em]
 
-                    text-[#143d2b]/50
+                    text-[#143d2b]/80
 
                     transition-colors
                     duration-300
 
                     hover:text-[#143d2b]
 
-                    xl:text-[9px]
+                    lg:text-[11px]
+                    xl:text-[12px]
 
-                    dark:text-[#eee5d7]/45
+                    dark:text-[#eee5d7]/80
                     dark:hover:text-[#eee5d7]
                   "
                 >
@@ -1301,17 +1306,18 @@ export default function Navbar({
 
                       flex
                       items-center
-                      gap-2.5
+                      gap-2
+                      whitespace-nowrap
 
                       bg-[#143d2b]
 
-                      px-5
-                      py-3
+                      px-3.5
+                      py-2
 
-                      text-[8px]
+                      text-[10px]
                       font-bold
                       uppercase
-                      tracking-[0.18em]
+                      tracking-[0.12em]
 
                       text-[#f8f1e7]
 
@@ -1322,7 +1328,11 @@ export default function Navbar({
 
                       hover:bg-[#1b4a35]
 
-                      xl:text-[9px]
+                      sm:px-4.5
+                      sm:py-2.5
+
+                      lg:text-[11px]
+                      xl:text-[12px]
 
                       dark:bg-[#d2b56b]
                       dark:text-[#11130f]

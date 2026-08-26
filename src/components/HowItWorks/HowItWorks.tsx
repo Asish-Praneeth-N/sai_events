@@ -294,16 +294,14 @@ export default function HowItWorks() {
 
               <span
                 className="
-                  text-[8px]
+                  text-[11px]
                   font-bold
                   uppercase
-                  tracking-[0.32em]
+                  tracking-[0.24em]
 
-                  text-[#9b742f]/75
+                  text-[#9b742f]
 
-                  sm:text-[9px]
-
-                  dark:text-[#d4af37]/65
+                  dark:text-[#d4af37]
                 "
               >
                 Your Journey
@@ -389,15 +387,15 @@ export default function HowItWorks() {
               className="
                 max-w-[390px]
 
-                text-[12px]
+                text-[14px]
                 font-normal
-                leading-[1.9]
+                leading-[1.8]
 
-                text-[#143d2b]/50
+                text-[#143d2b]/80
 
-                sm:text-[13px]
+                sm:text-[15px]
 
-                dark:text-[#eee5d7]/42
+                dark:text-[#eee5d7]/80
               "
               style={{
                 fontFamily: '"Poppins", sans-serif',

@@ -43,79 +43,16 @@ function RegisterPageContent() {
         }}
       >
         {/* ----------------------------------------------------------
-            EYEBROW
-        ---------------------------------------------------------- */}
-
-        <div
-          className="
-            mb-4
-            flex items-center
-            justify-between
-            gap-4
-          "
-        >
-          <div className="flex min-w-0 items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="
-                h-px w-7 flex-shrink-0
-                bg-[#173d2c]/35
-                dark:bg-[#d2b56b]/40
-              "
-            />
-
-            <Sparkles
-              className="
-                h-2.5 w-2.5
-                flex-shrink-0
-                text-[#a17a34]
-                dark:text-[#d2b56b]
-              "
-            />
-
-            <span
-              className="
-                truncate
-                text-[7px] font-bold uppercase
-                tracking-[0.28em]
-                text-[#173d2c]/55
-                dark:text-[#d9c88d]/65
-              "
-            >
-              Begin Your Journey
-            </span>
-          </div>
-
-          <span
-            className="
-              flex-shrink-0
-              text-[6px] font-semibold uppercase
-              tracking-[0.22em]
-              text-[#173d2c]/22
-              dark:text-white/18
-            "
-          >
-            02 / REGISTER
-          </span>
-        </div>
-
-        {/* ----------------------------------------------------------
             TITLE
         ---------------------------------------------------------- */}
 
-        <div
-          className="
-            flex items-end
-            justify-between
-            gap-6
-          "
-        >
+        <div className="mb-3 flex items-center justify-between">
           <h1
             className="
               font-heading
               text-[clamp(2.7rem,7vw,4.55rem)]
               font-normal
-              leading-[0.87]
+              leading-[1.02]
               tracking-[-0.055em]
               text-[#143d2b]
 
@@ -136,121 +73,33 @@ function RegisterPageContent() {
               begins.
             </span>
           </h1>
-
-          {/* Editorial initial */}
-
-          <span
-            aria-hidden="true"
-            className="
-              mb-1 hidden
-              select-none
-              font-heading
-              text-3xl italic
-              text-[#173d2c]/[0.08]
-              sm:block
-              dark:text-white/[0.05]
-            "
-            style={{
-              fontFamily: '"Playfair Display", serif',
-            }}
-          >
-            S
-          </span>
         </div>
 
         {/* ----------------------------------------------------------
             DESCRIPTION
         ---------------------------------------------------------- */}
 
-        <div
+        <p
           className="
-            mt-4
-            grid grid-cols-1
-            items-end
-            gap-4
+            max-w-[480px]
+            text-[13px]
+            leading-[1.75]
+            text-[#17392b]/80
 
-            sm:grid-cols-[1fr_auto]
+            sm:text-[14px]
+
+            dark:text-[#eee5d7]/80
           "
+          style={{
+            fontFamily: '"Poppins", sans-serif',
+          }}
         >
-          <p
-            className="
-              max-w-[440px]
-              text-[10px]
-              leading-[1.75]
-              text-[#17392b]/50
+          Create your private SAI Events account and bring your
+          celebration from first thought to beautifully managed
+          experience.
+        </p>
 
-              sm:text-[11px]
-
-              dark:text-[#eee5d7]/42
-            "
-            style={{
-              fontFamily: '"Poppins", sans-serif',
-            }}
-          >
-            Create your private SAI Events account and bring your
-            celebration from first thought to beautifully managed
-            experience.
-          </p>
-
-          <span
-            className="
-              hidden
-              text-[6px] font-semibold uppercase
-              tracking-[0.23em]
-              text-[#a17a34]/65
-
-              sm:block
-
-              dark:text-[#d2b56b]/55
-            "
-          >
-            Start something memorable
-          </span>
-        </div>
-
-        {/* ----------------------------------------------------------
-            FORM INTRO DIVIDER
-        ---------------------------------------------------------- */}
-
-        <div className="mt-5 flex items-center gap-3">
-          <span
-            className="
-              text-[6.5px] font-bold uppercase
-              tracking-[0.25em]
-              text-[#a17a34]
-
-              dark:text-[#d2b56b]
-            "
-          >
-            Your Details
-          </span>
-
-          <span
-            aria-hidden="true"
-            className="
-              h-px flex-1
-              bg-[#173d2c]/10
-              dark:bg-white/[0.08]
-            "
-          />
-
-          <Feather
-            className="
-              h-3 w-3
-              text-[#a17a34]/55
-              dark:text-[#d2b56b]/50
-            "
-          />
-
-          <span
-            aria-hidden="true"
-            className="
-              h-1.5 w-1.5
-              rotate-45
-              bg-[#a17a34]/55
-            "
-          />
-        </div>
+        <div className="mt-5 h-px w-full bg-[#173d2c]/10 dark:bg-white/[0.08]" />
       </motion.header>
 
       {/* ============================================================

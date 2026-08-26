@@ -13,6 +13,7 @@ import { LANDING_PAGE_CONFIG } from "@/constants/introConfig";
 import {
   ArrowUpRight,
   Check,
+  ChevronDown,
   Clock,
   Mail,
   MapPin,
@@ -424,14 +425,14 @@ export default function Contact() {
 
               <span
                 className="
-                  text-[8px]
+                  text-[11px]
                   font-bold
                   uppercase
-                  tracking-[0.32em]
+                  tracking-[0.24em]
 
-                  text-[#9b742f]/75
+                  text-[#9b742f]
 
-                  dark:text-[#d4af37]/65
+                  dark:text-[#d4af37]
                 "
               >
                 Get In Touch
@@ -1094,143 +1095,28 @@ export default function Contact() {
                 />
               </div>
 
-              {/* event type */}
+              {/* event type - custom luxury select */}
 
-              <div className="relative">
-                <label
-                  htmlFor="eventType"
-                  className="
-                    mb-3
-                    block
-
-                    text-[7px]
-                    font-bold
-                    uppercase
-                    tracking-[0.28em]
-
-                    text-[#143d2b]/40
-
-                    dark:text-white/30
-                  "
-                >
-                  Event Being Planned *
-                </label>
-
-                <select
-                  id="eventType"
-                  name="eventType"
-                  value={formData.eventType}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      eventType:
-                        e.target.value,
-                    })
-                  }
-                  className="
-                    w-full
-
-                    appearance-none
-
-                    border-0
-                    border-b
-                    border-[#143d2b]/20
-
-                    bg-transparent
-
-                    px-0
-                    py-3
-
-                    font-heading
-
-                    text-[16px]
-
-                    text-[#143d2b]
-
-                    outline-none
-
-                    transition-colors
-                    duration-300
-
-                    focus:border-[#9b742f]
-
-                    dark:border-white/15
-                    dark:text-[#eee5d7]
-                    dark:focus:border-[#d2b56b]
-                  "
-                  style={{
-                    fontFamily:
-                      '"Playfair Display", serif',
-                  }}
-                >
-                  <option
-                    value="Wedding"
-                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
-                  >
-                    Wedding
-                  </option>
-
-                  <option
-                    value="Corporate Event"
-                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
-                  >
-                    Corporate Event
-                  </option>
-
-                  <option
-                    value="Birthday"
-                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
-                  >
-                    Birthday
-                  </option>
-
-                  <option
-                    value="Engagement"
-                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
-                  >
-                    Engagement
-                  </option>
-
-                  <option
-                    value="Reception"
-                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
-                  >
-                    Reception
-                  </option>
-
-                  <option
-                    value="Private Event"
-                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
-                  >
-                    Private Event
-                  </option>
-
-                  <option
-                    value="Other"
-                    className="bg-[#f3eadf] text-[#143d2b] dark:bg-[#12140f] dark:text-[#eee5d7]"
-                  >
-                    Other
-                  </option>
-                </select>
-
-                <span
-                  className="
-                    pointer-events-none
-
-                    absolute
-                    bottom-[14px]
-                    right-1
-
-                    text-[10px]
-
-                    text-[#9b742f]
-
-                    dark:text-[#d2b56b]
-                  "
-                >
-                  ↓
-                </span>
-              </div>
+              <LuxuryCustomSelect
+                label="Event Being Planned"
+                value={formData.eventType}
+                options={[
+                  "Wedding",
+                  "Corporate Event",
+                  "Birthday",
+                  "Engagement",
+                  "Reception",
+                  "Private Event",
+                  "Other",
+                ]}
+                onChange={(val) =>
+                  setFormData({
+                    ...formData,
+                    eventType: val,
+                  })
+                }
+                required
+              />
 
               {/* message */}
 
@@ -1241,14 +1127,14 @@ export default function Contact() {
                     mb-3
                     block
 
-                    text-[7px]
+                    text-[11px]
                     font-bold
                     uppercase
-                    tracking-[0.28em]
+                    tracking-[0.24em]
 
-                    text-[#143d2b]/40
+                    text-[#143d2b]/80
 
-                    dark:text-white/30
+                    dark:text-[#eee5d7]/80
                   "
                 >
                   Tell Us About The Event *
@@ -1261,8 +1147,7 @@ export default function Contact() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      message:
-                        e.target.value,
+                      message: e.target.value,
                     })
                   }
                   required
@@ -1275,35 +1160,36 @@ export default function Contact() {
 
                     border-0
                     border-b
-                    border-[#143d2b]/20
+                    border-[#143d2b]/30
 
                     bg-transparent
 
                     px-0
                     py-3
 
-                    text-[12px]
+                    text-[14px]
                     leading-[1.8]
 
                     text-[#143d2b]
 
                     outline-none
 
-                    placeholder:text-[#143d2b]/25
+                    placeholder:text-[#143d2b]/45
 
                     transition-colors
                     duration-300
 
                     focus:border-[#9b742f]
 
-                    dark:border-white/15
-                    dark:text-[#eee5d7]
-                    dark:placeholder:text-white/20
+                    sm:text-[15px]
+
+                    dark:border-white/25
+                    dark:text-[#fffaf3]
+                    dark:placeholder:text-[#eee5d7]/40
                     dark:focus:border-[#d2b56b]
                   "
                   style={{
-                    fontFamily:
-                      '"Poppins", sans-serif',
+                    fontFamily: '"Poppins", sans-serif',
                   }}
                 />
               </div>
@@ -1326,14 +1212,16 @@ export default function Contact() {
               >
                 <p
                   className="
-                    max-w-[310px]
+                    max-w-[340px]
 
-                    text-[9px]
+                    text-[11px]
                     leading-[1.7]
 
-                    text-[#143d2b]/30
+                    text-[#143d2b]/60
 
-                    dark:text-white/22
+                    sm:text-[12px]
+
+                    dark:text-[#eee5d7]/60
                   "
                 >
                   By submitting this enquiry,
@@ -1365,7 +1253,7 @@ export default function Contact() {
                     group
 
                     flex
-                    min-w-[190px]
+                    min-w-[200px]
 
                     cursor-pointer
 
@@ -1378,10 +1266,10 @@ export default function Contact() {
                     px-7
                     py-4
 
-                    text-[8px]
+                    text-xs
                     font-bold
                     uppercase
-                    tracking-[0.22em]
+                    tracking-[0.18em]
 
                     text-[#f7f0e6]
 
@@ -1489,18 +1377,18 @@ function EditorialInput({
           mb-3
           block
 
-          text-[7px]
+          text-[11px]
           font-bold
           uppercase
-          tracking-[0.28em]
+          tracking-[0.24em]
 
-          text-[#143d2b]/40
+          text-[#143d2b]/80
 
           transition-colors
 
           group-focus-within:text-[#9b742f]
 
-          dark:text-white/30
+          dark:text-[#eee5d7]/80
           dark:group-focus-within:text-[#d2b56b]
         "
       >
@@ -1522,7 +1410,7 @@ function EditorialInput({
 
           border-0
           border-b
-          border-[#143d2b]/20
+          border-[#143d2b]/30
 
           bg-transparent
 
@@ -1532,6 +1420,7 @@ function EditorialInput({
           font-heading
 
           text-[16px]
+          sm:text-[18px]
 
           text-[#143d2b]
 
@@ -1542,8 +1431,8 @@ function EditorialInput({
 
           focus:border-[#9b742f]
 
-          dark:border-white/15
-          dark:text-[#eee5d7]
+          dark:border-white/25
+          dark:text-[#fffaf3]
           dark:focus:border-[#d2b56b]
         "
         style={{
@@ -1551,6 +1440,221 @@ function EditorialInput({
             '"Playfair Display", serif',
         }}
       />
+    </div>
+  );
+}
+
+/* ======================================================================== */
+/* LUXURY CUSTOM SELECT                                                     */
+/* ======================================================================== */
+
+function LuxuryCustomSelect({
+  label,
+  value,
+  options,
+  onChange,
+  required = false,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (val: string) => void;
+  required?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="group relative">
+      <label
+        className="
+          mb-3
+          block
+
+          text-[11px]
+          font-bold
+          uppercase
+          tracking-[0.24em]
+
+          text-[#143d2b]/80
+
+          transition-colors
+
+          group-focus-within:text-[#9b742f]
+
+          dark:text-[#eee5d7]/80
+          dark:group-focus-within:text-[#d2b56b]
+        "
+      >
+        {label}
+        {required && " *"}
+      </label>
+
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="
+          flex
+          w-full
+          items-center
+          justify-between
+
+          border-0
+          border-b
+          border-[#143d2b]/30
+
+          bg-transparent
+
+          px-0
+          py-3
+
+          text-left
+          font-heading
+
+          text-[16px]
+          sm:text-[18px]
+
+          text-[#143d2b]
+
+          outline-none
+
+          transition-colors
+          duration-300
+
+          focus:border-[#9b742f]
+
+          dark:border-white/25
+          dark:text-[#fffaf3]
+          dark:focus:border-[#d2b56b]
+        "
+        style={{
+          fontFamily: '"Playfair Display", serif',
+        }}
+      >
+        <span>{value || "Select Event"}</span>
+        <ChevronDown
+          className={`
+            h-4
+            w-4
+            text-[#9b742f]
+            transition-transform
+            duration-300
+
+            dark:text-[#d2b56b]
+            ${isOpen ? "rotate-180" : ""}
+          `}
+        />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 4, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="
+              absolute
+              left-0
+              right-0
+              top-full
+              z-50
+
+              overflow-hidden
+
+              border
+              border-[#9b742f]/35
+              bg-[#f7f0e6]
+
+              py-1.5
+
+              shadow-[0_20px_50px_rgba(20,61,43,0.15)]
+              backdrop-blur-xl
+
+              dark:border-[#d2b56b]/35
+              dark:bg-[#181b16]
+              dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
+            "
+          >
+            {options.map((opt) => {
+              const isSelected = value === opt;
+
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt);
+                    setIsOpen(false);
+                  }}
+                  className={`
+                    flex
+                    w-full
+                    items-center
+                    justify-between
+
+                    px-5
+                    py-3
+
+                    text-left
+                    font-heading
+
+                    text-[15px]
+                    sm:text-[16px]
+
+                    transition-colors
+                    duration-200
+
+                    ${
+                      isSelected
+                        ? `
+                          bg-[#9b742f]/15
+                          font-semibold
+                          text-[#9b742f]
+
+                          dark:bg-[#d2b56b]/20
+                          dark:text-[#d2b56b]
+                        `
+                        : `
+                          text-[#143d2b]/80
+
+                          hover:bg-[#9b742f]/10
+                          hover:text-[#143d2b]
+
+                          dark:text-[#eee5d7]/80
+                          dark:hover:bg-white/[0.08]
+                          dark:hover:text-[#eee5d7]
+                        `
+                    }
+                  `}
+                  style={{
+                    fontFamily: '"Playfair Display", serif',
+                  }}
+                >
+                  <span>{opt}</span>
+
+                  {isSelected && (
+                    <Check className="h-4 w-4 text-[#9b742f] dark:text-[#d2b56b]" />
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

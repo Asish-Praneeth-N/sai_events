@@ -300,10 +300,10 @@ export default function Testimonials() {
 
               <span
                 className="
-                  text-[8px]
+                  text-[11px]
                   font-bold
                   uppercase
-                  tracking-[0.34em]
+                  tracking-[0.24em]
                   text-[#9b742f]
 
                   dark:text-[#d2b56b]

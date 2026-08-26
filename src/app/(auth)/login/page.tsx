@@ -38,60 +38,15 @@ export default function LoginPage() {
           ease: EASE,
         }}
       >
-        {/* Eyebrow */}
-
-        <div
-          className="
-            mb-4
-            flex items-center
-            justify-between
-            gap-4
-          "
-        >
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="h-px w-7 flex-shrink-0 bg-[#173d2c]/35 dark:bg-[#d2b56b]/40" />
-
-            <Sparkles className="h-2.5 w-2.5 text-[#a17a34] dark:text-[#d2b56b]" />
-
-            <span
-              className="
-                text-[7px] font-bold uppercase
-                tracking-[0.28em]
-                text-[#173d2c]/55
-                dark:text-[#d9c88d]/65
-              "
-            >
-              Client Access
-            </span>
-          </div>
-
-          <span
-            className="
-              text-[6px] font-semibold uppercase
-              tracking-[0.22em]
-              text-[#173d2c]/22
-              dark:text-white/18
-            "
-          >
-            01 / SIGN IN
-          </span>
-        </div>
-
         {/* Main title row */}
 
-        <div
-          className="
-            flex items-end
-            justify-between
-            gap-6
-          "
-        >
+        <div className="mb-3 flex items-center justify-between">
           <h1
             className="
               font-heading
               text-[clamp(2.85rem,7vw,4.65rem)]
               font-normal
-              leading-[0.86]
+              leading-[1.02]
               tracking-[-0.055em]
               text-[#143d2b]
               dark:text-[#f0e8db]
@@ -111,83 +66,26 @@ export default function LoginPage() {
               back.
             </span>
           </h1>
-
-          <span
-            aria-hidden="true"
-            className="
-              mb-1 hidden
-              font-heading
-              text-3xl italic
-              text-[#173d2c]/[0.08]
-              sm:block
-              dark:text-white/[0.05]
-            "
-            style={{
-              fontFamily: '"Playfair Display", serif',
-            }}
-          >
-            S
-          </span>
         </div>
 
-        <div
+        <p
           className="
-            mt-4
-            grid grid-cols-1
-            items-end
-            gap-4
-            sm:grid-cols-[1fr_auto]
+            max-w-[440px]
+            text-[13px]
+            leading-[1.75]
+            text-[#17392b]/80
+            sm:text-[14px]
+            dark:text-[#eee5d7]/80
           "
+          style={{
+            fontFamily: '"Poppins", sans-serif',
+          }}
         >
-          <p
-            className="
-              max-w-[430px]
-              text-[10px]
-              leading-[1.75]
-              text-[#17392b]/50
-              sm:text-[11px]
-              dark:text-[#eee5d7]/42
-            "
-            style={{
-              fontFamily: '"Poppins", sans-serif',
-            }}
-          >
-            Continue your event journey and pick up exactly
-            where you left off.
-          </p>
+          Continue your event journey and pick up exactly
+          where you left off.
+        </p>
 
-          <span
-            className="
-              hidden
-              text-[6px] font-semibold uppercase
-              tracking-[0.23em]
-              text-[#a17a34]/65
-              sm:block
-              dark:text-[#d2b56b]/55
-            "
-          >
-            Welcome home
-          </span>
-        </div>
-
-        {/* Editorial divider */}
-
-        <div className="mt-5 flex items-center gap-3">
-          <span
-            className="
-              text-[6.5px] font-bold uppercase
-              tracking-[0.25em]
-              text-[#a17a34]
-              dark:text-[#d2b56b]
-            "
-          >
-            Credentials
-          </span>
-
-          <span className="h-px flex-1 bg-[#173d2c]/10 dark:bg-white/[0.08]" />
-
-          <span className="h-1.5 w-1.5 rotate-45 bg-[#a17a34]/55" />
-        </div>
+        <div className="mt-5 h-px w-full bg-[#173d2c]/10 dark:bg-white/[0.08]" />
       </motion.header>
 
       {/* ================================================================ */}

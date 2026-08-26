@@ -196,9 +196,9 @@ export default function RoleSwitcher({
                 <span
                   className="
                     block truncate
-                    text-[8px] font-bold uppercase
-                    tracking-[0.18em]
-                    sm:text-[8.5px]
+                    text-[12px] font-bold uppercase
+                    tracking-[0.14em]
+                    sm:text-[13px]
                   "
                 >
                   {content.label}
@@ -207,21 +207,21 @@ export default function RoleSwitcher({
                 <span
                   className={`
                     mt-0.5
-                    hidden truncate
-                    text-[6px]
+                    block truncate
+                    text-[10px]
                     font-medium
-                    tracking-[0.04em]
-                    sm:block
+                    tracking-[0.02em]
+                    sm:text-[11px]
 
                     ${
                       active
                         ? `
-                          text-white/45
-                          dark:text-[#173d2c]/50
+                          text-white/80
+                          dark:text-[#161812]/80
                         `
                         : `
-                          text-[#173d2c]/30
-                          dark:text-white/25
+                          text-[#173d2c]/65
+                          dark:text-[#eee5d7]/65
                         `
                     }
                   `}
